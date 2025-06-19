@@ -1,5 +1,5 @@
 import React from "react";
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "../scenes/authen/Login";
 import ProtectAdmin from "./ProtectAdmin";
 import ProtectUser from "./ProtectUser";
@@ -31,7 +31,15 @@ const router = createBrowserRouter([
 ]);
 
 const AppRoutes = () => {
-  return <div>AppRoutes</div>;
+  return (
+    <RouterProvider
+    router={router}
+    future={{
+      v7_startTransition:true,
+      v7_relativeSplatPath: true,
+    }}
+    />
+  )
 };
 
 export default AppRoutes;
