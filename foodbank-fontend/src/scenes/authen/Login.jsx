@@ -19,25 +19,23 @@ import { Formik } from "formik";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { Link as RouterLink } from "react-router-dom";
+import useFoodBankStorage from "../../zustand/foodbank-storage";
 
 const Login = () => {
-
   const navigate = useNavigate();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openSnackbarerror, setOpenSnackbarerror] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const actionLogin = useFoodBankStorage((state)=>state.actionLogin)
 
   const handleFormSubmit = async (values) => {
     try {
       const res = await actionLogin(values);
-      const role = res.data.payload.role;
+      console.log(res)
+      const role = res?.data?.payload?.role;
       roleRedirect(role);
-      if (res && res.data) {
-        setSnackbarMessage(res.data.message || "Login successful!"); // Use API response message
-        setOpenSnackbar(true);
-      }
     } catch (err) {
       console.log(err);
       setSnackbarMessage(err.response?.data?.message || "Can't Login!!"); // Use error message from API
