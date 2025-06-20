@@ -18,7 +18,7 @@ const router = createBrowserRouter([
     element: <ProtectAdmin element={<LaoyoutAdmin />} />,
     children: [
       { index: true, element: <Dashboard /> },
-      { index: "team", element: <Team /> },
+      { path: "team", element: <Team /> },
     ],
   },
   {

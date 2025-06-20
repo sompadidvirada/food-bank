@@ -18,7 +18,8 @@ exports.authCheck = async (req, res, next) => {
         phonenumber: req.user.phonenumber,
       },
     });
-    if (!user.status) {
+
+    if (!user.aviable) {
       return res.status(400).json({ message: `This account can't access` });
     }
     next();

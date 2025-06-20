@@ -1,40 +1,40 @@
-import React from 'react'
-import { useState } from 'react'
-import useFoodBankStorage from '../zustand/foodbank-storage'
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
-import { currectAdmin } from '../api/authen'
+import React from "react";
+import { useState } from "react";
+import useFoodBankStorage from "../zustand/foodbank-storage";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { currectAdmin } from "../api/authen";
 
 const ProtectAdmin = ({ element }) => {
+  const [ok, setOk] = useState(null);
+  const user = useFoodBankStorage((state) => state.user);
+  const token = useFoodBankStorage((state) => state.token);
+  const navigate = useNavigate();
 
-  const [ok, setOk] = useState(null)
-  const user = useFoodBankStorage((state)=>state.user)
-  const token = useFoodBankStorage((state)=>state.token)
-  const navigate = useNavigate()
-
-  useEffect(()=> {
-    if(user && token) {
+  useEffect(() => {
+    if (user && token) {
       currectAdmin(token)
-      .then(()=> setOk(true))
-      .catch(()=> setOk(false))
+        .then(() => setOk(true))
+        .catch((err) => {
+          console.log(err);
+          setOk(false);
+        });
     } else {
-      setOk(false)
+      setOk(false);
     }
-  },[user,token])
-
+  }, [user, token]);
 
   //Redirect if not Allow
 
-  useEffect(() =>{
-    if(ok === false) {
-      navigate("/")
+  useEffect(() => {
+    if (ok === false) {
+      navigate("/");
     }
-  },[ok, navigate])
+  }, [ok, navigate]);
 
-  if (ok === null) return null
+  if (ok === null) return null;
 
+  return element;
+};
 
-  return element
-}
-
-export default ProtectAdmin
+export default ProtectAdmin;

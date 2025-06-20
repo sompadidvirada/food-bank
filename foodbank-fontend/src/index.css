@@ -54,3 +54,8 @@ body,
   position: absolute !important;
   pointer-events: none;
 }
+
+.Toastify__toast {
+  font-family: 'Noto Sans Lao', sans-serif;
+  font-size: 16px; /* optional */
+}
