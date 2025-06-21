@@ -79,3 +79,26 @@ exports.updateStatusStaff = async (req, res) => {
     return res.status(500).json({ message: `server error` });
   }
 };
+
+exports.updateRoleStaff = async (req,res) => {
+  try {
+    const {id}= req.params
+    const {role} = req.body
+
+    if(!id || !role) {
+      return res.status(400).json({message: `Can't update role with emty value.`})
+    }
+
+    const respone = await prisma.staff.update({
+      where: {
+        id: Number(id)
+      }, data : {
+        role: role
+      }
+    })
+    res.send(respone)
+  }catch(err) {
+    console.log(err)
+    return res.status(500).json({ message : `server error.`})
+  }
+}

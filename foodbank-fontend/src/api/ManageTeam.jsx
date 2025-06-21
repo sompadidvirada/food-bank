@@ -24,11 +24,28 @@ export const updateBranchStaffInfo = (token, branchId, id) => {
 };
 
 export const updateStatusStaff = (id, status, token) => {
-  return axios.put(`${URL}/updatestatusstaff/${id}`, {
-    status: status
-  }, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  return axios.put(
+    `${URL}/updatestatusstaff/${id}`,
+    {
+      status: status,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  })
-}
+  );
+};
+export const updateRoleStaff = (id, role, token) => {
+  return axios.put(
+    `${URL}/updaterolestaff/${id}`,
+    {
+      role: role,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};

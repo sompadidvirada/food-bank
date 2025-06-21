@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, useTheme } from "@mui/material";
-import { tokens } from "../theme";
 import ProgressCircle from "./ProgressCircle";
+import { tokens } from "../../theme";
 
 const StatusBox = ({ title, subtitle, icon, progress, increase }) => {
   const theme = useTheme();
