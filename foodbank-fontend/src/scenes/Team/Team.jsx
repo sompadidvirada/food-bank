@@ -13,14 +13,10 @@ import {
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
-import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
 import SearchIcon from "@mui/icons-material/Search";
 import Header from "../component/Header";
-import { mockDataTeam } from "../../data/mockData";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import {
   getAllStaffInfo,
@@ -603,7 +599,7 @@ const Team = () => {
             autoFocus
             variant="contained"
             color="success"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
           >
             ຢືນຢັນ
           </Button>
@@ -611,7 +607,7 @@ const Team = () => {
             onClick={handleCloseEditRole}
             variant="contained"
             color="error"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
           >
             ຍົກເລີກ
           </Button>

@@ -7,6 +7,7 @@ import LaoyoutAdmin from "../scenes/layout/LaoyoutAdmin";
 import Dashboard from "../scenes/Dashboard/Dashboard";
 import Team from "../scenes/Team/Team";
 import LayoutUser from "../scenes/layout/LayoutUser";
+import OpenStreetMap from "../scenes/Map/OpenStreetMap";
 
 const router = createBrowserRouter([
   {
@@ -19,6 +20,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: "team", element: <Team /> },
+      { path: "map", element: <OpenStreetMap /> },
     ],
   },
   {
