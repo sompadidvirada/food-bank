@@ -7,6 +7,7 @@ const FoodBankStorage = (set, get) => ({
   user: null,
   token: null,
   branchs: null,
+  storage: {},
   actionLogin: async (form) => {
     const res = await Login(form);
     set({
@@ -18,10 +19,10 @@ const FoodBankStorage = (set, get) => ({
   getBrnachs: async () => {
     const token = get().token;
     try {
-        const res = await getAllBranch(token)
-        set({
-            branchs: res.data
-        })
+      const res = await getAllBranch(token);
+      set({
+        branchs: res.data,
+      });
     } catch (err) {
       if (err.respone?.status === 401) {
         console.warn("Token expired");
@@ -30,6 +31,14 @@ const FoodBankStorage = (set, get) => ({
       }
     }
   },
+  setValue: (key, value) => {
+    set((state) => ({
+      storage: { ...state.storage, [key]: value },
+    }));
+  },
+
+  // get value by key
+  getValue: (key) => get().storage[key],
 });
 
 const usePersist = {

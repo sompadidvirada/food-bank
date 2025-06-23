@@ -3,11 +3,14 @@ import React, { useEffect, useRef } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import L from "leaflet";
+import useFoodBankStorage from "../../zustand/foodbank-storage";
 
 const OpenStreetMap = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const mapRef = useRef(null); // ✅ Use one ref
+  const storage = useFoodBankStorage((state)=>state.storage)
+  const setValue = useFoodBankStorage((state)=>state.setValue)
 
   useEffect(() => {
     mapRef.current = L.map("map").setView([51.505, -0.09], 13);
@@ -19,6 +22,10 @@ const OpenStreetMap = () => {
       })
       .addTo(mapRef.current);
   }, []);
+
+  useEffect(()=>{
+
+  },[])
   return (
     <Box m="20px">
       <Header title="ແຜນທີ" subtitle="ລາຍລະອຽດແຜນທີ" />
