@@ -49,3 +49,11 @@ export const updateRoleStaff = (id, role, token) => {
     }
   );
 };
+
+export const updateMainSt = (id, form, token) => {
+  return axios.put(`${URL}/updateuser/${id}`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+  });
+}

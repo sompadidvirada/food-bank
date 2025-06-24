@@ -1,23 +1,17 @@
 import React from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
-import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
-import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
-import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import { Box, Dialog, DialogContent, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
+import Editprofile from "./component/Editprofile";
+const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -43,6 +37,19 @@ const SideBarAdmin = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const user = useFoodBankStorage((state)=>state.user)
+  const [openImageModal, setOpenImageModal] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+
+
+  const handleImageClick = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
+  // Function to close the image modal
+  const handleCloseImageModal = () => {
+    setOpenImageModal(false);
+    setSelectedImageUrl(null);
+  };
   return (
     <Box
       sx={{
@@ -95,11 +102,12 @@ const SideBarAdmin = () => {
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
+                onClick={()=>handleImageClick(`${URL}/staffimage/${user?.image || "public/staff_porfile/default-image.JPG"}`)}
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`./alexandar.png`}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
+                  src={`${URL}/staffimage/${user?.image || "public/staff_porfile/default-image.JPG"}`}
+                  style={{ cursor: "pointer", borderRadius: "50%", objectFit: "cover" }}
                 />
               </Box>
               <Box textAlign="center">
@@ -111,8 +119,8 @@ const SideBarAdmin = () => {
                 >
                   {user?.firstname} {user?.lastname}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {user?.role}
+                <Typography variant="h5" color={colors.greenAccent[500]} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  {user?.role} <Editprofile />
                 </Typography>
               </Box>
             </Box>
@@ -160,6 +168,40 @@ const SideBarAdmin = () => {
           </Box>
         </Menu>
       </ProSidebar>
+
+            {/** image modal */}
+      <Dialog
+        open={openImageModal}
+        onClose={handleCloseImageModal}
+        maxWidth="md"
+      >
+        <DialogContent sx={{ position: "relative", padding: "0" }}>
+          <IconButton
+            onClick={handleCloseImageModal}
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              backgroundColor: "white",
+              "&:hover": { backgroundColor: "gray" },
+            }}
+          >
+            <CloseIcon sx={{ color: "black" }} />
+          </IconButton>
+          {selectedImageUrl && (
+            <img
+              src={selectedImageUrl || "nigler.png"}
+              alt="Large Preview"
+              style={{
+                width: "100%",
+                height: "800px",
+                maxHeight: "90vh",
+                overflow: "hidden",
+              }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </Box>
   );
 };

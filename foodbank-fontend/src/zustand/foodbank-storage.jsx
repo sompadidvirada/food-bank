@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { Login } from "../api/authen";
 import { getAllBranch } from "../api/branch";
+import { updateMainSt } from "../api/ManageTeam";
 
 const FoodBankStorage = (set, get) => ({
   user: null,
@@ -39,6 +40,27 @@ const FoodBankStorage = (set, get) => ({
 
   // get value by key
   getValue: (key) => get().storage[key],
+  updateUser: async (form) => {
+    // Accept form as a parameter
+    const token = get().token;
+    const user = get().user;
+
+    if (!user) {
+      console.error("No user logged in.");
+      return;
+    }
+
+    try {
+      const res = await updateMainSt(user.id, form, token);
+      set({
+        user: res.data.payload,
+        token: res.data.token, // Update token if needed
+      });
+      return res;
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  }
 });
 
 const usePersist = {

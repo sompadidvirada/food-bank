@@ -1,4 +1,8 @@
 const prisma = require("../config/prisma");
+const jwt = require("jsonwebtoken");
+const fs = require('fs');
+const path = require('path');
+
 
 exports.getStaffInfos = async (req, res) => {
   try {
@@ -80,25 +84,104 @@ exports.updateStatusStaff = async (req, res) => {
   }
 };
 
-exports.updateRoleStaff = async (req,res) => {
+exports.updateRoleStaff = async (req, res) => {
   try {
-    const {id}= req.params
-    const {role} = req.body
+    const { id } = req.params
+    const { role } = req.body
 
-    if(!id || !role) {
-      return res.status(400).json({message: `Can't update role with emty value.`})
+    if (!id || !role) {
+      return res.status(400).json({ message: `Can't update role with emty value.` })
     }
 
     const respone = await prisma.staff.update({
       where: {
         id: Number(id)
-      }, data : {
+      }, data: {
         role: role
       }
     })
     res.send(respone)
-  }catch(err) {
+  } catch (err) {
     console.log(err)
-    return res.status(500).json({ message : `server error.`})
+    return res.status(500).json({ message: `server error.` })
+  }
+}
+
+exports.updateMainStaff = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { firstname, lastname, phonenumber, password } = req.body;
+
+    if (!id || !firstname || !lastname || !phonenumber) {
+      return res.status(400).json({ message: `Invalid input data.` });
+    }
+
+    const exitingUser = await prisma.staff.findUnique({
+      where: { id: Number(id) }
+    });
+
+    if (!exitingUser) {
+      return res.status(404).json({ message: `Staff not found.` });
+    }
+
+    const phoneCheck = await prisma.staff.findFirst({
+      where: {
+        phonenumber: phonenumber,
+        id: { not: Number(id) },
+      },
+    });
+
+    if (phoneCheck) {
+      return res.status(400).json({ message: `Other User Already Use This Phone number.` });
+    }
+
+
+    const updateData = { firstname, lastname };
+    if (password || password !== "") {
+      updateData.password = password;
+    }
+    if (exitingUser.phonenumber !== phonenumber) {
+      updateData.phonenumber = phonenumber;
+    }
+
+    // If there's an image uploaded, delete the old one and update with new one
+    if (req.file && req.file.filename) {
+      if (exitingUser.image) {
+        const oldImagePath = path.join(__dirname, '../public/staff_porfile', exitingUser.image);
+        try {
+          fs.unlinkSync(oldImagePath); // Synchronously delete the old image
+          console.log('Old image deleted successfully.');
+        } catch (err) {
+          console.error('Error deleting old image:', err.message);
+        }
+      }
+
+      updateData.image = req.file.filename;
+    }
+
+    const updatedStaff = await prisma.staff.update({
+      where: { id: Number(id) },
+      data: updateData,
+    });
+
+    const payload = {
+      id: updatedStaff.id,
+      firstname: updatedStaff.firstname,
+      lastname: updatedStaff.lastname,
+      phonenumber: updatedStaff.phonenumber,
+      role: updatedStaff.role,
+      status: updatedStaff.aviable,
+      image: updatedStaff.image,
+    };
+
+    jwt.sign(payload, process.env.SECRET, { expiresIn: "1d" }, (err, token) => {
+      if (err) {
+        return res.status(500).json({ message: "Token error." });
+      }
+      res.send({ payload, token });
+    });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: `Server error.` });
   }
 }
