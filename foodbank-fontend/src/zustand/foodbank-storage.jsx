@@ -8,7 +8,6 @@ const FoodBankStorage = (set, get) => ({
   user: null,
   token: null,
   branchs: null,
-  storage: {},
   actionLogin: async (form) => {
     const res = await Login(form);
     set({
@@ -32,16 +31,8 @@ const FoodBankStorage = (set, get) => ({
       }
     }
   },
-  setValue: (key, value) => {
-    set((state) => ({
-      storage: { ...state.storage, [key]: value },
-    }));
-  },
-
-  // get value by key
-  getValue: (key) => get().storage[key],
+  setBranchs: (newBranches) => set({ branchs: newBranches }),
   updateUser: async (form) => {
-    // Accept form as a parameter
     const token = get().token;
     const user = get().user;
 
@@ -54,7 +45,7 @@ const FoodBankStorage = (set, get) => ({
       const res = await updateMainSt(user.id, form, token);
       set({
         user: res.data.payload,
-        token: res.data.token, // Update token if needed
+        token: res.data.token,
       });
       return res;
     } catch (error) {

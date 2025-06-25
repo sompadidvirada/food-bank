@@ -8,3 +8,11 @@ export const getAllBranch = (token) => {
         }
     })
 }
+export const updateBranchLocation = (id, form, token) => {
+    return axios.put(`${URL}/updatebranchlocation/${id}`,
+        form, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

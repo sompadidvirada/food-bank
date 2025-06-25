@@ -18,7 +18,7 @@ model staff {
   id          Int      @id @unique @default(autoincrement())
   firstname   String
   lastname    String
-  password    String? @default("1234")
+  password    String?  @default("1234")
   phonenumber String   @unique
   role        String   @default("staff")
   birdDate    DateTime
@@ -31,6 +31,9 @@ model staff {
 model branch {
   id         Int     @id @unique @default(autoincrement())
   branchname String
+  latitude   Float   @default(17.97790669567272) // Add this
+  longitude  Float   @default(102.62220237805069) // Add this
   staff      staff[]
+  province   String  @default("Vientiane Prefecture")
   aviable    Boolean @default(true)
 }

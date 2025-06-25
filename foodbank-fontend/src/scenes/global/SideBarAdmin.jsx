@@ -138,6 +138,7 @@ const SideBarAdmin = () => {
 
             <Typography
               variant="h6"
+              display={isCollapsed ? "none" : "block"}
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px", fontFamily:"Noto Sans Lao" }}
             >
@@ -152,6 +153,7 @@ const SideBarAdmin = () => {
             />
             <Typography
               variant="h6"
+              display={isCollapsed ? "none" : "block"}
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px", fontFamily:"Noto Sans Lao" }}
             >
