@@ -63,3 +63,7 @@ body,
 #map { height: 80%;
       width: 80%;
 }
+
+.leaflet-routing-container {
+  display: none !important;
+}

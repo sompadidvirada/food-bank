@@ -13,14 +13,15 @@ import NearMeIcon from '@mui/icons-material/NearMe';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import { updateBranchLocation } from "../../api/branch";
 import { toast, ToastContainer } from "react-toastify";
+import MinorCrashIcon from '@mui/icons-material/MinorCrash';
+import "leaflet-routing-machine";
 
 const OpenStreetMap = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const token = useFoodBankStorage((state)=>state.token)
+  const token = useFoodBankStorage((state) => state.token)
   const mapContainerRef = useRef(null); // For the div
   const mapRef = useRef(null);          // For the Leaflet map instance
-  const newBranchMarkerRef = useRef(null);
   const { position: location, fetchLocation } = useGeolocation();
   const userMarkerRef = useRef();
   const branch = useFoodBankStorage((state) => state.branchs)
@@ -29,17 +30,17 @@ const OpenStreetMap = () => {
   const [branchName, setBranchName] = useState("");
   const [province, setProvince] = useState('Vientiane Prefecture');
   const [userFocus, setUserFocus] = useState(true);
-  const [userPosition, setUserPosition] = useLocalStorage("USER_MARKER", { latitude: 0, longitude: 0 });
-  const products = ["Product A", "Product B", "Product C"];
-  const [firstLoad, setFirstLoad] = useState(true);
   const filteredBranches = branch?.filter((item) => item.province === province);
   const [showUserMarker, setShowUserMarker] = useState(false);
   const [enableClick, setEnableClick] = useState(false)
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const branchMarkersRef = useRef({});
-  const [updatedBranchData, setUpdatedBranchData] = useState(null);
-
-
+  const [distancePoints, setDistancePoints] = useState([]);
+  const [routingControl, setRoutingControl] = useState(null);
+  const [customRouteInfo, setCustomRouteInfo] = useState(null);
+  const [isDistanceMode, setIsDistanceMode] = useState(false);
+  const [selectedBranches, setSelectedBranches] = useState([]);
+  
 
 
 
@@ -111,16 +112,13 @@ const OpenStreetMap = () => {
 
         // 👉 Prepare form data
         const updatedBranch = updatedBranches.find(item => item.id === selectedBranchId);
-        setUpdatedBranchData(updatedBranch);
 
-        console.log("Prepared data to send:", updatedBranch.id, updatedBranch.latitude, updatedBranch.longitude);
-
-        try{
+        try {
           await updateBranchLocation(updatedBranch.id, { latitude: lat, longitude: lng }, token);
           toast.success("ອັປເດດສຳເລັດ.")
-        }catch(err) {
+        } catch (err) {
           console.log(err)
-          return 
+          return
         }
 
         setSelectedBranchId(null); // Reset
@@ -165,12 +163,61 @@ const OpenStreetMap = () => {
   };
 
 
-  const handleBranchClick = (latitude, longitude) => {
-    if (mapRef.current) {
-      mapRef.current.flyTo([latitude, longitude], 17);
-      setUserFocus(false); // 👉 Stop focusing on user's location
+  const handleBranchClick = (latitude, longitude, branchId) => {
+    if (!isDistanceMode) {
+      if (mapRef.current) {
+        mapRef.current.flyTo([latitude, longitude], 17);
+        setUserFocus(false);
+      }
+      return;
+    }
+
+    if (selectedBranches.length < 2 && !selectedBranches.some(b => b.id === branchId)) {
+      const newSelection = [...selectedBranches, { id: branchId, lat: latitude, lng: longitude }];
+      setSelectedBranches(newSelection);
+
+      if (newSelection.length === 2) {
+        const start = L.latLng(newSelection[0].lat, newSelection[0].lng);
+        const end = L.latLng(newSelection[1].lat, newSelection[1].lng);
+
+        mapRef.current.fitBounds([start, end], { padding: [50, 50] });
+
+        if (routingControl) {
+          mapRef.current.removeControl(routingControl);
+          const oldContainer = document.querySelector('.leaflet-routing-container');
+          if (oldContainer) oldContainer.remove();
+        }
+
+        const newRoute = L.Routing.control({
+          waypoints: [start, end],
+          routeWhileDragging: false,
+          lineOptions: { styles: [{ color: 'blue', weight: 4 }] },
+          show: false,
+          addWaypoints: false,
+          createMarker: () => { return null; }
+        }).addTo(mapRef.current);
+
+        newRoute.on('routesfound', function (e) {
+          const route = e.routes[0];
+          const distanceInKm = (route.summary.totalDistance / 1000).toFixed(2);
+          const durationInMin = Math.ceil(route.summary.totalTime / 60);
+
+          toast.info(`ໄລຍະທາງ: ${distanceInKm} km, ໃຊ້ເວລາ: ${durationInMin} ນາທີ`);
+
+          setCustomRouteInfo({
+            distance: distanceInKm,
+            duration: durationInMin
+          });
+        });
+
+        setRoutingControl(newRoute);
+        setIsPanelOpen(false)
+      }
     }
   };
+
+
+
 
   useEffect(() => {
     if (mapRef.current && location.latitude && location.longitude && showUserMarker) {
@@ -320,11 +367,16 @@ const OpenStreetMap = () => {
                       {filteredBranches.map((branchItem) => {
                         return (
                           <ListItemButton
-                            sx={{ display: 'flex', justifyContent: 'space-between' }}
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              backgroundColor: selectedBranches.some(b => b.id === branchItem?.id) ? colors.greenAccent[700] : 'transparent',
+                            }}
                             key={branchItem?.id}
                           >
-                            <ListItemIcon onClick={() => handleBranchClick(branchItem.latitude, branchItem.longitude)} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                              <LocationOnIcon /><ListItemText primary={branchItem?.branchname}
+                            <ListItemIcon onClick={() => handleBranchClick(branchItem.latitude, branchItem.longitude, branchItem.id)} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <LocationOnIcon />
+                              <ListItemText primary={branchItem?.branchname}
                                 primaryTypographyProps={{ fontFamily: 'Noto Sans Lao', color: branchItem.aviable ? colors.grey[100] : colors.redAccent[500] }} />
                             </ListItemIcon>
 
@@ -340,6 +392,7 @@ const OpenStreetMap = () => {
                               <LocalOfferIcon className="hover-icon" sx={{ color: colors.grey[100] }} />
                             </ListItemIcon>
                           </ListItemButton>
+
                         );
                       })}
                     </List>
@@ -351,13 +404,7 @@ const OpenStreetMap = () => {
 
           {/* Tab 2: Product List */}
           {selectedTab === 1 && (
-            <List>
-              {products.map((product, index) => (
-                <ListItem key={index} button>
-                  <ListItemText primary={product} />
-                </ListItem>
-              ))}
-            </List>
+            ""
           )}
 
           {/* Tab 3: Input Form */}
@@ -412,6 +459,56 @@ const OpenStreetMap = () => {
         >
           <NearMeIcon sx={{ fontSize: 30, color: "black" }} />
         </IconButton>
+
+        {/** calculate maile button */}
+
+        <IconButton
+          variant="contained"
+          sx={{ position: 'absolute', bottom: 26, right: 80, zIndex: 999 }}
+          onClick={() => {
+            if (routingControl) {
+              mapRef.current.removeControl(routingControl);
+              const oldContainer = document.querySelector('.leaflet-routing-container');
+              if (oldContainer) oldContainer.remove();
+              setRoutingControl(null);
+              setSelectedBranches([]);
+              setCustomRouteInfo(null);
+              setIsDistanceMode(false);
+              return;
+            }
+            setIsPanelOpen(true)
+            setIsDistanceMode(true);
+            toast.info("ເລືອກ 2 ສາຂາທີ່ຈະຄຳນວນໄລຍະທາງ");
+          }}
+        >
+          <MinorCrashIcon sx={{ fontSize: 30, color: isDistanceMode ? "red" : "black" }} />
+        </IconButton>
+
+
+
+        {customRouteInfo && (
+          <Box
+            sx={{
+              position: 'absolute',
+              bottom: 100,
+              right: 20,
+              backgroundColor: 'white',
+              padding: '10px 15px',
+              borderRadius: '8px',
+              boxShadow: '0 4px 8px rgba(0,0,0,0.3)',
+              zIndex: 999
+            }}
+          >
+            <Typography fontFamily="Noto Sans Lao" color="black">
+              ໄລຍະທາງ: {customRouteInfo.distance} km
+            </Typography>
+            <Typography fontFamily="Noto Sans Lao" color="black">
+              ໃຊ້ເວລາ: {customRouteInfo.duration} ນາທີ
+            </Typography>
+          </Box>
+        )}
+
+
 
         {/* Map */}
         <div id="map" ref={mapContainerRef} style={{ height: "100%", width: "100%" }}></div>
