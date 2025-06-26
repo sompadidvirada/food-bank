@@ -15,25 +15,120 @@ datasource db {
 }
 
 model staff {
-  id          Int      @id @unique @default(autoincrement())
+  id          Int         @id @unique @default(autoincrement())
   firstname   String
   lastname    String
-  password    String?  @default("1234")
-  phonenumber String   @unique
-  role        String   @default("staff")
+  password    String?     @default("1234")
+  phonenumber String      @unique
+  role        String      @default("staff")
   birdDate    DateTime
   image       String?
-  aviable     Boolean  @default(true)
-  branch      branch?  @relation(fields: [branchId], references: [id])
+  aviable     Boolean     @default(true)
+  branch      branch?     @relation(fields: [branchId], references: [id])
   branchId    Int?
+  tracksell   tracksell[]
+  tracksend   tracksend[]
+  trackexp    trackexp[]
 }
 
 model branch {
-  id         Int     @id @unique @default(autoincrement())
+  id         Int                @id @unique @default(autoincrement())
   branchname String
-  latitude   Float   @default(17.97790669567272) // Add this
-  longitude  Float   @default(102.62220237805069) // Add this
+  latitude   Float              @default(17.97790669567272) // Add this
+  longitude  Float              @default(102.62220237805069) // Add this
   staff      staff[]
-  province   String  @default("ນະຄອນຫຼວງວຽງຈັນ")
-  aviable    Boolean @default(true)
+  province   String             @default("ນະຄອນຫຼວງວຽງຈັນ")
+  aviable    Boolean            @default(true)
+  tracksell  tracksell[]
+  tracksend  tracksend[]
+  trackexp   trackexp[]
+  available  availableproduct[]
+}
+
+model products {
+  id         Int                @id @unique @default(autoincrement())
+  name       String
+  price      Int
+  sellprice  Int
+  status     String             @default("A")
+  lifetime   Int                @default(7)
+  image      String?
+  tracksell  tracksell[]
+  tracksend  tracksend[]
+  trackexp   trackexp[]
+  available  availableproduct[]
+  category   category?          @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+}
+
+model category {
+  id      Int        @id @default(autoincrement())
+  name    String
+  product products[]
+}
+
+model availableproduct {
+  id            Int       @id @unique @default(autoincrement())
+  aviableStatus Boolean   @default(true)
+  updateAt      DateTime? @updatedAt
+  products      products? @relation(fields: [productsId], references: [id])
+  productsId    Int?
+  branch        branch?   @relation(fields: [branchId], references: [id])
+  branchId      Int?
+
+  @@unique([productsId, branchId])
+}
+
+model tracksell {
+  id         Int       @id @unique @default(autoincrement())
+  sellCount  Int
+  sellAt     DateTime
+  sellDay    String
+  products   products? @relation(fields: [productsId], references: [id])
+  productsId Int?
+  staff      staff?    @relation(fields: [staffId], references: [id])
+  staffId    Int?
+  branch     branch?   @relation(fields: [branchId], references: [id])
+  branchId   Int?
+
+  @@unique([productsId, branchId, sellAt])
+}
+
+model tracksend {
+  id         Int       @id @unique @default(autoincrement())
+  sendCount  Int
+  sendAt     DateTime
+  sendDay    String
+  products   products? @relation(fields: [productsId], references: [id])
+  productsId Int?
+  staff      staff?    @relation(fields: [staffId], references: [id])
+  staffId    Int?
+  branch     branch?   @relation(fields: [branchId], references: [id])
+  branchId   Int?
+
+  @@unique([productsId, branchId, sendAt])
+}
+
+model trackexp {
+  id         Int       @id @unique @default(autoincrement())
+  expCount   Int
+  expAt      DateTime
+  expDay     String
+  products   products? @relation(fields: [productsId], references: [id])
+  productsId Int?
+  staff      staff?    @relation(fields: [staffId], references: [id])
+  staffId    Int?
+  branch     branch?   @relation(fields: [branchId], references: [id])
+  branchId   Int?
+
+  @@unique([productsId, branchId, expAt])
+}
+
+model calendar {
+  id          Int      @id @unique @default(autoincrement())
+  suplyer     String
+  discription String
+  polink      String
+  date        DateTime
+  isSuccess   String @default("ready")
 }

@@ -3,11 +3,13 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { Login } from "../api/authen";
 import { getAllBranch } from "../api/branch";
 import { updateMainSt } from "../api/ManageTeam";
+import { getAllProduct } from "../api/product";
 
 const FoodBankStorage = (set, get) => ({
   user: null,
   token: null,
   branchs: null,
+  products: null,
   actionLogin: async (form) => {
     const res = await Login(form);
     set({
@@ -50,6 +52,15 @@ const FoodBankStorage = (set, get) => ({
       return res;
     } catch (error) {
       console.error("Error updating user:", error);
+    }
+  },
+  getProduct: async () => {
+    const token = get().token
+    try{
+      const ress = await getAllProduct(token)
+      set({ products : ress.data })
+    }catch(err) {
+      console.log(err)
     }
   }
 });

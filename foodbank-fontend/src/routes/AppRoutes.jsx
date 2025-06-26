@@ -8,6 +8,7 @@ import Dashboard from "../scenes/Dashboard/Dashboard";
 import Team from "../scenes/Team/Team";
 import LayoutUser from "../scenes/layout/LayoutUser";
 import OpenStreetMap from "../scenes/Map/OpenStreetMap";
+import Product from "../scenes/Product/Product";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +22,7 @@ const router = createBrowserRouter([
       { index: true, element: <Dashboard /> },
       { path: "team", element: <Team /> },
       { path: "map", element: <OpenStreetMap /> },
+      { path: "product", element: <Product/> },
     ],
   },
   {

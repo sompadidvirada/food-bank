@@ -11,6 +11,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Editprofile from "./component/Editprofile";
+import MapIcon from '@mui/icons-material/Map';
+import FastfoodIcon from '@mui/icons-material/Fastfood';
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -161,9 +163,16 @@ const SideBarAdmin = () => {
             </Typography>
 
             <Item
-              title="ແຜນທີ"
+              title="ແຜນທີສາຂາ"
               to="/admin/map"
-              icon={<PeopleOutlinedIcon />}
+              icon={<MapIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການສິນຄ້າ"
+              to="/admin/product"
+              icon={<FastfoodIcon />}
               selected={selected}
               setSelected={setSelected}
             />
