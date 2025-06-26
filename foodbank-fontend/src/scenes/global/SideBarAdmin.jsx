@@ -3,7 +3,14 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
-import { Box, Dialog, DialogContent, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
@@ -11,8 +18,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Editprofile from "./component/Editprofile";
-import MapIcon from '@mui/icons-material/Map';
-import FastfoodIcon from '@mui/icons-material/Fastfood';
+import MapIcon from "@mui/icons-material/Map";
+import FastfoodIcon from "@mui/icons-material/Fastfood";
+import LocalShippingIcon from '@mui/icons-material/LocalShipping';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -38,10 +48,9 @@ const SideBarAdmin = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const user = useFoodBankStorage((state)=>state.user)
+  const user = useFoodBankStorage((state) => state.user);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
-
 
   const handleImageClick = (imageUrl) => {
     setSelectedImageUrl(imageUrl);
@@ -91,7 +100,7 @@ const SideBarAdmin = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                 FOODBANK
+                  FOODBANK
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -104,12 +113,24 @@ const SideBarAdmin = () => {
             <Box mb="25px">
               <Box display="flex" justifyContent="center" alignItems="center">
                 <img
-                onClick={()=>handleImageClick(`${URL}/staffimage/${user?.image || "public/staff_porfile/default-image.JPG"}`)}
+                  onClick={() =>
+                    handleImageClick(
+                      `${URL}/staffimage/${
+                        user?.image || "public/staff_porfile/default-image.JPG"
+                      }`
+                    )
+                  }
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`${URL}/staffimage/${user?.image || "public/staff_porfile/default-image.JPG"}`}
-                  style={{ cursor: "pointer", borderRadius: "50%", objectFit: "cover" }}
+                  src={`${URL}/staffimage/${
+                    user?.image || "public/staff_porfile/default-image.JPG"
+                  }`}
+                  style={{
+                    cursor: "pointer",
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
                 />
               </Box>
               <Box textAlign="center">
@@ -121,7 +142,15 @@ const SideBarAdmin = () => {
                 >
                   {user?.firstname} {user?.lastname}
                 </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]} sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Typography
+                  variant="h5"
+                  color={colors.greenAccent[500]}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   {user?.role} <Editprofile />
                 </Typography>
               </Box>
@@ -130,7 +159,6 @@ const SideBarAdmin = () => {
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
-              
               title="ພາບລວມບໍລິສັດທັງຫມົດ"
               to="/admin"
               icon={<HomeOutlinedIcon />}
@@ -142,7 +170,7 @@ const SideBarAdmin = () => {
               variant="h6"
               display={isCollapsed ? "none" : "block"}
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px", fontFamily:"Noto Sans Lao" }}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
             >
               ບຸກຂະລາກອນ
             </Typography>
@@ -157,7 +185,7 @@ const SideBarAdmin = () => {
               variant="h6"
               display={isCollapsed ? "none" : "block"}
               color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px", fontFamily:"Noto Sans Lao" }}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
             >
               ຈັດການພາຍໃນບໍລິສັດ
             </Typography>
@@ -176,11 +204,41 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ຈັດການຕິດຕາມສິນຄ້າ
+            </Typography>
+
+            <Item
+              title="ຕິດຕາມຍອດສົ່ງ"
+              to="/admin/tracksend"
+              icon={<LocalShippingIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຕິດຕາມຍອດຂາຍ"
+              to="/admin/tracksell"
+              icon={<AttachMoneyIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຕິດຕາມຍອດໝົດອາຍຸ"
+              to="/admin/trackexp"
+              icon={<DeleteForeverIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
           </Box>
         </Menu>
       </ProSidebar>
 
-            {/** image modal */}
+      {/** image modal */}
       <Dialog
         open={openImageModal}
         onClose={handleCloseImageModal}

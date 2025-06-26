@@ -9,6 +9,9 @@ import Team from "../scenes/Team/Team";
 import LayoutUser from "../scenes/layout/LayoutUser";
 import OpenStreetMap from "../scenes/Map/OpenStreetMap";
 import Product from "../scenes/Product/Product";
+import Tracksell from "../scenes/Tracking/Tracksell";
+import Tracksend from "../scenes/Tracking/Tracksend";
+import Trackexp from "../scenes/Tracking/Trackexp";
 
 const router = createBrowserRouter([
   {
@@ -23,6 +26,9 @@ const router = createBrowserRouter([
       { path: "team", element: <Team /> },
       { path: "map", element: <OpenStreetMap /> },
       { path: "product", element: <Product/> },
+      { path: "tracksell", element: <Tracksell/> },
+      { path: "tracksend", element: <Tracksend/> },
+      { path: "trackexp", element: <Trackexp/> },
     ],
   },
   {
