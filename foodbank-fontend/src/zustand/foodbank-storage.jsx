@@ -3,13 +3,14 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { Login } from "../api/authen";
 import { getAllBranch } from "../api/branch";
 import { updateMainSt } from "../api/ManageTeam";
-import { getAllProduct } from "../api/product";
+import { getAllProduct, getCategorys } from "../api/product";
 
 const FoodBankStorage = (set, get) => ({
   user: null,
   token: null,
   branchs: null,
   products: null,
+  categorys:null,
   actionLogin: async (form) => {
     const res = await Login(form);
     set({
@@ -59,6 +60,15 @@ const FoodBankStorage = (set, get) => ({
     try{
       const ress = await getAllProduct(token)
       set({ products : ress.data })
+    }catch(err) {
+      console.log(err)
+    }
+  },
+  getCategory: async () => {
+    const token = get().token
+    try{
+      const ress = await getCategorys(token)
+      set({ categorys: ress.data.data})
     }catch(err) {
       console.log(err)
     }

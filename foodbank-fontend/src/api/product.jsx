@@ -16,3 +16,35 @@ export const updateStatusProduct = (id, form, token) => {
     },
   });
 };
+
+export const getCategorys = (token) => {
+  return axios.get(`${URL}/getcategory`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const updateProduct = (id, form, token) => {
+  return axios.put(`${URL}/updateproduct/` + id, form, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const deleteProduct = (id, token) => {
+  return axios.delete(`${URL}/deleteproduct/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
+export const createProduct = (form, token) => {
+  return axios.post(`${URL}/createproduct`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

@@ -8,6 +8,8 @@ const {
   createProduct,
   getProducts,
   updatePerBrach,
+  updateProduct,
+  deleteProduct,
 } = require("../controller/products");
 
 {
@@ -27,20 +29,16 @@ const upload = multer({ storage });
 {
   /**route upload */
 }
-router.post(
-  "/createproduct",
-  upload.single("image"),
-  authCheck,
-  adminCheck,
-  createProduct
-);
+router.post("/createproduct",upload.single("image"),authCheck,adminCheck,createProduct);
+
+
 {
   /** ACCESS IMG route */
 }
 
 const defaultImage = "";
 
-router.get("/products/:imageName", (req, res) => {
+router.get("/product_img/:imageName", (req, res) => {
   const { imageName } = req.params;
   const imagePath = path.join(__dirname, "../public/product_img", imageName);
 
@@ -66,5 +64,7 @@ router.get("/products/:imageName", (req, res) => {
 
 router.get("/getallproduct", authCheck, getProducts);
 router.put("/updateaviable/:id", authCheck, updatePerBrach);
+router.put("/updateproduct/:id", upload.single("image"), authCheck, updateProduct);
+router.delete("/deleteproduct/:id", authCheck, adminCheck, deleteProduct)
 
 module.exports = router;

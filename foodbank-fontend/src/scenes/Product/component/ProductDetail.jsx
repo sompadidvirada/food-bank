@@ -59,7 +59,6 @@ const ProductDetail = ({
     }
   };
 
-  console.log(selectedProduct)
 
   return (
     <Dialog
@@ -76,8 +75,8 @@ const ProductDetail = ({
       <DialogTitle>
         <Box display="flex" alignItems="center" justifySelf={"center"} gap={5}>
           <img
-            style={{ width: "60px", borderRadius: "5px" }}
-            src={`${URL}/products/${selectedProduct?.image}`}
+            style={{ width: "60px", height: "60px", borderRadius: "5px" }}
+            src={`${URL}/product_img/${selectedProduct?.image}`}
           />
           <Typography variant="h2" fontFamily={"Noto Sans Lao"}>
             {selectedProduct?.name}

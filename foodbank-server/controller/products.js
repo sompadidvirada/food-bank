@@ -1,9 +1,12 @@
 const prisma = require("../config/prisma");
+const fs = require("fs");
+const path = require("path");
 
 exports.createProduct = async (req, res) => {
   try {
-    const { name, price, sellprice, lifetime, categoryId } = req.body;
-    if (!name || !price || !sellprice || !lifetime || !categoryId) {
+    const { name, price, sellprice, lifetime, category } = req.body;
+    console.log(req.body)
+    if (!name || !price || !sellprice || !lifetime || !category) {
       return res
         .status(400)
         .json({ message: `Can't create product with emty value.` });
@@ -21,7 +24,7 @@ exports.createProduct = async (req, res) => {
           price: Number(price),
           sellprice: Number(sellprice),
           lifetime: Number(lifetime),
-          categoryId: Number(categoryId),
+          categoryId: Number(category),
           image: req?.file?.filename || "",
         },
       });
@@ -99,5 +102,110 @@ exports.updatePerBrach = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: `Server error` });
+  }
+};
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, price, sellprice, categoryId, lifetime } = req.body;
+    if (!name || !price || !sellprice || !categoryId || !lifetime) {
+      return res.status(400).json({ message: `Can't update with emty value.` });
+    }
+    if (!req.file || !req.file.filename) {
+      const updateProduct = await prisma.products.update({
+        where: {
+          id: Number(id),
+        },
+        data: {
+          name: name,
+          price: Number(price),
+          sellprice: Number(sellprice),
+          lifetime: Number(lifetime),
+          categoryId: Number(categoryId),
+        },
+      });
+      return res.status(201).json({
+        message: "Product update successfully!",
+        user: updateProduct,
+      });
+    }
+    const checkImg = await prisma.products.findFirst({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (checkImg.image) {
+      const oldImagePath = path.join(
+        __dirname,
+        "../public/product_img",
+        checkImg.image
+      );
+      try {
+        fs.unlinkSync(oldImagePath); // Synchronously delete the old image
+        console.log("Old image deleted successfully.");
+      } catch (err) {
+        console.error("Error deleting old image:", err.message);
+      }
+    }
+
+    const updateProduct = await prisma.products.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        name: name,
+        price: Number(price),
+        sellprice: Number(sellprice),
+        lifetime: Number(lifetime),
+        categoryId: Number(categoryId),
+        image: req.file.filename,
+      },
+    });
+    res.status(201).json({
+      message: "Product update successfully!",
+      user: updateProduct,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: `server error.` });
+  }
+};
+
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ message: `Can't delete product with emty id.` });
+    }
+    const checkImg = await prisma.products.findFirst({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (checkImg.image) {
+      const oldImagePath = path.join(
+        __dirname,
+        "../public/product_img",
+        checkImg.image
+      );
+      try {
+        fs.unlinkSync(oldImagePath); // Synchronously delete the old image
+        console.log("Old image deleted successfully.");
+      } catch (err) {
+        console.error("Error deleting old image:", err.message);
+      }
+    }
+    const de = await prisma.products.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.status(200).json({ message: `Delete Product success.`, data: de });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
   }
 };

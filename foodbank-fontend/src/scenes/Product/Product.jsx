@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   Dialog,
   DialogContent,
   IconButton,
@@ -10,12 +11,15 @@ import React, { useEffect, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import { DataGrid } from "@mui/x-data-grid";
-import EditIcon from "@mui/icons-material/Edit";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import CloseIcon from "@mui/icons-material/Close";
 import { NumericFormat } from "react-number-format";
-import DeleteIcon from "@mui/icons-material/Delete";
 import ProductDetail from "./component/ProductDetail";
+import EditProduct from "./component/EditProduct";
+import DeleteProduct from "./component/DeleteProduct";
+import AddProduct from "./component/AddProduct";
+import AddCategory from "./component/AddCategory";
+import DeleteCategory from "./component/DeleteCategory";
 const URL = import.meta.env.VITE_API_URL;
 
 const Product = () => {
@@ -36,17 +40,27 @@ const Product = () => {
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
 
   {
+    /** import function or varible from zustand */
+  }
+
+  const token = useFoodBankStorage((state) => state.token);
+  const products = useFoodBankStorage((state) => state.products);
+  const getProduct = useFoodBankStorage((state) => state.getProduct);
+  const branch = useFoodBankStorage((state) => state.branchs);
+  const user = useFoodBankStorage((state) => state.user);
+
+  {
     /** column for DataGrid */
   }
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.1 },
+    { field: "id", headerName: "ໄອດີ", flex: 0.1 },
     {
       field: "image",
-      headerName: "PICTURE",
+      headerName: "ຮູບພາບ",
       flex: 0.3,
       renderCell: (params) => {
         const imageUrl = params.row.image
-          ? `${URL}/uploads/${params.row?.image}`
+          ? `${URL}/product_img/${params.row?.image}`
           : null;
         return imageUrl ? (
           <img
@@ -68,7 +82,7 @@ const Product = () => {
     },
     {
       field: "name",
-      headerName: "NAME",
+      headerName: "ຊື່ສິນຄ້າ",
       type: "text",
       headerAlign: "left",
       flex: 0.5,
@@ -91,7 +105,7 @@ const Product = () => {
     },
     {
       field: "category",
-      headerName: "CATEGORY",
+      headerName: "ໝວດໝູ່ສິນຄ້າ",
       type: "text",
       headerAlign: "left",
       flex: 0.3,
@@ -112,7 +126,7 @@ const Product = () => {
     },
     {
       field: "price",
-      headerName: "PRICE",
+      headerName: "ລາຄາຕົ້ນທຶນ",
       flex: 0.3,
       renderCell: (params) => (
         <NumericFormat
@@ -127,7 +141,7 @@ const Product = () => {
     },
     {
       field: "sellprice",
-      headerName: "SELL PRICE",
+      headerName: "ລາຄາຂາຍ",
       flex: 0.3,
       renderCell: (params) => (
         <NumericFormat
@@ -142,62 +156,32 @@ const Product = () => {
     },
     {
       field: "lifetime",
-      headerName: "LIFE TIME",
+      headerName: "ອາຍຸສິນຄ້າ",
       flex: 0.2,
     },
     {
       field: "status",
-      headerName: "STATUS",
+      headerName: "ສະຖານະ",
       flex: 0.2,
     },
     {
       field: "manage",
-      headerName: "MANAGE",
+      headerName: "ຈັດການ",
       renderCell: (params) => (
         <Box display="flex" justifyContent="space-around" width="100%">
           {/* Show EditIcon to everyone */}
-          <IconButton onClick={() => handleOpen(params.row)}>
-            <EditIcon
-              sx={{
-                cursor: "pointer",
-                color: colors.blueAccent[500],
-                "&:hover": {
-                  color: colors.blueAccent[700],
-                },
-              }}
-            />
-          </IconButton>
-          <IconButton onClick={() => handleDelete(params.row.id)}>
-            <DeleteIcon
-              sx={{
-                cursor: "pointer",
-                color: colors.redAccent[500],
-                "&:hover": {
-                  color: colors.redAccent[700],
-                },
-              }}
-            />
-          </IconButton>
+          <EditProduct productRow={params.row} />
+          {user?.role === "admin" && <DeleteProduct productRow={params.row} />}
         </Box>
       ),
     },
   ];
 
   {
-    /** import function or varible from zustand */
-  }
-
-  const token = useFoodBankStorage((state) => state.token);
-  const products = useFoodBankStorage((state) => state.products);
-  const getProduct = useFoodBankStorage((state) => state.getProduct);
-  const branch = useFoodBankStorage((state) => state.branchs);
-  const user = useFoodBankStorage((state) => state.user);
-
-  {
     /** create other variable or filter function for varialbe */
   }
 
-  const productWBracnh = products.map((product) => ({
+  const productWBracnh = products?.map((product) => ({
     ...product,
     available: product.available.map((item) => {
       const branchs = branch.find((b) => b.id === item.branchId);
@@ -207,7 +191,6 @@ const Product = () => {
       };
     }),
   }));
-
 
   {
     /** useEffect zone */
@@ -241,13 +224,17 @@ const Product = () => {
   };
 
   return (
-    <Box m="20px">
+    <Box ml="20px">
       <Header
         title="PRODUCT"
         subtitle="List of Products for Future Reference"
       />
+      <Box display={"flex"} gap={5} justifyContent={"center"}>
+        <AddProduct />
+        <AddCategory />
+        <DeleteCategory />
+      </Box>
       <Box
-        m="40px 0 0 0"
         height="75vh"
         sx={{
           "& .MuiDataGrid-root": {
@@ -278,7 +265,18 @@ const Product = () => {
           },
         }}
       >
-        <DataGrid rows={productWBracnh} columns={columns} />
+        <DataGrid
+          rows={productWBracnh}
+          columns={columns}
+          hideFooter
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              fontFamily: "Noto Sans Lao",
+              fontWeight: "bold", // optional
+              fontSize: "16px", // optional
+            },
+          }}
+        />
       </Box>
 
       {/** image modal dialog */}
