@@ -2,21 +2,38 @@ const prisma = require("../config/prisma");
 
 exports.createBranch = async (req, res) => {
   try {
-    const { branchName } = req.body;
-    if (!branchName) {
-      return res.status(400).json({ message: `Can't create with emty value.` });
+    const { branchName, province, latitude, longitude } = req.body;
+
+    // Basic Validation
+    if (!branchName || !province || latitude === undefined || longitude === undefined) {
+      return res.status(400).json({ message: `Can't create with empty value.` });
     }
+
+    // Type and Range Validation
+    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
+      return res.status(400).json({ message: `Latitude and Longitude must be numbers.` });
+    }
+
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      return res.status(400).json({ message: `Invalid latitude or longitude range.` });
+    }
+
     const createB = await prisma.branch.create({
       data: {
         branchname: branchName,
+        province: province,
+        latitude: latitude,
+        longitude: longitude
       },
     });
-    res.send(createB);
+
+    return res.status(201).json(createB);
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: `server error.` });
+    return res.status(500).json({ message: `Server error.` });
   }
 };
+
 
 exports.getBranchs = async (req,res) => {
     try{

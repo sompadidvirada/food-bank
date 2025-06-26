@@ -4,17 +4,17 @@ import Header from "../component/Header";
 import { tokens } from "../../theme";
 import L from "leaflet";
 import useGeolocation from "../../zustand/useGeoLocation";
-import useLocalStorage from "../../zustand/useLocalStorage";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import NearMeIcon from '@mui/icons-material/NearMe';
 import LocalOfferIcon from '@mui/icons-material/LocalOffer';
-import { updateBranchLocation } from "../../api/branch";
+import { CreateBranch, updateBranchLocation } from "../../api/branch";
 import { toast, ToastContainer } from "react-toastify";
 import MinorCrashIcon from '@mui/icons-material/MinorCrash';
 import "leaflet-routing-machine";
+import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 
 const OpenStreetMap = () => {
   const theme = useTheme();
@@ -25,22 +25,29 @@ const OpenStreetMap = () => {
   const { position: location, fetchLocation } = useGeolocation();
   const userMarkerRef = useRef();
   const branch = useFoodBankStorage((state) => state.branchs)
+  const getBrnachs = useFoodBankStorage((state) => state.getBrnachs)
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [branchName, setBranchName] = useState("");
-  const [province, setProvince] = useState('Vientiane Prefecture');
+  const [province, setProvince] = useState('ນະຄອນຫຼວງວຽງຈັນ');
+  const [provinceCreate, setProvinceCreate] = useState('ນະຄອນຫຼວງວຽງຈັນ');
   const [userFocus, setUserFocus] = useState(true);
   const filteredBranches = branch?.filter((item) => item.province === province);
   const [showUserMarker, setShowUserMarker] = useState(false);
   const [enableClick, setEnableClick] = useState(false)
   const [selectedBranchId, setSelectedBranchId] = useState(null);
   const branchMarkersRef = useRef({});
-  const [distancePoints, setDistancePoints] = useState([]);
   const [routingControl, setRoutingControl] = useState(null);
   const [customRouteInfo, setCustomRouteInfo] = useState(null);
   const [isDistanceMode, setIsDistanceMode] = useState(false);
   const [selectedBranches, setSelectedBranches] = useState([]);
-  
+  const [isUserRouteMode, setIsUserRouteMode] = useState(false);
+  const [newBranchLat, setNewBranchLat] = useState("");
+  const [newBranchLng, setNewBranchLng] = useState("");
+  const [isCreateMode, setIsCreateMode] = useState(false); // To toggle map click for creating branch
+  const [tempMarker, setTempMarker] = useState(null); // Temporary marker object
+
+
 
 
 
@@ -162,8 +169,58 @@ const OpenStreetMap = () => {
     setProvince(event.target.value);
   };
 
+  const handleChangeCreate = (event) => {
+    setProvinceCreate(event.target.value);
+  };
+
 
   const handleBranchClick = (latitude, longitude, branchId) => {
+    if (isUserRouteMode) {
+      if (!location.latitude || !location.longitude) {
+        toast.error("ບໍ່ພົບຕຳແໜ່ງຂອງຜູ້ໃຊ້");
+        return;
+      }
+
+      if (routingControl) {
+        mapRef.current.removeControl(routingControl);
+        const oldContainer = document.querySelector('.leaflet-routing-container');
+        if (oldContainer) oldContainer.remove();
+        setRoutingControl(null);
+        setCustomRouteInfo(null);
+      }
+
+      const start = L.latLng(location.latitude, location.longitude);
+      const end = L.latLng(latitude, longitude);
+
+      mapRef.current.fitBounds([start, end], { padding: [50, 50] });
+
+      const newRoute = L.Routing.control({
+        waypoints: [start, end],
+        routeWhileDragging: false,
+        lineOptions: { styles: [{ color: 'blue', weight: 4 }] },
+        show: false,
+        addWaypoints: false,
+        createMarker: () => { return null; }
+      }).addTo(mapRef.current);
+
+      newRoute.on('routesfound', function (e) {
+        const route = e.routes[0];
+        const distanceInKm = (route.summary.totalDistance / 1000).toFixed(2);
+        const durationInMin = Math.ceil(route.summary.totalTime / 60);
+
+        toast.info(`ໄລຍະທາງ: ${distanceInKm} km, ໃຊ້ເວລາ: ${durationInMin} ນາທີ`);
+
+        setCustomRouteInfo({
+          distance: distanceInKm,
+          duration: durationInMin
+        });
+      });
+
+      setRoutingControl(newRoute);
+      setIsPanelOpen(false); // Close panel after selection
+      return;
+    }
+
     if (!isDistanceMode) {
       if (mapRef.current) {
         mapRef.current.flyTo([latitude, longitude], 17);
@@ -239,6 +296,61 @@ const OpenStreetMap = () => {
     }
   };
 
+  {/** create mode  */ }
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const handleMapClickForNewBranch = (e) => {
+      if (isCreateMode) {
+        const { lat, lng } = e.latlng;
+
+        // Remove existing temp marker
+        if (tempMarker) {
+          mapRef.current.removeLayer(tempMarker);
+        }
+
+        // Create a new draggable marker
+        const marker = L.marker([lat, lng], { draggable: true }).addTo(mapRef.current);
+
+        // Save the marker to state
+        setTempMarker(marker);
+
+        // Set lat/lng to input fields
+        setNewBranchLat(lat.toFixed(6));
+        setNewBranchLng(lng.toFixed(6));
+
+        toast.success(`ເລືອກສຳເລັດ: lat ${lat.toFixed(6)}, lng ${lng.toFixed(6)}`);
+
+        // Listen to marker drag
+        marker.on('dragend', function (event) {
+          const position = event.target.getLatLng();
+          setNewBranchLat(position.lat.toFixed(6));
+          setNewBranchLng(position.lng.toFixed(6));
+          toast.info(`ປັບຕຳແໜ່ງໃໝ່: lat ${position.lat.toFixed(6)}, lng ${position.lng.toFixed(6)}`);
+        });
+      }
+    };
+
+    if (isCreateMode) {
+      mapRef.current.on('click', handleMapClickForNewBranch);
+    } else {
+      mapRef.current.off('click', handleMapClickForNewBranch);
+
+      // Remove temp marker if mode is turned off
+      if (tempMarker) {
+        mapRef.current.removeLayer(tempMarker);
+        setTempMarker(null);
+      }
+    }
+
+    return () => {
+      mapRef.current?.off('click', handleMapClickForNewBranch);
+    };
+  }, [isCreateMode, tempMarker]);
+
+
+
   return (
     <Box m="20px">
       <Header title="ແຜນທີ" subtitle="ລາຍລະອຽດແຜນທີ" />
@@ -305,8 +417,7 @@ const OpenStreetMap = () => {
             }}
           >
             <Tab label="ສາຂາທັງໝົດ" sx={{ fontFamily: "Noto Sans Lao" }} />
-            <Tab label="ຄິດໄລ່ ໄລຍະທາງ" sx={{ fontFamily: "Noto Sans Lao" }} />
-            <Tab label="ແກ້ໄຂ ທີ່ຢູ່ສາຂາ" sx={{ fontFamily: "Noto Sans Lao" }} />
+            <Tab label="ເພີ່ມສາຂາ" sx={{ fontFamily: "Noto Sans Lao" }} />
           </Tabs>
 
           {/* Tab 1: Buttons */}
@@ -339,26 +450,27 @@ const OpenStreetMap = () => {
                       '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
                         borderColor: 'green',
                       },
+                      fontFamily: "Noto Sans Lao"
                     }}
                     onChange={handleChange}
                   >
-                    <MenuItem value={"Vientiane Prefecture"}>Vientiane Prefecture</MenuItem>
-                    <MenuItem value={"Xaisomboun Province"}>Xaisomboun Province</MenuItem>
-                    <MenuItem value={"Xiengkhouang"}>Xiengkhouang</MenuItem>
-                    <MenuItem value={"Vientiane Province"}>Vientiane Province</MenuItem>
-                    <MenuItem value={"Sekong"}>Sekong</MenuItem>
-                    <MenuItem value={"Savannakhet"}>Savannakhet</MenuItem>
-                    <MenuItem value={"Salavan"}>Salavan</MenuItem>
-                    <MenuItem value={"Sainyabuli"}>Sainyabuli</MenuItem>
-                    <MenuItem value={"Phongsaly"}>Phongsaly</MenuItem>
-                    <MenuItem value={"Oudomxay"}>Oudomxay</MenuItem>
-                    <MenuItem value={"Luang Prabang"}>Luang Prabang</MenuItem>
-                    <MenuItem value={"Luang Namtha"}>Luang Namtha</MenuItem>
-                    <MenuItem value={"Khammouane"}>Khammouane</MenuItem>
-                    <MenuItem value={"Champasak"}>Champasak</MenuItem>
-                    <MenuItem value={"Bolikhamsai"}>Bolikhamsai</MenuItem>
-                    <MenuItem value={"Bokeo"}>Bokeo</MenuItem>
-                    <MenuItem value={"Attapeu"}>Attapeu</MenuItem>
+                    <MenuItem value={"ນະຄອນຫຼວງວຽງຈັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ນະຄອນຫຼວງວຽງຈັນ</MenuItem>
+                    <MenuItem value={"ໄຊສົມບູນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ໄຊສົມບູນ</MenuItem>
+                    <MenuItem value={"ຊຽງຂວາງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຊຽງຂວາງ</MenuItem>
+                    <MenuItem value={"ວຽງຈັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ວຽງຈັນ</MenuItem>
+                    <MenuItem value={"ເຊກອງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ເຊກອງ</MenuItem>
+                    <MenuItem value={"ສະຫວັນນະເຂດ"} sx={{ fontFamily: "Noto Sans Lao" }}>ສະຫວັນນະເຂດ</MenuItem>
+                    <MenuItem value={"ສາລະວັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ສາລະວັນ</MenuItem>
+                    <MenuItem value={"ໄຊຍະບູລີ"} sx={{ fontFamily: "Noto Sans Lao" }}>ໄຊຍະບູລີ</MenuItem>
+                    <MenuItem value={"ຜົງສາລີ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຜົງສາລີ</MenuItem>
+                    <MenuItem value={"ອຸດົມໄຊ"} sx={{ fontFamily: "Noto Sans Lao" }}>ອຸດົມໄຊ</MenuItem>
+                    <MenuItem value={"ຫຼວງພະບາງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຫຼວງພະບາງ</MenuItem>
+                    <MenuItem value={"ຫຼວງນ້ຳທາ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຫຼວງນ້ຳທາ</MenuItem>
+                    <MenuItem value={"Khammouane"} sx={{ fontFamily: "Noto Sans Lao" }}>ຄຳມ່ວນ</MenuItem>
+                    <MenuItem value={"ຈຳປາສັກ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຈຳປາສັກ</MenuItem>
+                    <MenuItem value={"ບໍລິຄຳໄຊ"} sx={{ fontFamily: "Noto Sans Lao" }}>ບໍລິຄຳໄຊ</MenuItem>
+                    <MenuItem value={"ບໍແກ້ວ"} sx={{ fontFamily: "Noto Sans Lao" }}>ບໍແກ້ວ</MenuItem>
+                    <MenuItem value={"ອັດຕະປື"} sx={{ fontFamily: "Noto Sans Lao" }}>ອັດຕະປື</MenuItem>
                   </Select>
                 </FormControl>
                 {
@@ -404,23 +516,154 @@ const OpenStreetMap = () => {
 
           {/* Tab 2: Product List */}
           {selectedTab === 1 && (
-            ""
-          )}
-
-          {/* Tab 3: Input Form */}
-          {selectedTab === 2 && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <TextField
                 label="ຊື່ສາຂາ"
+                InputProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Input font family
+                    fontSize: '16px',            // ✅ Input font size
+                    color: colors.grey[100],              // ✅ Input text color
+                  },
+                }}
+                InputLabelProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Label font family
+                    fontSize: '16px',            // ✅ Label font size
+                    color: colors.grey[100],               // ✅ Label text color
+                  }
+                }}
                 value={branchName}
                 onChange={(e) => setBranchName(e.target.value)}
               />
+              <FormControl fullWidth>
+                <InputLabel
+                  id="demo-simple-select-label"
+                  sx={{
+                    fontFamily: 'Noto Sans Lao',
+                    fontSize: '16px',
+                    color: 'black', // Default color
+                    '&.Mui-focused': {
+                      color: 'green', // When focusing the select
+                    },
+                    '&.MuiInputLabel-shrink': {
+                      color: 'white', // When an item is selected (shrink state)
+                    },
+                  }}
+                >
+                  ເລືອກແຂວງ
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  id="demo-simple-select"
+                  value={provinceCreate}
+
+                  label="ເລືອກແຂວງຂອງສາຂາ"
+                  sx={{
+                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                      borderColor: 'green',
+                    },
+                    fontFamily: "Noto Sans Lao"
+                  }}
+                  onChange={handleChangeCreate}
+                >
+                  <MenuItem value={"ນະຄອນຫຼວງວຽງຈັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ນະຄອນຫຼວງວຽງຈັນ</MenuItem>
+                  <MenuItem value={"ໄຊສົມບູນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ໄຊສົມບູນ</MenuItem>
+                  <MenuItem value={"ຊຽງຂວາງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຊຽງຂວາງ</MenuItem>
+                  <MenuItem value={"ວຽງຈັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ວຽງຈັນ</MenuItem>
+                  <MenuItem value={"ເຊກອງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ເຊກອງ</MenuItem>
+                  <MenuItem value={"ສະຫວັນນະເຂດ"} sx={{ fontFamily: "Noto Sans Lao" }}>ສະຫວັນນະເຂດ</MenuItem>
+                  <MenuItem value={"ສາລະວັນ"} sx={{ fontFamily: "Noto Sans Lao" }}>ສາລະວັນ</MenuItem>
+                  <MenuItem value={"ໄຊຍະບູລີ"} sx={{ fontFamily: "Noto Sans Lao" }}>ໄຊຍະບູລີ</MenuItem>
+                  <MenuItem value={"ຜົງສາລີ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຜົງສາລີ</MenuItem>
+                  <MenuItem value={"ອຸດົມໄຊ"} sx={{ fontFamily: "Noto Sans Lao" }}>ອຸດົມໄຊ</MenuItem>
+                  <MenuItem value={"ຫຼວງພະບາງ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຫຼວງພະບາງ</MenuItem>
+                  <MenuItem value={"ຫຼວງນ້ຳທາ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຫຼວງນ້ຳທາ</MenuItem>
+                  <MenuItem value={"Khammouane"} sx={{ fontFamily: "Noto Sans Lao" }}>ຄຳມ່ວນ</MenuItem>
+                  <MenuItem value={"ຈຳປາສັກ"} sx={{ fontFamily: "Noto Sans Lao" }}>ຈຳປາສັກ</MenuItem>
+                  <MenuItem value={"ບໍລິຄຳໄຊ"} sx={{ fontFamily: "Noto Sans Lao" }}>ບໍລິຄຳໄຊ</MenuItem>
+                  <MenuItem value={"ບໍແກ້ວ"} sx={{ fontFamily: "Noto Sans Lao" }}>ບໍແກ້ວ</MenuItem>
+                  <MenuItem value={"ອັດຕະປື"} sx={{ fontFamily: "Noto Sans Lao" }}>ອັດຕະປື</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="outlined"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+                color={isCreateMode ? "error" : "success"}
+                onClick={() => {
+                  setIsCreateMode(!isCreateMode);
+                  toast.info(isCreateMode ? "ຍົກເລີກເລືອກສະຖານທີ່" : "ກະລຸນາຄລິກແຜນທີ່ເພື່ອເລືອກສະຖານທີ່");
+                }}
+              >
+                {isCreateMode ? "ຍົກເລີກເລືອກສະຖານທີ່" : "ເລືອກສະຖານທີ່ຈາກແຜນທີ່"}
+              </Button>
+              <TextField
+                label="ລະດັບທິດຕະເວັນ (Latitude)"
+                type="number"
+                InputLabelProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Label font family
+                    fontSize: '16px',            // ✅ Label font size
+                    color: colors.grey[100],               // ✅ Label text color
+                  }
+                }}
+                InputProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Input font family
+                    fontSize: '16px',            // ✅ Input font size
+                    color: colors.grey[100],              // ✅ Input text color
+                  },
+                }}
+                value={newBranchLat}
+                onChange={(e) => setNewBranchLat(e.target.value)}
+              />
+              <TextField
+                label="ລອງຈິຈູດ (Longitude)"
+                type="number"
+                InputLabelProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Label font family
+                    fontSize: '16px',            // ✅ Label font size
+                    color: colors.grey[100],               // ✅ Label text color
+                  }
+                }}
+                InputProps={{
+                  style: {
+                    fontFamily: 'Noto Sans Lao', // ✅ Input font family
+                    fontSize: '16px',            // ✅ Input font size
+                    color: colors.grey[100],              // ✅ Input text color
+                  },
+                }}
+                value={newBranchLng}
+                onChange={(e) => setNewBranchLng(e.target.value)}
+              />
               <Button
                 variant="contained"
-                color="primary"
-                onClick={() => {
-                  alert(`ເພີ່ມສາຂາ: ${branchName}`);
+                color="success"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+                onClick={async () => {
+                  // Call your API to create a branch here
+
+                  try {
+                    const form = {
+                      branchName,
+                      province: provinceCreate,  // You need to pass province
+                      latitude: parseFloat(newBranchLat), // Convert to number (if stored as string)
+                      longitude: parseFloat(newBranchLng)
+                    };
+                    const createBr = await CreateBranch(form, token)
+                    console.log(createBr)
+                  } catch (err) {
+                    console.log(err)
+                    return
+                  }
+                  getBrnachs()
+                  console.log(`Branch Name`, branchName, `long`, newBranchLng, `lat`, newBranchLat)
+                  toast.success(`ເພີ່ມສາຂາ: ${branchName} ສຳເລັດ`);
                   setBranchName("");
+                  setNewBranchLat("");
+                  setNewBranchLng("");
+                  setProvinceCreate("ນະຄອນຫຼວງວຽງຈັນ")
                 }}
               >
                 ເພີ່ມສາຂາ
@@ -476,6 +719,7 @@ const OpenStreetMap = () => {
               setIsDistanceMode(false);
               return;
             }
+            setIsUserRouteMode(false)
             setIsPanelOpen(true)
             setIsDistanceMode(true);
             toast.info("ເລືອກ 2 ສາຂາທີ່ຈະຄຳນວນໄລຍະທາງ");
@@ -484,6 +728,33 @@ const OpenStreetMap = () => {
           <MinorCrashIcon sx={{ fontSize: 30, color: isDistanceMode ? "red" : "black" }} />
         </IconButton>
 
+        {showUserMarker && (
+          <IconButton
+            variant="contained"
+            sx={{ position: 'absolute', bottom: 60, right: 20, zIndex: 999 }}
+            onClick={() => {
+              if (isUserRouteMode) {
+                // Clear Route
+                if (routingControl) {
+                  mapRef.current.removeControl(routingControl);
+                  const oldContainer = document.querySelector('.leaflet-routing-container');
+                  if (oldContainer) oldContainer.remove();
+                }
+                setRoutingControl(null);
+                setCustomRouteInfo(null);
+                setIsUserRouteMode(false);
+                toast.info("ຍົກເລີກເສັ້ນທາງ");
+              } else {
+                // Enable route mode
+                setIsPanelOpen(true);
+                setIsUserRouteMode(true);
+                toast.info("ເລືອກສາຂາທີ່ຈະຄຳນວນໄລຍະທາງຈາກຕຳແໜ່ງຂອງທ່ານ");
+              }
+            }}
+          >
+            <AssistWalkerIcon sx={{ fontSize: 30, color: isUserRouteMode ? "red" : "black" }} />
+          </IconButton>
+        )}
 
 
         {customRouteInfo && (

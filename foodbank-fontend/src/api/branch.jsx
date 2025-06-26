@@ -16,3 +16,10 @@ export const updateBranchLocation = (id, form, token) => {
         }
     })
 }
+export const CreateBranch = (form, token) => {
+    return axios.post(`${URL}/createbranch`, form, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}
