@@ -16,6 +16,7 @@ exports.getStaffInfos = async (req, res) => {
         birdDate: true,
         aviable: true,
         branch: true,
+        image: true
       },
     });
     res.send(getStaffInfo);

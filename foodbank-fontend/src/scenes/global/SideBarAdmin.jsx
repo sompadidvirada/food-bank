@@ -23,6 +23,8 @@ import FastfoodIcon from "@mui/icons-material/Fastfood";
 import LocalShippingIcon from '@mui/icons-material/LocalShipping';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
+import ChecklistIcon from '@mui/icons-material/Checklist';
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -231,6 +233,28 @@ const SideBarAdmin = () => {
               title="ຕິດຕາມຍອດໝົດອາຍຸ"
               to="/admin/trackexp"
               icon={<DeleteForeverIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ລາຍລະອຽດການຕິດຕາມ
+            </Typography>
+            <Item
+              title="ລາຍງານຍອດຂາຍລາຍສາຂາ"
+              to="/admin/reportperbranch"
+              icon={<SpeakerNotesIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ລາຍງານຍອດຂາຍທັງໝົດ"
+              to="/admin/reportall"
+              icon={<ChecklistIcon />}
               selected={selected}
               setSelected={setSelected}
             />

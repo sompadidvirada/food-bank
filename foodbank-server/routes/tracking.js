@@ -27,6 +27,6 @@ router.post("/deletealltracksend", authCheck, deleteTracksend);
 router.post("/deletealltrackexp", authCheck, deleteTrackexp);
 router.post("/updatetracksell", authCheck, updateTrackSell);
 router.post("/updatetracksend", authCheck, updateTrackSend);
-router.post("/updatetracksell", authCheck, updateTrackExp);
+router.post("/updatetrackexp", authCheck, updateTrackExp);
 
 module.exports = router;

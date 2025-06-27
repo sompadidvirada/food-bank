@@ -9,7 +9,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { tokens } from "../../../theme";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
-import { updateTrackSell } from "../../../api/tracking";
+import { updateTrackExp, updateTrackSell } from "../../../api/tracking";
 
 const DialogEditExp = ({
   trackedProduct,
@@ -41,11 +41,11 @@ const DialogEditExp = ({
     const updatedForm = {
       ...selectFormtracksell,
       productId: trackedProduct.productsId,
-      sellCount: editCount.sellCount,
+      expCount: editCount.expCount,
     };
 
     try {
-      await updateTrackSell(updatedForm, token);
+      await updateTrackExp(updatedForm, token);
       fetchDateBrachCheck(); // Refresh the data
       handleClose();
     } catch (err) {
@@ -75,18 +75,18 @@ const DialogEditExp = ({
           },
         }}
       >
-        <DialogTitle>EDIT SELL COUNT</DialogTitle>
+        <DialogTitle>EDIT EXP COUNT</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            ແກ້ໄຂຈຳນວນທີ່ໄດ້ຂາຍ " ເບີ່ງໃຫ້ດີກ່ອນກົດ "
+            ແກ້ໄຂຈຳນວນທີ່ໝົດອາຍຸ " ເບີ່ງໃຫ້ດີກ່ອນກົດ "
           </DialogContentText>
           <TextField
             autoFocus
             required
             margin="dense"
-            id="sellCount"
-            name="sellCount"
-            label="Sell Count"
+            id="expCount"
+            name="expCount"
+            label="Exp Count"
             type="number"
             fullWidth
             variant="standard"

@@ -10,7 +10,27 @@ const FoodBankStorage = (set, get) => ({
   token: null,
   branchs: null,
   products: null,
-  categorys:null,
+  categorys: null,
+  dataTrack: null,
+  totalData: null,
+  queryForm: {
+    startDate: "", 
+    endDate: "",
+  },
+  setTotalData: (newData) => {
+    set({ totalData: newData }); 
+  },
+  setDataTrack: (newData) => {
+    set({ dataTrack: newData });
+  },
+  setQueryForm: (key, value) => {
+    set((state) => ({
+      queryForm: {
+        ...state.queryForm,
+        [key]: value,
+      },
+    }));
+  },
   actionLogin: async (form) => {
     const res = await Login(form);
     set({
@@ -56,23 +76,23 @@ const FoodBankStorage = (set, get) => ({
     }
   },
   getProduct: async () => {
-    const token = get().token
-    try{
-      const ress = await getAllProduct(token)
-      set({ products : ress.data })
-    }catch(err) {
-      console.log(err)
+    const token = get().token;
+    try {
+      const ress = await getAllProduct(token);
+      set({ products: ress.data });
+    } catch (err) {
+      console.log(err);
     }
   },
   getCategory: async () => {
-    const token = get().token
-    try{
-      const ress = await getCategorys(token)
-      set({ categorys: ress.data.data})
-    }catch(err) {
-      console.log(err)
+    const token = get().token;
+    try {
+      const ress = await getCategorys(token);
+      set({ categorys: ress.data.data });
+    } catch (err) {
+      console.log(err);
     }
-  }
+  },
 });
 
 const usePersist = {

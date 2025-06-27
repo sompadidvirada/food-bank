@@ -16,11 +16,11 @@ export default function CalendarExp({
       const formattedDate = dayjs(newValue).startOf("day").toISOString();
       setSelectFormtracksell((prevState) => ({
         ...prevState,
-        sellAt: formattedDate,
+        expAt: formattedDate,
       }));
       setSelectDateBrachCheck((prevState) => ({
         ...prevState,
-        sellDate: formattedDate,
+        expDate: formattedDate,
       }));
     }
   };

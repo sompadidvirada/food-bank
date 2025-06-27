@@ -30,7 +30,9 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import CloseIcon from "@mui/icons-material/Close";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+const URL = import.meta.env.VITE_API_URL;
 
 const Team = () => {
   const theme = useTheme();
@@ -48,7 +50,18 @@ const Team = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [status, setStatus] = useState(null);
   const [searchText, setSearchText] = useState("");
+  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [allStaffs, setAllStaffs] = useState([]);
+  const [openImageModal, setOpenImageModal] = useState(false);
+  const handleImageClick = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
+
+  const handleCloseImageModal = () => {
+    setOpenImageModal(false);
+    setSelectedImageUrl(null);
+  };
 
   const handleClickOpenEditBranch = (row) => {
     setOpen(true);
@@ -178,6 +191,32 @@ const Team = () => {
 
   const columns = [
     { field: "id", headerName: "ID STAFF" },
+    {
+      field: "image",
+      headerName: "IMAGE",
+      renderCell: (params) => {
+        const imageUrl = params.row.image
+          ? `${URL}/staffimage/${params.row.image}`
+          : null;
+        return imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Product"
+            loading="lazy"
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+            onClick={() => handleImageClick(imageUrl)}
+          />
+        ) : (
+          <span>No Image</span>
+        );
+      },
+    },
     {
       field: "fullName",
       headerName: "Name",
@@ -342,6 +381,7 @@ const Team = () => {
     },
   ];
 
+  console.log(staffsInfo);
   return (
     <Box m="20px">
       <Header title="ຈັດການພະນັກງານ" subtitle="ແກ້ໄຂລາຍລະອຽດພະນັກງານ" />
@@ -377,7 +417,14 @@ const Team = () => {
         {/* SEARCH BAR */}
         <Box display="flex" justifyContent={"space-between"}>
           <Box sx={{ alignSelf: "center" }}>
-            <Button variant="contained" sx={{ bgcolor: colors.blueAccent[300], gap:1, color: colors.grey[900]}}>
+            <Button
+              variant="contained"
+              sx={{
+                bgcolor: colors.blueAccent[300],
+                gap: 1,
+                color: colors.grey[900],
+              }}
+            >
               <Typography fontFamily={"Noto Sans Lao"}>
                 ເພີ່ມພະນັກງານ
               </Typography>
@@ -611,6 +658,39 @@ const Team = () => {
             ຍົກເລີກ
           </Button>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openImageModal}
+        onClose={handleCloseImageModal}
+        maxWidth="md"
+      >
+        <DialogContent sx={{ position: "relative", padding: "0" }}>
+          <IconButton
+            onClick={handleCloseImageModal}
+            sx={{
+              position: "absolute",
+              top: 10,
+              right: 10,
+              backgroundColor: "white",
+              "&:hover": { backgroundColor: "gray" },
+            }}
+          >
+            <CloseIcon sx={{ color: "black" }} />
+          </IconButton>
+          {selectedImageUrl && (
+            <img
+              src={selectedImageUrl}
+              alt="Large Preview"
+              style={{
+                width: "100%",
+                height: "800px",
+                maxHeight: "90vh",
+                overflow: "hidden",
+              }}
+            />
+          )}
+        </DialogContent>
       </Dialog>
 
       {/**Toastify Part */}

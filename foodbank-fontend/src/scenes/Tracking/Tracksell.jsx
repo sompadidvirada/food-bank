@@ -99,7 +99,7 @@ const Tracksell = () => {
     {
       field: "manage",
       headerName: "SALE COUNT",
-      flex: 0.3,
+      flex: 0.5,
       renderCell: (params) => {
         const productId = params.row.id;
 

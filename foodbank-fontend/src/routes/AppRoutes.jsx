@@ -12,6 +12,8 @@ import Product from "../scenes/Product/Product";
 import Tracksell from "../scenes/Tracking/Tracksell";
 import Tracksend from "../scenes/Tracking/Tracksend";
 import Trackexp from "../scenes/Tracking/Trackexp";
+import ReportPerBranch from "../scenes/report_per_branch/ReportPerBranch";
+import ReportAll from "../scenes/report_all/ReportAll";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +31,8 @@ const router = createBrowserRouter([
       { path: "tracksell", element: <Tracksell/> },
       { path: "tracksend", element: <Tracksend/> },
       { path: "trackexp", element: <Trackexp/> },
+      { path: "reportperbranch", element: <ReportPerBranch/> },
+      { path: "reportall", element: <ReportAll/> },
     ],
   },
   {
