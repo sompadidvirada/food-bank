@@ -16,7 +16,12 @@ import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast, ToastContainer } from "react-toastify";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
-import { checkTrackSell } from "../../api/tracking";
+import {
+  checkTrackSell,
+  deleteTrackSell,
+  insertTracksell,
+} from "../../api/tracking";
+import DialogEditSell from "./component/DialogEditSell";
 const URL = import.meta.env.VITE_API_URL;
 
 const Tracksell = () => {
@@ -40,6 +45,10 @@ const Tracksell = () => {
     brachId: "",
   });
   const [sellCounts, setSellCounts] = useState({});
+
+  {
+    /** column for DataGrid  */
+  }
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.2 },
@@ -106,8 +115,7 @@ const Tracksell = () => {
               >
                 Tracked. ({trackedProduct.sellCount})
               </span>
-              <DialogSell
-                productId={productId}
+              <DialogEditSell
                 trackedProduct={trackedProduct}
                 selectFormtracksell={selectFormtracksell}
                 setSelectFormtracksell={setSelectFormtracksell}
@@ -115,48 +123,49 @@ const Tracksell = () => {
               />
             </Box>
           );
+        } else {
+          return (
+            <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+              <input
+                type="number"
+                min="0"
+                value={sellCounts[productId] || ""}
+                onChange={(e) =>
+                  handleChange(productId, Math.max(0, e.target.value))
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSetSellCount(productId);
+                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                    e.preventDefault(); // Prevent up/down arrows
+                }}
+                onWheel={(e) => e.target.blur()} // Prevent scroll
+                style={{
+                  width: "60px",
+                  padding: "5px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  textAlign: "center",
+                  appearance: "textfield", // Hides arrows in most browsers
+                  MozAppearance: "textfield", // Hides arrows in Firefox
+                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
+                }}
+              />
+              <button
+                onClick={() => handleSetSellCount(productId)}
+                style={{
+                  background: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                  borderRadius: "4px",
+                }}
+              >
+                ✔
+              </button>
+            </div>
+          );
         }
-        return (
-          <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
-            <input
-              type="number"
-              min="0"
-              value={sellCounts[productId] || ""}
-              onChange={(e) =>
-                handleChange(productId, Math.max(0, e.target.value))
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSetSellCount(productId);
-                if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                  e.preventDefault(); // Prevent up/down arrows
-              }}
-              onWheel={(e) => e.target.blur()} // Prevent scroll
-              style={{
-                width: "60px",
-                padding: "5px",
-                borderRadius: "4px",
-                border: "1px solid #ccc",
-                textAlign: "center",
-                appearance: "textfield", // Hides arrows in most browsers
-                MozAppearance: "textfield", // Hides arrows in Firefox
-                WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-              }}
-            />
-            <button
-              onClick={() => handleSetSellCount(productId)}
-              style={{
-                background: "#4CAF50",
-                color: "white",
-                border: "none",
-                padding: "5px 10px",
-                cursor: "pointer",
-                borderRadius: "4px",
-              }}
-            >
-              ✔
-            </button>
-          </div>
-        );
       },
     },
     {
@@ -194,16 +203,17 @@ const Tracksell = () => {
     },
   ];
 
-    const handleSetSellCount = async (productId) => {
+  {
+    /** function insert tracking to database */
+  }
+
+  const handleSetSellCount = async (productId) => {
     if (!sellCounts[productId]) return; // Prevent empty values
 
     if (
       selectFormtracksell.sellAt === "" ||
       selectFormtracksell.brachId === ""
     ) {
-      setSeverity("error");
-      setSnackbarMessage("Select Date and Branch first.");
-      setOpenSnackbar(true);
       return;
     }
 
@@ -214,14 +224,13 @@ const Tracksell = () => {
     };
 
     setSelectFormtracksell(updatedForm);
-
     try {
-      await tracksell(updatedForm, token);
+      const ress = await insertTracksell(updatedForm, token);
 
       // **Update checked state with new entry**
       setChecked((prevChecked) => [
         ...prevChecked,
-        { productId, sellCount: sellCounts[productId] },
+        { productsId: productId, sellCount: sellCounts[productId] },
       ]);
 
       // Reset input field after submission
@@ -231,29 +240,41 @@ const Tracksell = () => {
     }
   };
 
+  {
+    /**function delete all the tracking from the date user selected */
+  }
 
   const handeDeleteAll = async () => {
     try {
+      const ress = await deleteTrackSell(selectDateBrachCheck, token);
+      fetchDateBrachCheck()
     } catch (err) {
       console.log(err);
       toast.error("error");
     }
   };
 
+  {
+    /** function open modal image  */
+  }
+  const handleImageClick = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
   const handleCloseImageModal = () => {
     setOpenImageModal(false);
     setSelectedImageUrl(null);
   };
 
+  {
+    /** fucntion fecth the tracking from the database */
+  }
+
   const fetchDateBrachCheck = async () => {
     // Ensure that both branch ID and sell date are available
     if (selectDateBrachCheck.brachId && selectDateBrachCheck.sellDate) {
       try {
-        console.log(
-          `Bracnh ID ${selectDateBrachCheck.brachId} Date Select ${selectDateBrachCheck.sellDate}`
-        );
         const res = await checkTrackSell(selectDateBrachCheck, token);
-        console.log(res);
         setChecked(res.data);
       } catch (error) {
         console.error("Error fetching branch check:", error);
@@ -261,13 +282,20 @@ const Tracksell = () => {
     }
   };
 
+  {
+    /**running the function event to fecth the tracking data from database */
+  }
+
   useEffect(() => {
     fetchDateBrachCheck();
   }, [selectDateBrachCheck.brachId, selectDateBrachCheck.sellDate]);
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
+  {
+    /** function handlechange for input insert tracking*/
+  }
+
+  const handleChange = (productId, value) => {
+    setSellCounts((prev) => ({ ...prev, [productId]: value }));
   };
 
   return (

@@ -1,11 +1,32 @@
 const express = require("express");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
-const { checkTrackSell } = require("../controller/tracking");
+const {
+  checkTrackSell,
+  checkTrackSend,
+  checkTrackExp,
+  insertTrackSell,
+  deleteTracksell,
+  insertTrackSend,
+  insertTrackExp,
+  deleteTracksend,
+  deleteTrackexp,
+  updateTrackSell,
+  updateTrackSend,
+  updateTrackExp,
+} = require("../controller/tracking");
 const router = express.Router();
 
-router.post('/checktracksell', authCheck, checkTrackSell)
-router.post('/checktracksend', authCheck)
-router.post('/checktrackexp', authCheck)
-
+router.post("/checktracksell", authCheck, checkTrackSell);
+router.post("/checktracksend", authCheck, checkTrackSend);
+router.post("/checktrackexp", authCheck, checkTrackExp);
+router.post("/inserttracksell", authCheck, insertTrackSell);
+router.post("/inserttracksend", authCheck, insertTrackSend);
+router.post("/inserttrackexp", authCheck, insertTrackExp);
+router.post("/deletealltracksell", authCheck, deleteTracksell);
+router.post("/deletealltracksend", authCheck, deleteTracksend);
+router.post("/deletealltrackexp", authCheck, deleteTrackexp);
+router.post("/updatetracksell", authCheck, updateTrackSell);
+router.post("/updatetracksend", authCheck, updateTrackSend);
+router.post("/updatetracksell", authCheck, updateTrackExp);
 
 module.exports = router;

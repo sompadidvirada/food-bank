@@ -7,22 +7,35 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
-import Calendar from "./component/Calendar";
+import CalendarSend from "./component/CalendarSend";
 import SelectBranch from "./component/SelectBranch";
 import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast, ToastContainer } from "react-toastify";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
+import {
+  checkTrackSell,
+  checkTrackSend,
+  deleteTrackSell,
+  deleteTrackSend,
+  insertTracksell,
+  insertTracksend,
+} from "../../api/tracking";
+import DialogEditSend from "./component/DialogEditSend";
+const URL = import.meta.env.VITE_API_URL;
 
 const Tracksend = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const user = useFoodBankStorage((state) => state.user);
+  const token = useFoodBankStorage((state) => state.token);
+  const products = useFoodBankStorage((state) => state.products);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const [checked, setChecked] = useState(null);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     sendCount: "",
     sendAt: "",
@@ -34,23 +47,262 @@ const Tracksend = () => {
     sendDate: "",
     brachId: "",
   });
+  const [sendCounts, setSellCounts] = useState({});
+
+  {
+    /** column for DataGrid  */
+  }
+
+  const columns = [
+    { field: "id", headerName: "ID", flex: 0.2 },
+    {
+      field: "image",
+      headerName: "PICTURE",
+      flex: 0.2,
+      renderCell: (params) => {
+        const imageUrl = params.row.image
+          ? `${URL}/product_img/${params.row?.image}`
+          : null;
+        return imageUrl ? (
+          <img
+            src={imageUrl}
+            alt="Product"
+            style={{
+              width: 50,
+              height: 50,
+              objectFit: "cover",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+            onClick={() => handleImageClick(imageUrl)}
+          />
+        ) : (
+          <span>No Image</span>
+        );
+      },
+    },
+    {
+      field: "name",
+      headerName: "NAME",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      cellClassName: "name-column--cell",
+      flex: 0.5,
+      renderCell: (params) => (
+        <Typography
+          variant="laoText"
+          fontWeight="bold"
+          color={colors.grey[100]}
+        >
+          {params?.value}
+        </Typography>
+      ),
+    },
+    {
+      field: "manage",
+      headerName: "SAND COUNT",
+      flex: 0.3,
+      renderCell: (params) => {
+        const productId = params.row.id;
+
+        // Find the tracked product in `checked`
+        const trackedProduct = checked?.find(
+          (item) => item?.productsId === productId
+        );
+        if (trackedProduct) {
+          return (
+            <Box display="flex-row">
+              <span
+                style={{ color: colors.greenAccent[200], fontWeight: "bold" }}
+              >
+                Tracked. ({trackedProduct.sendCount})
+              </span>
+              <DialogEditSend
+                trackedProduct={trackedProduct}
+                selectFormtracksell={selectFormtracksell}
+                setSelectFormtracksell={setSelectFormtracksell}
+                fetchDateBrachCheck={fetchDateBrachCheck}
+              />
+            </Box>
+          );
+        } else {
+          return (
+             <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+              <input
+                type="number"
+                min="0"
+                value={sendCounts[productId] || ""}
+                onChange={(e) =>
+                  handleChange(productId, Math.max(0, e.target.value))
+                }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") handleSetSendCount(productId);
+                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                    e.preventDefault(); // Prevent up/down arrows
+                }}
+                onWheel={(e) => e.target.blur()} // Prevent scroll
+                style={{
+                  width: "60px",
+                  padding: "5px",
+                  borderRadius: "4px",
+                  border: "1px solid #ccc",
+                  textAlign: "center",
+                  appearance: "textfield", // Hides arrows in most browsers
+                  MozAppearance: "textfield", // Hides arrows in Firefox
+                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
+                }}
+              />
+              <button
+                onClick={() => handleSetSendCount(productId)}
+                style={{
+                  background: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  padding: "5px 10px",
+                  cursor: "pointer",
+                  borderRadius: "4px",
+                }}
+              >
+                ✔
+              </button>
+            </div>
+          );
+        }
+      },
+    },
+    {
+      field: "category",
+      headerName: "CATEGORY",
+      type: "text",
+      headerAlign: "left",
+      flex: 0.5,
+      align: "left",
+      renderCell: (params) => {
+        return params.row.category ? (
+          <Typography
+            variant="laoText"
+            fontWeight="bold"
+            color={colors.grey[100]}
+          >
+            {params.row.category.name}
+          </Typography>
+        ) : (
+          "No Category"
+        );
+      },
+    },
+    {
+      field: "price",
+      type: "number",
+      headerName: "PRICE",
+      flex: 0.5,
+    },
+    {
+      field: "sellprice",
+      type: "number",
+      headerName: "SELL PRICE",
+      flex: 0.5,
+    },
+  ];
+
+  {
+    /** function insert tracking to database */
+  }
+
+  const handleSetSendCount = async (productId) => {
+    if (!sendCounts[productId]) return; // Prevent empty values
+
+    if (
+      selectFormtracksell.sendAt === "" ||
+      selectFormtracksell.brachId === ""
+    ) {
+      return;
+    }
+
+    const updatedForm = {
+      ...selectFormtracksell,
+      productId,
+      sendCount: sendCounts[productId],
+    };
+
+    setSelectFormtracksell(updatedForm);
+    try {
+      const ress = await insertTracksend(updatedForm, token);
+
+      // **Update checked state with new entry**
+      setChecked((prevChecked) => [
+        ...prevChecked,
+        { productsId: productId, sendCount: sendCounts[productId] },
+      ]);
+
+      // Reset input field after submission
+      setSellCounts((prev) => ({ ...prev, [productId]: "" }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  {
+    /**function delete all the tracking from the date user selected */
+  }
 
   const handeDeleteAll = async () => {
     try {
+      const ress = await deleteTrackSend(selectDateBrachCheck, token);
+      fetchDateBrachCheck()
     } catch (err) {
       console.log(err);
       toast.error("error");
     }
   };
 
+  {
+    /** function open modal image  */
+  }
+  const handleImageClick = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
   const handleCloseImageModal = () => {
     setOpenImageModal(false);
     setSelectedImageUrl(null);
   };
 
+  {
+    /** fucntion fecth the tracking from the database */
+  }
+  const fetchDateBrachCheck = async () => {
+    // Ensure that both branch ID and sell date are available
+    if (selectDateBrachCheck.brachId && selectDateBrachCheck.sendDate) {
+      try {
+        const res = await checkTrackSend(selectDateBrachCheck, token);
+        setChecked(res.data);
+      } catch (error) {
+        console.error("Error fetching branch check:", error);
+      }
+    }
+  };
+
+  {
+    /**running the function event to fecth the tracking data from database */
+  }
+
+  useEffect(() => {
+    fetchDateBrachCheck();
+  }, [selectDateBrachCheck.brachId, selectDateBrachCheck.sendDate]);
+
+  {
+    /** function handlechange for input insert tracking*/
+  }
+
+  const handleChange = (productId, value) => {
+    setSellCounts((prev) => ({ ...prev, [productId]: value }));
+  };
+
   return (
     <Box m="20px" textAlign="center">
-      <Header title="ຄີຍອດສົ່ງແຕ່ລະສາຂາ" />
+      <Header title="ຄີຍອດຈັດສົ່ງແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
         display="grid"
@@ -68,7 +320,7 @@ const Tracksend = () => {
             gap="20px"
           >
             <Box>
-              <Calendar
+              <CalendarSend
                 selectFormtracksell={selectFormtracksell}
                 setSelectFormtracksell={setSelectFormtracksell}
                 setSelectDateBrachCheck={setSelectDateBrachCheck}
@@ -122,17 +374,18 @@ const Tracksend = () => {
             },
           }}
         >
-          {selectFormtracksell.sellAt && selectFormtracksell.brachId ? (
+          {selectFormtracksell.sendAt && selectFormtracksell.brachId ? (
             <DataGrid
               rows={products.filter((product) =>
-                product.avilableproduct?.some(
+                product.available?.some(
                   (item) =>
                     item.aviableStatus === true &&
-                    item.brachId === selectFormtracksell.brachId
+                    item.branchId === selectFormtracksell.brachId
                 )
               )}
               columns={columns}
               autoHeight
+              hideFooter
               sx={{ width: "100%" }}
             />
           ) : (

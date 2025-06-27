@@ -57,8 +57,8 @@ model products {
   tracksend  tracksend[]
   trackexp   trackexp[]
   available  availableproduct[]
-  category   category?          @relation(fields: [categoryId], references: [id])
-  categoryId Int?
+  category   category          @relation(fields: [categoryId], references: [id])
+  categoryId Int
 }
 
 model category {
@@ -80,46 +80,46 @@ model availableproduct {
 }
 
 model tracksell {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int      @id @unique @default(autoincrement())
   sellCount  Int
   sellAt     DateTime
   sellDay    String
-  products   products? @relation(fields: [productsId], references: [id])
-  productsId Int?
-  staff      staff?    @relation(fields: [staffId], references: [id])
-  staffId    Int?
-  branch     branch?   @relation(fields: [branchId], references: [id])
-  branchId   Int?
+  products   products @relation(fields: [productsId], references: [id])
+  productsId Int
+  staff      staff    @relation(fields: [staffId], references: [id])
+  staffId    Int
+  branch     branch   @relation(fields: [branchId], references: [id])
+  branchId   Int
 
   @@unique([productsId, branchId, sellAt])
 }
 
 model tracksend {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int      @id @unique @default(autoincrement())
   sendCount  Int
   sendAt     DateTime
   sendDay    String
-  products   products? @relation(fields: [productsId], references: [id])
-  productsId Int?
-  staff      staff?    @relation(fields: [staffId], references: [id])
-  staffId    Int?
-  branch     branch?   @relation(fields: [branchId], references: [id])
-  branchId   Int?
+  products   products @relation(fields: [productsId], references: [id])
+  productsId Int
+  staff      staff    @relation(fields: [staffId], references: [id])
+  staffId    Int
+  branch     branch   @relation(fields: [branchId], references: [id])
+  branchId   Int
 
   @@unique([productsId, branchId, sendAt])
 }
 
 model trackexp {
-  id         Int       @id @unique @default(autoincrement())
+  id         Int      @id @unique @default(autoincrement())
   expCount   Int
   expAt      DateTime
   expDay     String
-  products   products? @relation(fields: [productsId], references: [id])
-  productsId Int?
-  staff      staff?    @relation(fields: [staffId], references: [id])
-  staffId    Int?
-  branch     branch?   @relation(fields: [branchId], references: [id])
-  branchId   Int?
+  products   products @relation(fields: [productsId], references: [id])
+  productsId Int
+  staff      staff    @relation(fields: [staffId], references: [id])
+  staffId    Int
+  branch     branch   @relation(fields: [branchId], references: [id])
+  branchId   Int
 
   @@unique([productsId, branchId, expAt])
 }
@@ -130,5 +130,5 @@ model calendar {
   discription String
   polink      String
   date        DateTime
-  isSuccess   String @default("ready")
+  isSuccess   String   @default("ready")
 }
