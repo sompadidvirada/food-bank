@@ -17,6 +17,9 @@ import ReportAll from "../scenes/report_all/ReportAll";
 import BarSell from "../scenes/Bar/BarSell";
 import BarSend from "../scenes/Bar/BarSend"
 import BarExp from "../scenes/Bar/BarExp"
+import PieSell from "../scenes/Pie/PieSell";
+import PieSend from "../scenes/Pie/PieSend";
+import PieExp from "../scenes/Pie/PieExp";
 
 const router = createBrowserRouter([
   {
@@ -39,6 +42,9 @@ const router = createBrowserRouter([
       { path: "barsell", element: <BarSell/> },
       { path: "barsend", element: <BarSend/> },
       { path: "barexp", element: <BarExp/> },
+      { path: "piesell", element: <PieSell/> },
+      { path: "piesend", element: <PieSend/> },
+      { path: "pieexp", element: <PieExp/> },
     ],
   },
   {

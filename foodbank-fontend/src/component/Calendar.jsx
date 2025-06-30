@@ -10,6 +10,7 @@ import {
   getBarChartSell,
   getBarChartSend,
 } from "../api/barChart";
+import { getPieChartExp, getPieChartSell, getPieChartSend } from "../api/PieChart";
 
 export default function Calendar() {
   const {
@@ -20,9 +21,36 @@ export default function Calendar() {
     setBarSell,
     setBarSend,
     setBarExp,
+    setPieSell,
+    setPieSend,
+    setPieExp
   } = useFoodBankStorage();
   const token = useFoodBankStorage((state) => state.token);
 
+  const fetchPieSell = async () => {
+    try {
+      const getDate = await getPieChartSell(queryForm, token);
+      setPieSell(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  const fetchPieSend = async () => {
+    try {
+      const getDate = await getPieChartSend(queryForm, token);
+      setPieSend(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  const fetchPieExp = async () => {
+    try {
+      const getDate = await getPieChartExp(queryForm, token);
+      setPieExp(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
   const fetchBarSell = async () => {
     try {
       const getDate = await getBarChartSell(queryForm, token);
@@ -73,6 +101,9 @@ export default function Calendar() {
       fetchBarSell();
       fetchBarSend();
       fetchBarExp();
+      fetchPieSell()
+      fetchPieSend()
+      fetchPieExp()
     }
   }, [queryForm.startDate, queryForm.endDate]);
 

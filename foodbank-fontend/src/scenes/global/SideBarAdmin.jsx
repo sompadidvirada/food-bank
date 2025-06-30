@@ -26,8 +26,8 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
-import AnalyticsIcon from '@mui/icons-material/Analytics';
-import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import AnalyticsIcon from "@mui/icons-material/Analytics";
+import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -271,6 +271,7 @@ const SideBarAdmin = () => {
               ກາຟລາຍລະອຽດສິນຄ້າ
             </Typography>
 
+            {/**BAR CHART MENU */}
             <SubMenu
               title="Bar Chart"
               icon={<BarChartIcon />}
@@ -293,6 +294,35 @@ const SideBarAdmin = () => {
               <Item
                 title="EXP Bar Chart"
                 to="/admin/barexp"
+                icon={<LeaderboardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </SubMenu>
+            
+            {/**PIE CHART MENU */}
+            <SubMenu
+              title="PIE Chart"
+              icon={<BarChartIcon />}
+              style={{ color: colors.grey[100] }}
+            >
+              <Item
+                title="Sell Pie Chart"
+                to="/admin/piesell"
+                icon={<ChecklistIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Send Pie Chart"
+                to="/admin/piesend"
+                icon={<AnalyticsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="EXP Pie Chart"
+                to="/admin/pieexp"
                 icon={<LeaderboardIcon />}
                 selected={selected}
                 setSelected={setSelected}
