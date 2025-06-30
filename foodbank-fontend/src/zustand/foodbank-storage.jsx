@@ -14,11 +14,23 @@ const FoodBankStorage = (set, get) => ({
   dataTrack: null,
   totalData: null,
   queryForm: {
-    startDate: "", 
+    startDate: "",
     endDate: "",
   },
+  barSell: null,
+  barSend: null,
+  barExp: null,
+  setBarSell: (newData) => {
+    set({ barSell: newData }); // <-- Add function to update data
+  },
+  setBarSend: (newData) => {
+    set({ barSend: newData }); // <-- Add function to update data
+  },
+  setBarExp: (newData) => {
+    set({ barExp: newData }); // <-- Add function to update data
+  },
   setTotalData: (newData) => {
-    set({ totalData: newData }); 
+    set({ totalData: newData });
   },
   setDataTrack: (newData) => {
     set({ dataTrack: newData });

@@ -14,7 +14,7 @@ const SelectStatus = ({ setFormUpdateAviable, row, formUpdateAviable }) => {
   };
 
   return (
-    <FormControl sx={{ minWidth: 160, textAlign: "center", height: 48 }}>
+    <FormControl>
       <Select
         labelId="status-select-label"
         displayEmpty
@@ -31,13 +31,14 @@ const SelectStatus = ({ setFormUpdateAviable, row, formUpdateAviable }) => {
             paddingTop: 1,
             paddingBottom: 1,
           },
+          fontFamily:"Noto Sans Lao"
         }}
       >
         <MenuItem value="" disabled>
-          <Typography>Select Status</Typography>
+          <Typography  sx={{fontFamily:"Noto Sans Lao"}}>ເລືອກສະຖານະ</Typography>
         </MenuItem>
-        <MenuItem value="true">AVAILABLE</MenuItem>
-        <MenuItem value="false">UNAVAILABLE</MenuItem>
+        <MenuItem value="true" sx={{fontFamily:"Noto Sans Lao"}}>ອະນຸມັດ</MenuItem>
+        <MenuItem value="false" sx={{fontFamily:"Noto Sans Lao"}}>ບໍ່ອະນຸມັດ</MenuItem>
       </Select>
     </FormControl>
   );

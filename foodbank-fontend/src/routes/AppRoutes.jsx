@@ -14,6 +14,9 @@ import Tracksend from "../scenes/Tracking/Tracksend";
 import Trackexp from "../scenes/Tracking/Trackexp";
 import ReportPerBranch from "../scenes/report_per_branch/ReportPerBranch";
 import ReportAll from "../scenes/report_all/ReportAll";
+import BarSell from "../scenes/Bar/BarSell";
+import BarSend from "../scenes/Bar/BarSend"
+import BarExp from "../scenes/Bar/BarExp"
 
 const router = createBrowserRouter([
   {
@@ -33,6 +36,9 @@ const router = createBrowserRouter([
       { path: "trackexp", element: <Trackexp/> },
       { path: "reportperbranch", element: <ReportPerBranch/> },
       { path: "reportall", element: <ReportAll/> },
+      { path: "barsell", element: <BarSell/> },
+      { path: "barsend", element: <BarSend/> },
+      { path: "barexp", element: <BarExp/> },
     ],
   },
   {

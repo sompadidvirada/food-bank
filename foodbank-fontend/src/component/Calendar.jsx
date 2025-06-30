@@ -5,10 +5,48 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 import useFoodBankStorage from "../zustand/foodbank-storage";
 import { fecthReportAll, fecthReportPerBranch } from "../api/report";
+import {
+  getBarChartExp,
+  getBarChartSell,
+  getBarChartSend,
+} from "../api/barChart";
 
 export default function Calendar() {
-  const { queryForm, setQueryForm, setDataTrack,setTotalData } = useFoodBankStorage();
+  const {
+    queryForm,
+    setQueryForm,
+    setDataTrack,
+    setTotalData,
+    setBarSell,
+    setBarSend,
+    setBarExp,
+  } = useFoodBankStorage();
   const token = useFoodBankStorage((state) => state.token);
+
+  const fetchBarSell = async () => {
+    try {
+      const getDate = await getBarChartSell(queryForm, token);
+      setBarSell(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  const fetchBarSend = async () => {
+    try {
+      const getDate = await getBarChartSend(queryForm, token);
+      setBarSend(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+  const fetchBarExp = async () => {
+    try {
+      const getDate = await getBarChartExp(queryForm, token);
+      setBarExp(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
 
   const fecthDataTrack = async () => {
     try {
@@ -19,20 +57,22 @@ export default function Calendar() {
     }
   };
 
-    const fecthTotalData = async () => {
+  const fecthTotalData = async () => {
     try {
-      const respones = await fecthReportAll(queryForm, token)
-      setTotalData(respones.data.totalDetail)
-
-    }catch(err) {
-      console.log(err)
+      const respones = await fecthReportAll(queryForm, token);
+      setTotalData(respones.data.totalDetail);
+    } catch (err) {
+      console.log(err);
     }
-  }
+  };
 
   React.useEffect(() => {
     if (queryForm.startDate && queryForm.endDate) {
       fecthDataTrack();
-      fecthTotalData()
+      fecthTotalData();
+      fetchBarSell();
+      fetchBarSend();
+      fetchBarExp();
     }
   }, [queryForm.startDate, queryForm.endDate]);
 

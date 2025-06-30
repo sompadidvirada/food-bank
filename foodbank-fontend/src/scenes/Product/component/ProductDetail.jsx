@@ -8,12 +8,14 @@ import {
   DialogTitle,
   IconButton,
   Typography,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { DataGrid } from "@mui/x-data-grid";
 import SelectStatus from "./SelectStatus";
 import { updateStatusProduct } from "../../../api/product";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
+import { tokens } from "../../../theme";
 const URL = import.meta.env.VITE_API_URL;
 
 const ProductDetail = ({
@@ -24,6 +26,9 @@ const ProductDetail = ({
 }) => {
   const [formUpdateAviable, setFormUpdateAviable] = useState({});
   const token = useFoodBankStorage((state) => state.token);
+    const theme = useTheme();
+    const colors = tokens(theme.palette.mode);
+  
 
   const handleCloseDetailDialog = () => {
     setOpenDetailDialog(false);
@@ -58,7 +63,6 @@ const ProductDetail = ({
       console.log(err);
     }
   };
-
 
   return (
     <Dialog
@@ -99,40 +103,93 @@ const ProductDetail = ({
       <DialogContent dividers>
         <Box sx={{ height: "100%", width: "100%" }}>
           <DataGrid
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                fontFamily: "Noto Sans Lao",
+                fontWeight: "bold", // optional
+                fontSize: "16px", // optional
+              },
+            }}
             rows={selectedProduct?.available ?? []}
             columns={[
-              { field: "branchId", headerName: "ID", flex: 0.2 },
+              {
+                field: "branchId",
+                headerName: "ໄອດີສາຂາ",
+                flex: 0.4,
+                headerAlign: "center",
+                align: "center",
+              },
               {
                 field: "branchName",
-                headerName: "Branch Name",
+                headerName: "ຊື່ສາຂາ",
                 flex: 1,
+                headerAlign: "center",
+                align: "center",
                 renderCell: (params) => (
-                  <Typography
+                  <Box
                     sx={{
-                      fontFamily: "Noto Sans Lao",
-                      justifySelf: "center",
-                      alignSelf: "center",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      width: "100%",
+                      height: "100%",
                     }}
                   >
-                    {params.value}
-                  </Typography>
+                    <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                      {params.value}
+                    </Typography>
+                  </Box>
                 ),
               },
               {
                 field: "aviableStatus",
-                headerName: "Available",
+                headerName: "ສະຖານະສິນຄ້າ",
                 flex: 0.5,
+                headerAlign: "center",
+                align: "center",
                 renderCell: (params) =>
                   params.value ? (
-                    <Typography color="green">Available</Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      <Typography
+                        color={ colors.greenAccent[400]}
+                        sx={{ fontFamily: "Noto Sans Lao" }}
+                      >
+                        ອະນຸມັດ
+                      </Typography>
+                    </Box>
                   ) : (
-                    <Typography color="red">Unavailable</Typography>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: "100%",
+                        height: "100%",
+                      }}
+                    >
+                      <Typography
+                        color={colors.redAccent[400]}
+                        sx={{ fontFamily: "Noto Sans Lao" }}
+                      >
+                        ບໍ່ອະນຸມັດ
+                      </Typography>
+                    </Box>
                   ),
               },
               {
                 field: "updateAt",
-                headerName: "Last Updated",
+                headerName: "ວັນທີ່ອັປເດດ",
                 flex: 1,
+                headerAlign: "center",
+                align: "center",
                 renderCell: (params) => {
                   const date = new Date(params.value);
                   return isNaN(date)
@@ -149,7 +206,9 @@ const ProductDetail = ({
               },
               {
                 field: "manage",
-                headerName: "MANAGE",
+                headerName: "ຈັດການ",
+                headerAlign: "center",
+                align: "center",
                 flex: 1,
                 renderCell: (params) => {
                   return (
@@ -158,6 +217,7 @@ const ProductDetail = ({
                         setFormUpdateAviable={setFormUpdateAviable}
                         row={params.row}
                         formUpdateAviable={formUpdateAviable}
+                        sx={{ height: "80%", alignSelf: "center" }}
                       />
                       <Button
                         onClick={() => hadleUpdateAviable(params.row)}
@@ -167,8 +227,13 @@ const ProductDetail = ({
                           formUpdateAviable.status === undefined
                         }
                         variant="contained"
+                        sx={{
+                          height: "80%",
+                          alignSelf: "center",
+                          fontFamily: "Noto Sans Lao",
+                        }}
                       >
-                        SUBMIT
+                        ສົ່ງຟອມ
                       </Button>
                     </Box>
                   );
@@ -184,7 +249,13 @@ const ProductDetail = ({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleCloseDetailDialog}>Close</Button>
+        <Button
+          onClick={handleCloseDetailDialog}
+          variant="contained"
+          color="error"
+        >
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );

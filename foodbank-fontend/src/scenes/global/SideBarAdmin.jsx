@@ -2,7 +2,7 @@ import React from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { ProSidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
 import {
   Box,
   Dialog,
@@ -20,11 +20,14 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Editprofile from "./component/Editprofile";
 import MapIcon from "@mui/icons-material/Map";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
-import LocalShippingIcon from '@mui/icons-material/LocalShipping';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import SpeakerNotesIcon from '@mui/icons-material/SpeakerNotes';
-import ChecklistIcon from '@mui/icons-material/Checklist';
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
+import ChecklistIcon from "@mui/icons-material/Checklist";
+import AnalyticsIcon from '@mui/icons-material/Analytics';
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -258,6 +261,43 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ກາຟລາຍລະອຽດສິນຄ້າ
+            </Typography>
+
+            <SubMenu
+              title="Bar Chart"
+              icon={<BarChartIcon />}
+              style={{ color: colors.grey[100] }}
+            >
+              <Item
+                title="Sell Bar Chart"
+                to="/admin/barsell"
+                icon={<ChecklistIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="Send Bar Chart"
+                to="/admin/barsend"
+                icon={<AnalyticsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+              <Item
+                title="EXP Bar Chart"
+                to="/admin/barexp"
+                icon={<LeaderboardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+            </SubMenu>
           </Box>
         </Menu>
       </ProSidebar>
