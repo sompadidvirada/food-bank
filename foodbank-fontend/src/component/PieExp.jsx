@@ -12,7 +12,7 @@ const PieExpCompo = ({ isDashboard, dataPie }) => {
     <div
       style={{
         width: "100%", // Ensure it spans the full available width
-        height: isDashboard ? "100%" : "1000px", // Adjust height for dashboard view
+        height: isDashboard ? "100%" : "600px", // Adjust height for dashboard view
         padding: "0 20px", // Add padding for better spacing
         boxSizing: "border-box", // Ensure padding doesn't affect layout
       }}
@@ -87,31 +87,6 @@ const PieExpCompo = ({ isDashboard, dataPie }) => {
             rotation: -45,
             lineWidth: 6,
             spacing: 10,
-          },
-        ]}
-        legends={[
-          {
-            anchor: "right",
-            direction: "column",
-            justify: false,
-            translateX: -200,
-            translateY: 0,
-            itemsSpacing: 5,
-            itemWidth: 10,
-            itemHeight: 19,
-            itemTextColor: "#999",
-            itemDirection: "left-to-right",
-            itemOpacity: 1,
-            symbolSize: 17,
-            symbolShape: "circle",
-            effects: [
-              {
-                on: "hover",
-                style: {
-                  itemTextColor: colors.grey[100],
-                },
-              },
-            ],
           },
         ]}
         tooltip={({ datum }) => (

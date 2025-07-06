@@ -4,8 +4,6 @@ const jwt = require("jsonwebtoken");
 exports.login = async (req, res) => {
   try {
     const { phonenumber, password } = req.body;
-    console.log(req.body)
-
     if (!phonenumber || !password) {
       return res.status(400).json({ message: `Can't Access.` });
     }
@@ -69,7 +67,7 @@ exports.createStaff = async (req, res) => {
         firstname: firstname,
         lastname: lastname,
         phonenumber: phonenumber,
-        birdDate: new Date(birdDate),
+        birstDate: new Date(birdDate),
       },
     });
     res.send(createStaff);

@@ -184,7 +184,7 @@ const Product = () => {
   const productWBracnh = products?.map((product) => ({
     ...product,
     available: product.available.map((item) => {
-      const branchs = branch.find((b) => b.id === item.branchId);
+      const branchs = branch?.find((b) => b.id === item.branchId);
       return {
         ...item,
         branchName: branchs ? branchs.branchname : null,

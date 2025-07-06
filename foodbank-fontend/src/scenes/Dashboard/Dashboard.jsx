@@ -10,10 +10,19 @@ import TrafficIcon from "@mui/icons-material/Traffic";
 import ProgressCircle from "../component/ProgressCircle";
 import BarChart from "../../component/BarChartSell";
 import PieChart from "../../component/PieChart";
+import useFoodBankStorage from "../../zustand/foodbank-storage";
+import { useEffect } from "react";
 
 const Dashboard = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const { getProduct, getBrnachs, getCategory } = useFoodBankStorage();
+  
+  useEffect(() => {
+    getProduct();
+    getBrnachs();
+    getCategory();
+  }, []);
   return (
     <Box m="20px">
       {/* HEADER */}
