@@ -30,9 +30,7 @@ const ReportAll = () => {
       ? totalData.totalDetail
           .flatMap((item) => item.detail || [])
           .map((item) =>
-            item.image
-              ? `${URL}/product_img/${item.image}`
-              : null
+            item.image ? `${URL}/product_img/${item.image}` : null
           )
           .filter(Boolean)
       : [];
@@ -377,7 +375,7 @@ const ReportAll = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center">
+    <Box m="20px" textAlign="center" sx={{ paddingBottom: "60px" }}>
       <Header title="TRACKING EVERY BRANCH SALE AND EXPIRE" />
       <Box
         mt="30px"
@@ -401,7 +399,6 @@ const ReportAll = () => {
         </Box>
         <Box
           sx={{
-            height: "100vh",
             "& .MuiDataGrid-root": { border: "none" },
             "& .MuiDataGrid-cell": { borderBottom: "none" },
             "& .name-column--cell": { color: colors.greenAccent[300] },
@@ -411,6 +408,9 @@ const ReportAll = () => {
             },
             "& .MuiDataGrid-virtualScroller": {
               backgroundColor: colors.primary[400],
+            },
+            "& .MuiDataGrid-virtualScrollerContent": {
+              paddingBottom: "60px", // ✅ adds visible space AFTER the last row
             },
             "& .MuiDataGrid-footerContainer": {
               borderTop: "none",
@@ -425,9 +425,11 @@ const ReportAll = () => {
           }}
         >
           <DataGrid
+            autoHeight // ✅ let the grid expand to fit all rows
             rows={rowsWithPercent}
             columns={columns}
             disableRowSelectionOnClick
+            hideFooter
           />
         </Box>
       </Box>

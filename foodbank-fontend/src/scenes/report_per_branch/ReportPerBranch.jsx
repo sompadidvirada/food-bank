@@ -291,9 +291,8 @@ const ReportPerBranch = () => {
         >
           <Box
             m="40px 0 0 0"
-            width="98%"
+            width="100%"
             height="100%"
-            overflow="scroll"
             sx={{
               "& .MuiDataGrid-root": { border: "none" },
               "& .MuiDataGrid-cell": { borderBottom: "none" },
