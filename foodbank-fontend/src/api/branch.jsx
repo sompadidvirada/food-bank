@@ -23,3 +23,10 @@ export const CreateBranch = (form, token) => {
         }
     })
 }
+export const updateProvince = (form, token) => {
+    return axios.put(`${URL}/updateprovince`, form, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

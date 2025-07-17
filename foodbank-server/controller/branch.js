@@ -69,3 +69,25 @@ exports.updateBranchLocation = async  (req,res) => {
     res.status(500).json({message: `server error`})
   }
 } 
+
+exports.updateBranchProvice = async (req,res) => {
+  try{
+    const { branchId, provice} = req.body
+
+    if(!branchId || !provice) {
+      return res.status(400).json({ message: `Emty value.`})
+    }
+
+    const updateBranch = await prisma.branch.update({
+      where: {
+        id: Number(branchId)
+      }, data: {
+        province: provice
+      }
+    })
+    res.send(updateBranch)
+  }catch(err) {
+    console.log(err)
+    return res.status(500).json({ message: `server error`})
+  }
+}
