@@ -3,12 +3,6 @@ import React, { useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import StatusBox from "../component/StatusBox";
-import EmailIcon from "@mui/icons-material/Email";
-import PointOfSaleIcon from "@mui/icons-material/PointOfSale";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
-import TrafficIcon from "@mui/icons-material/Traffic";
-import ProgressCircle from "../component/ProgressCircle";
-import BarChart from "../../component/BarChartSell";
 import SsidChartIcon from "@mui/icons-material/SsidChart";
 import LocalAtmIcon from "@mui/icons-material/LocalAtm";
 import PieChart from "../../component/PieChart";
@@ -20,6 +14,20 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CircularProgress from "@mui/material/CircularProgress";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import Checkboxs from "./checkbox/Checkbox";
+import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import DepartureBoardIcon from "@mui/icons-material/DepartureBoard";
+import AutoDeleteIcon from "@mui/icons-material/AutoDelete";
+import EmojiSymbolsIcon from "@mui/icons-material/EmojiSymbols";
+import LineCharts from "../../component/LineChart";
+import PieSellCompo from "../../component/PieSell";
+import PieSendCompo from "../../component/PieSend";
+import PieExpCompo from "../../component/PieExp";
+import BarChart from "../../component/BarChartSell";
+import BarChartSend from "../../component/BarChartSend";
+import BarChartExp from "../../component/BarChartExp";
+import AddBusinessIcon from "@mui/icons-material/AddBusiness";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -28,8 +36,20 @@ const Dashboard = () => {
   const [selectBranchs, setSelectBranchs] = useState([]);
   const [selectBranchName, setSelectBranchName] = useState([]);
   const [totalSell, setTotalSell] = useState(null);
-  const { getProduct, getBrnachs, getCategory, token, queryForm, branchs } =
-    useFoodBankStorage();
+  const {
+    getProduct,
+    getBrnachs,
+    getCategory,
+    token,
+    queryForm,
+    branchs,
+    pieSell,
+    pieSend,
+    pieExp,
+  } = useFoodBankStorage();
+  const data = useFoodBankStorage((state) => state.barSell);
+  const data2 = useFoodBankStorage((state) => state.barSend);
+  const data3 = useFoodBankStorage((state) => state.barExp);
 
   const getPercentFromPreviose = (current, last) => {
     const diffPercent = Math.abs((current - last) / last) * 100;
@@ -96,8 +116,6 @@ const Dashboard = () => {
     setOpenBackdrop(false);
   };
 
-  console.log(totalSell);
-
   return (
     <Box>
       {openBackdrop ? (
@@ -110,13 +128,12 @@ const Dashboard = () => {
       ) : (
         <Box m="20px">
           {/* HEADER */}
+          <Header title="DASHBOARD" />
           <Box
             display="flex"
             justifyContent="space-between"
             alignItems="center"
           >
-            <Header title="DASHBOARD" subtitle="Welcome to your dashboard" />
-
             <Box
               sx={{
                 display: "flex",
@@ -147,7 +164,7 @@ const Dashboard = () => {
               </Box>
             </Box>
             <Box>
-              <Calendar />
+              <Calendar selectBranchs={selectBranchs} />
             </Box>
           </Box>
 
@@ -184,7 +201,7 @@ const Dashboard = () => {
                 increase={incress1}
                 icon={
                   <LocalAtmIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -214,7 +231,7 @@ const Dashboard = () => {
                 progress={"none"}
                 icon={
                   <LocalShippingIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -244,7 +261,7 @@ const Dashboard = () => {
                 progress={"none"}
                 icon={
                   <DeleteForeverIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -273,7 +290,7 @@ const Dashboard = () => {
                 }
                 icon={
                   <SsidChartIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -302,8 +319,8 @@ const Dashboard = () => {
                 }
                 progress="none"
                 icon={
-                  <PersonAddIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                  <CurrencyExchangeIcon
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -326,13 +343,13 @@ const Dashboard = () => {
                 }
                 subtitle={
                   <Typography variant="laoText">
-                    ຍອດຂາຍທັງຫມົດທຸກສາຂາ ເດືອນກ່ອນ
+                    ຍອດຈັດສົ່ງທັງຫມົດທຸກສາຂາ ເດືອນກ່ອນ
                   </Typography>
                 }
                 progress="none"
                 icon={
-                  <PersonAddIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                  <DepartureBoardIcon
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -360,8 +377,8 @@ const Dashboard = () => {
                 }
                 progress="none"
                 icon={
-                  <PersonAddIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                  <AutoDeleteIcon
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -379,7 +396,8 @@ const Dashboard = () => {
                     {!totalSell ||
                     totalSell?.lastMonth?.percentageOfPricetotalExpLast === null
                       ? "0"
-                      : totalSell?.lastMonth?.percentageOfPricetotalExpLast}{" "}
+                      : totalSell?.lastMonth
+                          ?.percentageOfPricetotalExpLast}{" "}
                     %
                   </Typography>
                 }
@@ -389,8 +407,8 @@ const Dashboard = () => {
                   </Typography>
                 }
                 icon={
-                  <SsidChartIcon
-                    sx={{ color: colors.greenAccent[600], fontSize: "26px" }}
+                  <EmojiSymbolsIcon
+                    sx={{ color: colors.grey[100], fontSize: "26px" }}
                   />
                 }
               />
@@ -402,38 +420,157 @@ const Dashboard = () => {
               gridColumn="span 12"
               gridRow="span 3"
               backgroundColor={colors.primary[400]}
+              textAlign={"center"}
             >
               <Typography
-                variant="h5"
+                variant="laoText"
                 fontWeight="600"
-                sx={{ padding: "30px 30px 0 30px" }}
+                fontSize={25}
+                sx={{ p: 2 }}
               >
-                Sales Quantity
+                ຍອດຂາຍແຕ່ລະສາຂາ ແຍກເປັນວັນ ຈັນ - ອາທິດ
               </Typography>
               <Box height="90%">
-                <BarChart isDashboard={true} />
+                <LineCharts isDashboard={true} />
               </Box>
             </Box>
 
             {/** ROW 4 */}
 
             <Box
-              gridColumn="span 6"
-              gridRow="span 3"
+              gridColumn="span 4"
+              gridRow="span 2"
               backgroundColor={colors.primary[400]}
+              textAlign={"center"}
             >
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+                ລາຍການທີ່ຂາຍ
+              </Typography>
               <Box height="90%">
-                <PieChart />
+                <PieSellCompo isDashboard={true} dataPie={pieSell} />
               </Box>
             </Box>
 
             <Box
-              gridColumn="span 6"
+              gridColumn="span 4"
+              gridRow="span 2"
+              backgroundColor={colors.primary[400]}
+              textAlign={"center"}
+            >
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+                ລາຍການທີ່ຈັດສົ່ງ
+              </Typography>
+              <Box height="90%">
+                <PieSendCompo isDashboard={true} dataPie={pieSend} />
+              </Box>
+            </Box>
+            <Box
+              gridColumn="span 4"
+              gridRow="span 2"
+              backgroundColor={colors.primary[400]}
+              textAlign={"center"}
+            >
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+                ລາຍການທີ່ໝົດອາຍຸ
+              </Typography>
+              <Box height="90%">
+                <PieExpCompo isDashboard={true} dataPie={pieExp} />
+              </Box>
+            </Box>
+            {/** ROW 5 */}
+            <Box
+              gridColumn="span 12"
               gridRow="span 3"
               backgroundColor={colors.primary[400]}
+              textAlign={"center"}
             >
-              <Box height="90%">
-                <PieChart />
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "10%",
+                  display: "flex",
+                  gap: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="laoText"
+                  fontSize={20}
+                  color={colors.greenAccent[400]}
+                >
+                  ຍອດຂາຍແຕ່ລະສາຂາ
+                </Typography>
+                <VerifiedIcon
+                  sx={{ color: colors.greenAccent[400], fontSize: 30 }}
+                />
+              </Box>
+              <Box sx={{ width: "100%", height: "85%" }}>
+                <BarChart data={data} isDashboard={true} />
+              </Box>
+            </Box>
+            {/** ROW 6 */}
+            <Box
+              gridColumn="span 12"
+              gridRow="span 3"
+              backgroundColor={colors.primary[400]}
+              textAlign={"center"}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "10%",
+                  display: "flex",
+                  gap: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="laoText"
+                  fontSize={20}
+                  color={colors.blueAccent[400]}
+                >
+                  ຍອດຈັດສົ່ງແຕ່ລະສາຂາ
+                </Typography>
+                <AddBusinessIcon
+                  sx={{ color: colors.blueAccent[400], fontSize: 30 }}
+                />
+              </Box>
+              <Box sx={{ width: "100%", height: "85%" }}>
+                <BarChartSend data={data2} isDashboard={true} />
+              </Box>
+            </Box>
+            {/** ROW 7 */}
+            <Box
+              gridColumn="span 12"
+              gridRow="span 3"
+              backgroundColor={colors.primary[400]}
+              textAlign={"center"}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "10%",
+                  display: "flex",
+                  gap: 4,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Typography
+                  variant="laoText"
+                  fontSize={20}
+                  color={colors.redAccent[400]}
+                >
+                  ຍອດໝົດອາຍຸແຕ່ລະສາຂາ
+                </Typography>
+                <RestoreFromTrashIcon
+                  sx={{ color: colors.redAccent[400], fontSize: 30 }}
+                />
+              </Box>
+              <Box sx={{ width: "100%", height: "85%" }}>
+                <BarChartExp data={data3} isDashboard={true} />
               </Box>
             </Box>
           </Box>

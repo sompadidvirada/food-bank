@@ -12,14 +12,18 @@ const generateUniqueColors = (count) => {
 
 exports.pieChartSell = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
     const ress = await prisma.tracksell.findMany({
-      where: { sellAt: { gte: start, lte: end } },
+      where: {
+        sellAt: { gte: start, lte: end },
+        branchId: { notIn: branchs },
+      },
+
       include: { products: true },
     });
 
@@ -52,14 +56,17 @@ exports.pieChartSell = async (req, res) => {
 };
 exports.pieChartSend = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
     const ress = await prisma.tracksend.findMany({
-      where: { sendAt: { gte: start, lte: end } },
+      where: {
+        sendAt: { gte: start, lte: end },
+        branchId: { notIn: branchs },
+      },
       include: { products: true },
     });
 
@@ -92,14 +99,17 @@ exports.pieChartSend = async (req, res) => {
 };
 exports.pieChartExp = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
 
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
     const ress = await prisma.trackexp.findMany({
-      where: { expAt: { gte: start, lte: end } },
+      where: {
+        expAt: { gte: start, lte: end },
+        branchId: { notIn: branchs },
+      },
       include: { products: true },
     });
 

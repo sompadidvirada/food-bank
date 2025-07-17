@@ -10,9 +10,14 @@ import {
   getBarChartSell,
   getBarChartSend,
 } from "../api/barChart";
-import { getPieChartExp, getPieChartSell, getPieChartSend } from "../api/PieChart";
+import {
+  getPieChartExp,
+  getPieChartSell,
+  getPieChartSend,
+} from "../api/PieChart";
+import { getLineChart } from "../api/lineChart";
 
-export default function Calendar() {
+export default function Calendar({ selectBranchs }) {
   const {
     queryForm,
     setQueryForm,
@@ -23,13 +28,31 @@ export default function Calendar() {
     setBarExp,
     setPieSell,
     setPieSend,
-    setPieExp
+    setPieExp,
+    setLineChartData,
   } = useFoodBankStorage();
   const token = useFoodBankStorage((state) => state.token);
 
+  const fetchLineChartData = async () => {
+    try {
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getLineChart(updatedQueryForm, token);
+      setLineChartData(getDate.data); // <-- Save data in Zustand
+    } catch (err) {
+      console.error("Error fetching data:", err);
+    }
+  };
+
   const fetchPieSell = async () => {
     try {
-      const getDate = await getPieChartSell(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getPieChartSell(updatedQueryForm, token);
       setPieSell(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -37,7 +60,11 @@ export default function Calendar() {
   };
   const fetchPieSend = async () => {
     try {
-      const getDate = await getPieChartSend(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getPieChartSend(updatedQueryForm, token);
       setPieSend(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -45,7 +72,11 @@ export default function Calendar() {
   };
   const fetchPieExp = async () => {
     try {
-      const getDate = await getPieChartExp(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getPieChartExp(updatedQueryForm, token);
       setPieExp(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -53,7 +84,11 @@ export default function Calendar() {
   };
   const fetchBarSell = async () => {
     try {
-      const getDate = await getBarChartSell(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getBarChartSell(updatedQueryForm, token);
       setBarSell(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -61,7 +96,11 @@ export default function Calendar() {
   };
   const fetchBarSend = async () => {
     try {
-      const getDate = await getBarChartSend(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getBarChartSend(updatedQueryForm, token);
       setBarSend(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -69,7 +108,11 @@ export default function Calendar() {
   };
   const fetchBarExp = async () => {
     try {
-      const getDate = await getBarChartExp(queryForm, token);
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const getDate = await getBarChartExp(updatedQueryForm, token);
       setBarExp(getDate.data); // <-- Save data in Zustand
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -98,14 +141,30 @@ export default function Calendar() {
     if (queryForm.startDate && queryForm.endDate) {
       fecthDataTrack();
       fecthTotalData();
+    }
+  }, [queryForm.startDate, queryForm.endDate]);
+
+  React.useEffect(() => {
+    if (queryForm.startDate && queryForm.endDate) {
       fetchBarSell();
       fetchBarSend();
       fetchBarExp();
-      fetchPieSell()
-      fetchPieSend()
-      fetchPieExp()
     }
-  }, [queryForm.startDate, queryForm.endDate]);
+  }, [queryForm.startDate, queryForm.endDate, selectBranchs]);
+
+  React.useEffect(() => {
+    if (queryForm.startDate && queryForm.endDate) {
+      fetchPieSell();
+      fetchPieSend();
+      fetchPieExp();
+    }
+  }, [queryForm.startDate, queryForm.endDate, selectBranchs]);
+
+  React.useEffect(() => {
+    if (queryForm.startDate && queryForm.endDate) {
+      fetchLineChartData();
+    }
+  }, [queryForm.startDate, queryForm.endDate, selectBranchs]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>

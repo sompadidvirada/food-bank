@@ -28,12 +28,12 @@ const Login = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openSnackbarerror, setOpenSnackbarerror] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
-  const actionLogin = useFoodBankStorage((state)=>state.actionLogin)
+  const actionLogin = useFoodBankStorage((state) => state.actionLogin);
 
   const handleFormSubmit = async (values) => {
     try {
       const res = await actionLogin(values);
-      console.log(res)
+      console.log(res);
       const role = res?.data?.payload?.role;
       roleRedirect(role);
     } catch (err) {
@@ -46,25 +46,46 @@ const Login = () => {
   const roleRedirect = (role) => {
     if (role === "admin") {
       navigate("/admin");
-    } else {
+    } else if (role === "staff") {
       navigate("/user");
+    } else {
+      return;
     }
   };
   return (
-    <Container maxWidth="xs">
-      <Paper elevation={10} sx={{ margin: 8, padding: 2 }}>
-        <Avatar
+    <Container
+      maxWidth="sm"
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "column",
+      }}
+    >
+      <Paper elevation={10} sx={{ padding: 4, width: "100%", maxWidth: 500 }}>
+        <Box display="flex" justifyContent="center" mb={2}>
+          <img
+            src="/TK.png"
+            alt="Logo"
+            style={{
+              height: 120,
+              display: "block",
+              margin: "16px auto",
+            }}
+          />
+        </Box>
+        <Typography
+          component="h1"
           sx={{
-            mx: "auto",
-            bgcolor: "secondary.main",
+            fontFamily: "Noto Sans Lao",
             textAlign: "center",
-            mb: 1,
+            mb: 2,
+            fontSize: 30,
+            fontWeight: "bold",
           }}
         >
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component="h1" variant="h5">
-          Singin
+          ເຂົ້າສູ່ລະບົບຂາຍ
         </Typography>
         <Formik
           onSubmit={handleFormSubmit}
@@ -85,7 +106,7 @@ const Login = () => {
                   fullWidth
                   variant="filled"
                   type="text"
-                  label="Contact Number"
+                  label={<Typography variant="laoText">ເບີໂທລະສັບ</Typography>}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.phonenumber}
@@ -98,7 +119,7 @@ const Login = () => {
                   fullWidth
                   variant="filled"
                   type="password"
-                  label="Password..."
+                  label={<Typography variant="laoText">ລະຫັດຜ່ານ</Typography>}
                   onBlur={handleBlur}
                   onChange={handleChange}
                   value={values.password}
@@ -109,36 +130,19 @@ const Login = () => {
                 />
               </Box>
               <Box display="flex" justifyContent="center" mt="20px">
-                <Button type="submit" color="secondary" variant="contained">
-                  LOG IN
+                <Button type="submit" color="secondary" variant="contained" sx={{fontFamily:"Noto Sans Lao"}}>
+                  ເຂົ້າສູ່ລະບົບ
                 </Button>
               </Box>
-              <Grid2 container justifyContent="space-between" sx={{ mt: 1 }}>
-                <Grid2>
-                  <Link
-                    component={RouterLink}
-                    to="/forgot"
-                    sx={{ color: colors.grey[100] }}
-                  >
-                    <Typography sx={{ font: "bold" }}>
-                      Forgot Password ?
-                    </Typography>
-                  </Link>
-                </Grid2>
-                <Grid2>
-                  <Link
-                    component={RouterLink}
-                    to="/singin"
-                    sx={{ color: colors.grey[100] }}
-                  >
-                    <Typography sx={{ font: "bold" }}>Sing in</Typography>
-                  </Link>
-                </Grid2>
-              </Grid2>
             </form>
           )}
         </Formik>
       </Paper>
+      <Box sx={{ mt: 4 }}>
+        <Typography sx={{ color: colors.grey[500], textAlign: "center" }}>
+          Copyright © 2025 BigTree Trading. All rights reserved.
+        </Typography>
+      </Box>
       {/* Snackbar for success message */}
       <Snackbar
         open={openSnackbar}

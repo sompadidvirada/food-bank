@@ -16,3 +16,15 @@ export const currectAdmin = (token) => {
     }
   );
 };
+
+export const currentUser = (token) => {
+  return axios.post(
+    `${URL}/current-user`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};

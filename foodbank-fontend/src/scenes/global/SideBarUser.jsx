@@ -1,4 +1,3 @@
-import React from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
@@ -48,7 +47,7 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const SideBarAdmin = () => {
+const SideBarUser = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -66,6 +65,7 @@ const SideBarAdmin = () => {
     setOpenImageModal(false);
     setSelectedImageUrl(null);
   };
+
   return (
     <Box
       sx={{
@@ -105,7 +105,7 @@ const SideBarAdmin = () => {
                 ml="15px"
               >
                 <Typography variant="h3" color={colors.grey[100]}>
-                  TREEKOFF
+                 TREEKOFF
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
                   <MenuOutlinedIcon />
@@ -163,29 +163,6 @@ const SideBarAdmin = () => {
           )}
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
-              title="ພາບລວມບໍລິສັດທັງຫມົດ"
-              to="/admin"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            <Typography
-              variant="h6"
-              display={isCollapsed ? "none" : "block"}
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
-            >
-              ບຸກຂະລາກອນ
-            </Typography>
-            <Item
-              title="ຈັດການພະນັກງານ"
-              to="/admin/team"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}
@@ -197,14 +174,14 @@ const SideBarAdmin = () => {
 
             <Item
               title="ແຜນທີສາຂາ"
-              to="/admin/map"
+              to="/user"
               icon={<MapIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ຈັດການສິນຄ້າ"
-              to="/admin/product"
+              to="/user/product"
               icon={<FastfoodIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -220,21 +197,21 @@ const SideBarAdmin = () => {
 
             <Item
               title="ຕິດຕາມຍອດສົ່ງ"
-              to="/admin/tracksend"
+              to="/user/tracksend"
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ຕິດຕາມຍອດຂາຍ"
-              to="/admin/tracksell"
+              to="/user/tracksell"
               icon={<AttachMoneyIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ຕິດຕາມຍອດໝົດອາຍຸ"
-              to="/admin/trackexp"
+              to="/user/trackexp"
               icon={<DeleteForeverIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -249,98 +226,18 @@ const SideBarAdmin = () => {
             </Typography>
             <Item
               title="ລາຍງານຍອດຂາຍລາຍສາຂາ"
-              to="/admin/reportperbranch"
+              to="/user/reportperbranch"
               icon={<SpeakerNotesIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ລາຍງານຍອດຂາຍທັງໝົດ"
-              to="/admin/reportall"
+              to="/user/reportall"
               icon={<ChecklistIcon />}
               selected={selected}
               setSelected={setSelected}
             />
-
-            <Typography
-              variant="h6"
-              display={isCollapsed ? "none" : "block"}
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
-            >
-              ກາຟລາຍລະອຽດສິນຄ້າ
-            </Typography>
-
-            {/**BAR CHART MENU */}
-            <SubMenu
-              title="Bar Chart"
-              icon={<BarChartIcon />}
-              style={{ color: colors.grey[100] }}
-            >
-              <Item
-                title="Sell Bar Chart"
-                to="/admin/barsell"
-                icon={<ChecklistIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="Send Bar Chart"
-                to="/admin/barsend"
-                icon={<AnalyticsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="EXP Bar Chart"
-                to="/admin/barexp"
-                icon={<LeaderboardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </SubMenu>
-
-            {/**PIE CHART MENU */}
-            <SubMenu
-              title="PIE Chart"
-              icon={<BarChartIcon />}
-              style={{ color: colors.grey[100] }}
-            >
-              <Item
-                title="Sell Pie Chart"
-                to="/admin/piesell"
-                icon={<ChecklistIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="Send Pie Chart"
-                to="/admin/piesend"
-                icon={<AnalyticsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              <Item
-                title="EXP Pie Chart"
-                to="/admin/pieexp"
-                icon={<LeaderboardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </SubMenu>
-            <SubMenu
-              title="Line Chart"
-              icon={<BarChartIcon />}
-              style={{ color: colors.grey[100] }}
-            >
-              <Item
-                title="Line Chart"
-                to="/admin/line"
-                icon={<LeaderboardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </SubMenu>
           </Box>
         </Menu>
       </ProSidebar>
@@ -382,4 +279,4 @@ const SideBarAdmin = () => {
   );
 };
 
-export default SideBarAdmin;
+export default SideBarUser;

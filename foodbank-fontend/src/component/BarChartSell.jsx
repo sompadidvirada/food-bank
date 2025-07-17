@@ -33,8 +33,8 @@ const BarChart = ({ isDashboard = false, data }) => {
       maxValue={maxValue}
       layout="horizontal"
       padding={0.05}
-      innerPadding={1}
-      labelSkipWidth={isDashboard ? 20 : 20}
+      innerPadding={2}
+      labelSkipWidth={isDashboard ? 25 : 20}
       theme={{
         // added
         axis: {
@@ -86,7 +86,7 @@ const BarChart = ({ isDashboard = false, data }) => {
       }}
       keys={productName ? productName : productSecon}
       indexBy="country"
-      margin={{ top: 50, right: 15, bottom: 50, left: 140 }}
+      margin={{ top: 10, right: 20, bottom: 20, left: 140 }}
       valueScale={{ type: "linear" }}
       indexScale={{ type: "band", round: true }}
       colors={{ scheme: "nivo" }}

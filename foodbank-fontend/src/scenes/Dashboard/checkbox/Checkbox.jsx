@@ -47,7 +47,6 @@ const Checkboxs = ({
     setOpen(false);
   };
 
-  console.log(branch)
   return (
     <Box>
       <Button

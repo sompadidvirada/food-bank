@@ -11,7 +11,7 @@ const generateColor = (name) => {
 
 exports.getBarChartSell = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
@@ -22,6 +22,7 @@ exports.getBarChartSell = async (req, res) => {
           gte: start,
           lte: end,
         },
+        branchId: { notIn: branchs },
       },
       include: {
         branch: true,
@@ -57,7 +58,7 @@ exports.getBarChartSell = async (req, res) => {
 };
 exports.getBarChartSend = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
@@ -68,6 +69,7 @@ exports.getBarChartSend = async (req, res) => {
           gte: start,
           lte: end,
         },
+        branchId: { notIn: branchs },
       },
       include: {
         branch: true,
@@ -103,7 +105,7 @@ exports.getBarChartSend = async (req, res) => {
 };
 exports.getBarChartExp = async (req, res) => {
   try {
-    const { startDate, endDate } = req.body;
+    const { startDate, endDate, branchs } = req.body;
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
@@ -114,6 +116,7 @@ exports.getBarChartExp = async (req, res) => {
           gte: start,
           lte: end,
         },
+        branchId: { notIn: branchs },
       },
       include: {
         branch: true,

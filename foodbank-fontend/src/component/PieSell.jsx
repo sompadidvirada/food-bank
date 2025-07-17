@@ -5,14 +5,12 @@ import { useTheme, Typography } from "@mui/material";
 const PieSellCompo = ({ isDashboard, dataPie }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const emtyData = []
-
+  const emtyData = [];
   return (
     <div
       style={{
         width: "100%", // Ensure it spans the full available width
         height: isDashboard ? "100%" : "600px", // Adjust height for dashboard view
-        padding: "0 20px", // Add padding for better spacing
         boxSizing: "border-box", // Ensure padding doesn't affect layout
       }}
     >
@@ -50,21 +48,26 @@ const PieSellCompo = ({ isDashboard, dataPie }) => {
             fontSize: 15,
           },
         }}
-        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        margin={
+          isDashboard
+            ? { top: 10, right: 10, bottom: 10, left: 10 }
+            : { top: 40, right: 80, bottom: 80, left: 80 }
+        }
         innerRadius={0.5}
         padAngle={0.7}
         cornerRadius={3}
+        enableArcLinkLabels={isDashboard ? false : true}
         activeOuterRadiusOffset={8}
         borderColor={{
           from: "color",
           modifiers: [["darker", 0.2]],
         }}
-        arcLinkLabelsSkipAngle={10}
+        arcLinkLabelsSkipAngle={isDashboard ? 15 : 10}
         arcLinkLabelsTextColor={colors.grey[100]}
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{ from: "color" }}
         arcLabelsRadiusOffset={0.4}
-        arcLabelsSkipAngle={7}
+        arcLabelsSkipAngle={ isDashboard ? 15 : 7}
         arcLabelsTextColor={{
           from: colors.grey[900],
         }}

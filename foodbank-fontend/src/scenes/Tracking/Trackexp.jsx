@@ -380,7 +380,7 @@ const Trackexp = () => {
         >
           {selectFormtracksell.expAt && selectFormtracksell.brachId ? (
             <DataGrid
-              rows={products.filter((product) =>
+              rows={products?.filter((product) =>
                 product.available?.some(
                   (item) =>
                     item.aviableStatus === true &&

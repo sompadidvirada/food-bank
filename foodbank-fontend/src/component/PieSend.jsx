@@ -12,7 +12,6 @@ const PieSendCompo = ({ isDashboard, dataPie }) => {
       style={{
         width: "100%", // Ensure it spans the full available width
         height: isDashboard ? "100%" : "600px", // Adjust height for dashboard view
-        padding: "0 20px", // Add padding for better spacing
         boxSizing: "border-box", // Ensure padding doesn't affect layout
       }}
     >
@@ -50,11 +49,12 @@ const PieSendCompo = ({ isDashboard, dataPie }) => {
             fontSize: 15,
           },
         }}
-        margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
+        margin={isDashboard ? { top: 10, right: 10, bottom: 10, left: 10 } : { top: 40, right: 80, bottom: 80, left: 80 }}
         innerRadius={0.5}
         padAngle={0.7}
         cornerRadius={3}
         activeOuterRadiusOffset={8}
+        enableArcLinkLabels={isDashboard ? false : true}
         borderColor={{
           from: "color",
           modifiers: [["darker", 0.2]],
@@ -64,7 +64,7 @@ const PieSendCompo = ({ isDashboard, dataPie }) => {
         arcLinkLabelsThickness={2}
         arcLinkLabelsColor={{ from: "color" }}
         arcLabelsRadiusOffset={0.4}
-        arcLabelsSkipAngle={7}
+        arcLabelsSkipAngle={ isDashboard ? 15 : 7}
         arcLabelsTextColor={{
           from: colors.grey[900],
         }}

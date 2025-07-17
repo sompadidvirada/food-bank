@@ -23,6 +23,10 @@ const FoodBankStorage = (set, get) => ({
   pieSell: null,
   pieSend: null,
   pieExp: null,
+  lineChartData: null,
+  setLineChartData: (newData) => {
+    set({ lineChartData: newData})
+  },
   setPieSell: (newData) => {
     set({ pieSell: newData }); // <-- Add function to update data
   },

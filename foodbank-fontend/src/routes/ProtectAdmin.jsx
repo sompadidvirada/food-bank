@@ -28,7 +28,7 @@ const ProtectAdmin = ({ element }) => {
 
   useEffect(() => {
     if (ok === false) {
-      navigate("/");
+      navigate(-1);
     }
   }, [ok, navigate]);
 
