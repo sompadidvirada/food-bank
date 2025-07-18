@@ -262,7 +262,7 @@ const ReportPerBranch = () => {
 
   return (
     <Box m="20px" textAlign="center">
-      <Header title="TRACKING EVERY BRANCH SALE AND EXPIRE" />
+      <Header title="ລາຍງານການ ຈັດສົ່ງ ຂາຍ ໝົດອາຍຸ ແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
         display="grid"

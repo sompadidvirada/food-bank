@@ -56,13 +56,12 @@ const EditProduct = ({ productRow }) => {
     image: "",
   });
 
-
   const handleOpen = (productRow) => {
-      setEditProduct(productRow);
-      setSelectedImage(null); 
-      if (productRow.image) {
+    setEditProduct(productRow);
+    setSelectedImage(null);
+    if (productRow.image) {
       const imageUrl = `${URL}/product_img/${productRow.image}`;
-      console.log(imageUrl)
+      console.log(imageUrl);
       setImagePreview(imageUrl); // Set imagePreview to the image URL
     } else {
       setImagePreview(null); // If no image, reset the image preview
@@ -108,6 +107,7 @@ const EditProduct = ({ productRow }) => {
 
     const update = await updateProduct(editProduct.id, formData, token);
     await getProduct();
+    toast.success('ອັປເດດສິນຄ້າສຳເລັດ.')
     setOpen(false);
   };
 
@@ -246,11 +246,19 @@ const EditProduct = ({ productRow }) => {
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color={colors.redAccent[100]}>
-            Cancel
+          <Button
+            onClick={handleSubmitEdit}
+            color="success"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
+          >
+            ຕົກລົງ
           </Button>
-          <Button onClick={handleSubmitEdit} color={colors.redAccent[100]}>
-            Save
+          <Button
+            onClick={handleClose}
+            color="error"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
+          >
+            ຍົກເລີກ
           </Button>
         </DialogActions>
       </Dialog>

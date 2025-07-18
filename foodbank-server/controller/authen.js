@@ -1,5 +1,7 @@
 const prisma = require("../config/prisma");
 const jwt = require("jsonwebtoken");
+const path = require("path");
+const fs = require("fs");
 
 exports.login = async (req, res) => {
   try {
@@ -44,10 +46,16 @@ exports.login = async (req, res) => {
 
 exports.createStaff = async (req, res) => {
   try {
-    const { firstname, lastname, phonenumber, birdDate } = req.body;
-    if (!firstname || !lastname || !phonenumber || !birdDate) {
-      return res.status(404).json({ message: `Can't create with emty value.` });
+    const { firstName, lastName, phonenumber, birthDate } = req.body;
+
+    if (!firstName || !lastName || !phonenumber || !birthDate) {
+      return res
+        .status(404)
+        .json({ message: `Can't create with empty value.` });
     }
+
+    // Use uploaded image filename or fallback to 'default.png'
+    const imageStaff = req.file?.filename || "default.PNG";
 
     const checkPhone = await prisma.staff.findMany({
       where: {
@@ -55,22 +63,71 @@ exports.createStaff = async (req, res) => {
       },
     });
 
-    console.log(checkPhone);
-
     if (checkPhone.length > 0) {
       return res
         .status(402)
         .json({ message: "This phonenumber already used." });
     }
+
     const createStaff = await prisma.staff.create({
       data: {
-        firstname: firstname,
-        lastname: lastname,
+        firstname: firstName,
+        lastname: lastName,
         phonenumber: phonenumber,
-        birstDate: new Date(birdDate),
+        birdDate: new Date(birthDate),
+        image: imageStaff,
       },
     });
+
     res.send(createStaff);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error` });
+  }
+};
+
+exports.deleteStaff = async (req, res) => {
+  try {
+    const { staffId, permisionId } = req.body;
+
+    if (!staffId || !permisionId) {
+      return res.status(400).json({ message: `Emty Value.` });
+    }
+
+    const userToDelete = await prisma.staff.findFirst({
+      where: {
+        id: Number(staffId),
+      },
+    });
+
+    if (!userToDelete || userToDelete?.id === Number(permisionId)) {
+      return res.status(500).json({ message: "Something went wrong!" });
+    }
+
+    // Delete the profile image if it exists and is not a default
+    const imageFile = userToDelete.image;
+    const defaultImageName = "default.PNG"; // Or set this to 'default.jpg' if you have one
+
+    if (imageFile && imageFile !== defaultImageName) {
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "staff_porfile",
+        imageFile
+      );
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath); // Deletes the file
+      }
+    }
+
+    await prisma.staff.delete({
+      where: {
+        id: Number(staffId),
+      },
+    });
+
+    res.send("Delete User Success.");
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: `server error` });

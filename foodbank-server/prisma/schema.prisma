@@ -26,6 +26,7 @@ model staff {
   aviable     Boolean     @default(true)
   branch      branch?     @relation(fields: [branchId], references: [id])
   branchId    Int?
+  calendar    calendar[]
   tracksell   tracksell[]
   tracksend   tracksend[]
   trackexp    trackexp[]
@@ -57,7 +58,7 @@ model products {
   tracksend  tracksend[]
   trackexp   trackexp[]
   available  availableproduct[]
-  category   category          @relation(fields: [categoryId], references: [id])
+  category   category           @relation(fields: [categoryId], references: [id])
   categoryId Int
 }
 
@@ -71,10 +72,10 @@ model availableproduct {
   id            Int       @id @unique @default(autoincrement())
   aviableStatus Boolean   @default(true)
   updateAt      DateTime? @updatedAt
-  products      products? @relation(fields: [productsId], references: [id])
-  productsId    Int?
-  branch        branch?   @relation(fields: [branchId], references: [id])
-  branchId      Int?
+  products      products  @relation(fields: [productsId], references: [id])
+  productsId    Int
+  branch        branch    @relation(fields: [branchId], references: [id])
+  branchId      Int
 
   @@unique([productsId, branchId])
 }
@@ -130,5 +131,7 @@ model calendar {
   discription String
   polink      String
   date        DateTime
-  isSuccess   String   @default("ready")
+  isSuccess   Boolean   @default(false)
+  staff       staff   @relation(fields: [staffId], references: [id])
+  staffId     Int
 }

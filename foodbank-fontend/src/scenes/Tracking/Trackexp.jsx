@@ -305,7 +305,7 @@ const Trackexp = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center">
+    <Box m="20px">
       <Header title="ຄີຍອດໝົດອາຍຸແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
@@ -393,13 +393,15 @@ const Trackexp = () => {
               sx={{ width: "100%" }}
             />
           ) : (
-            <Typography
-              variant="laoText"
-              fontWeight="bold"
-              color={colors.grey[100]}
-            >
-              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
-            </Typography>
+            <Box sx={{ width: "100%", textAlign: "center" }}>
+              <Typography
+                variant="laoText"
+                fontWeight="bold"
+                color={colors.grey[100]}
+              >
+                "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
+              </Typography>
+            </Box>
           )}
         </Box>
       </Box>

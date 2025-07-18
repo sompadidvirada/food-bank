@@ -252,6 +252,18 @@ exports.deleteTracksell = async (req, res) => {
       return res.status(400).json({ message: `Missing Data.` });
     }
 
+    const dateToDelete = new Date(sellDate);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "Cannot delete data older than 7 days." });
+    }
+
     const startOfDay = new Date(sellDate);
     startOfDay.setHours(0, 0, 0, 0);
 
@@ -267,17 +279,31 @@ exports.deleteTracksell = async (req, res) => {
         },
       },
     });
+
     res.status(200).json({ message: "Delete success." });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: `server error.` });
+    return res.status(500).json({ message: `Server error.` });
   }
 };
+
 exports.deleteTracksend = async (req, res) => {
   try {
     const { sendDate, brachId } = req.body;
     if (!sendDate || !brachId) {
       return res.status(400).json({ message: `Missing Data.` });
+    }
+
+    const dateToDelete = new Date(sendDate);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "Cannot delete data older than 7 days." });
     }
 
     const startOfDay = new Date(sendDate);
@@ -306,6 +332,18 @@ exports.deleteTrackexp = async (req, res) => {
     const { expDate, brachId } = req.body;
     if (!expDate || !brachId) {
       return res.status(400).json({ message: `Missing Data.` });
+    }
+
+    const dateToDelete = new Date(expDate);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "Cannot delete data older than 7 days." });
     }
 
     const startOfDay = new Date(expDate);

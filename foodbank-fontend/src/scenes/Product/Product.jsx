@@ -226,8 +226,8 @@ const Product = () => {
   return (
     <Box ml="20px">
       <Header
-        title="PRODUCT"
-        subtitle="List of Products for Future Reference"
+        title="ລາຍການສິນຄ້າ"
+        subtitle="ຈັດການລາຍການສິນຄ້າ"
       />
       <Box display={"flex"} gap={5} justifyContent={"center"}>
         <AddProduct />

@@ -28,3 +28,18 @@ export const currentUser = (token) => {
     }
   );
 };
+
+export const createStaff = (form, token) => {
+  return axios.post(`${URL}/createstaff`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+export const deleteStaff = (form, token) => {
+  return axios.post(`${URL}/deletestaff`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

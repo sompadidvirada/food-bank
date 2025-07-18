@@ -126,17 +126,6 @@ const OpenStreetMap = () => {
   }, [isTempMarkerMode]);
 
   {
-    /** clear temporaly markder function  */
-  }
-
-  const clearTempMarkers = () => {
-    tempMarkers.forEach(({ marker }) => {
-      mapRef.current.removeLayer(marker);
-    });
-    setTempMarkers([]);
-  };
-
-  {
     /** EDIT PROVINCE BRANCH FUNCTION DIALOG  */
   }
 
@@ -572,7 +561,7 @@ const OpenStreetMap = () => {
 
   return (
     <Box m="20px">
-      <Header title="ແຜນທີ" subtitle="ລາຍລະອຽດແຜນທີ" />
+      <Header title="ແຜນທີ" subtitle="ລາຍລະອຽດແຜນທີແຕ່ລະສາຂາ" />
 
       {/* Map and Floating Button Wrapper */}
       <Box

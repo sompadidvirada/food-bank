@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import {
   Box,
@@ -8,6 +8,7 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  TextField,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -32,6 +33,10 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import CloseIcon from "@mui/icons-material/Close";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import { Formik } from "formik";
+import * as yup from "yup";
+import { createStaff, deleteStaff } from "../../api/authen";
 const URL = import.meta.env.VITE_API_URL;
 
 const Team = () => {
@@ -53,6 +58,58 @@ const Team = () => {
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [allStaffs, setAllStaffs] = useState([]);
   const [openImageModal, setOpenImageModal] = useState(false);
+  const [openCreateStaff, setOpenCreateStaff] = useState(false);
+  const fileInputRef = useRef(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [openDeleteStaff, setOpenDeleteStaff] = useState(false);
+  const [selectIdStaffToDelete, setSelectIdStaffToDelete] = useState("");
+
+  const handleOpenDeleteStaff = (row) => {
+    setOpenDeleteStaff(true);
+    setSelectIdStaffToDelete(row);
+  };
+
+  const hadleCloseDeleteStaff = () => {
+    setOpenDeleteStaff(false);
+  };
+
+  const handleOpenCreateStaff = () => {
+    setOpenCreateStaff(true);
+  };
+  const handleCloseCreateStaff = () => {
+    setOpenCreateStaff(false);
+  };
+
+  const handleFormSubmit = async (values, { resetForm }) => {
+    try {
+      const formData = new FormData();
+
+      // Append all other form fields
+      Object.keys(values).forEach((key) => {
+        if (key === "profileImage") {
+          if (values.profileImage) {
+            formData.append("profileImage", values.profileImage);
+          }
+        } else {
+          formData.append(key, values[key]);
+        }
+      });
+      const ress = await createStaff(formData, token);
+
+      console.log(ress);
+
+      // Reset form after submission
+      resetForm(); // Reset Formik values
+      setPreviewImage(null); // Clear image preview
+      handleCloseCreateStaff();
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ""; // Reset file input
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const handleImageClick = (imageUrl) => {
     setSelectedImageUrl(imageUrl);
     setOpenImageModal(true);
@@ -73,7 +130,6 @@ const Team = () => {
       toast.error("ບໍ່ສາມາດແກ້ໄຂສະຖານະຕົນເອງໄດ້");
       return;
     }
-    console.log(currentStatus);
     setStatus(!currentStatus);
     setOpenStatus(true);
     setSelectStaff(id);
@@ -168,6 +224,29 @@ const Team = () => {
     }
   };
 
+  const hadleDeleteStaff = async () => {
+    try {
+      const res = await deleteStaff(
+        {
+          staffId: selectIdStaffToDelete.id,
+          permisionId: user.id,
+        },
+        token
+      );
+      toast.success("ລົບຢູ່ເຊີສຳເລັດ");
+      // Remove the deleted staff from the store
+      setStaffsInfos((prev) =>
+        prev.filter((staff) => staff.id !== selectIdStaffToDelete.id)
+      );
+
+      hadleCloseDeleteStaff();
+    } catch (err) {
+      console.log(err);
+      hadleCloseDeleteStaff();
+      toast.error(`ລອງໄໝ່ພາຍຫຼັງ`)
+    }
+  };
+
   useEffect(() => {
     getStaff();
     getBranch();
@@ -190,10 +269,10 @@ const Team = () => {
   }, [searchText, allStaffs]);
 
   const columns = [
-    { field: "id", headerName: "ID STAFF" },
+    { field: "id", headerName: "ໄອດີ" },
     {
       field: "image",
-      headerName: "IMAGE",
+      headerName: "ຮູບພາບ",
       renderCell: (params) => {
         const imageUrl = params.row.image
           ? `${URL}/staffimage/${params.row.image}`
@@ -219,7 +298,7 @@ const Team = () => {
     },
     {
       field: "fullName",
-      headerName: "Name",
+      headerName: "ຊື່ພະນັກງານ",
       headerAlign: "center",
       align: "center",
       flex: 1,
@@ -239,14 +318,14 @@ const Team = () => {
     },
     {
       field: "phonenumber",
-      headerName: "PHONENUMBER",
+      headerName: "ເບີໂທລະສັບ",
       type: "number",
       headerAlign: "center",
       align: "center",
     },
     {
       field: "birdDate",
-      headerName: "BIRD DATE",
+      headerName: "ວັນທີ່ເກີດ",
       type: "number",
       headerAlign: "center",
       align: "center",
@@ -268,7 +347,7 @@ const Team = () => {
     },
     {
       field: "role",
-      headerName: "ROLE",
+      headerName: "ຕຳແໜ່ງ",
       flex: 1,
       headerAlign: "center",
       align: "center",
@@ -314,7 +393,7 @@ const Team = () => {
     },
     {
       field: "branch",
-      headerName: "BRANCH",
+      headerName: "ສາຂາ",
       flex: 1,
       headerAlign: "center",
       align: "center",
@@ -350,7 +429,7 @@ const Team = () => {
     },
     {
       field: "aviable",
-      headerName: "STATUS ACCOUNT",
+      headerName: "ສະຖານະ ຢູເຊີ",
       headerAlign: "center",
       flex: 0.6,
       renderCell: (row) => {
@@ -379,9 +458,29 @@ const Team = () => {
         );
       },
     },
+    {
+      field: "manage",
+      headerName: "ຈັດການ",
+      headerAlign: "center",
+      flex: 0.6,
+      renderCell: (row) => {
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            height="100%"
+          >
+            <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
+              <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
+            </IconButton>
+          </Box>
+        );
+      },
+    },
   ];
 
-  console.log(staffsInfo);
   return (
     <Box m="20px">
       <Header title="ຈັດການພະນັກງານ" subtitle="ແກ້ໄຂລາຍລະອຽດພະນັກງານ" />
@@ -419,6 +518,7 @@ const Team = () => {
           <Box sx={{ alignSelf: "center" }}>
             <Button
               variant="contained"
+              onClick={handleOpenCreateStaff}
               sx={{
                 bgcolor: colors.blueAccent[300],
                 gap: 1,
@@ -449,7 +549,17 @@ const Team = () => {
           </Box>
         </Box>
 
-        <DataGrid rows={staffsInfo} columns={columns} />
+        <DataGrid
+          rows={staffsInfo}
+          columns={columns}
+          sx={{
+            "& .MuiDataGrid-columnHeaders": {
+              fontFamily: "Noto Sans Lao",
+              fontWeight: "bold", // optional
+              fontSize: "16px", // optional
+            },
+          }}
+        />
       </Box>
 
       {/** DIALOG EDIT BRANCH PART */}
@@ -660,6 +770,8 @@ const Team = () => {
         </DialogActions>
       </Dialog>
 
+      {/** DIALOG OPEN IMAGE */}
+
       <Dialog
         open={openImageModal}
         onClose={handleCloseImageModal}
@@ -693,10 +805,252 @@ const Team = () => {
         </DialogContent>
       </Dialog>
 
+      {/** DIALOG CREATE STAFF */}
+
+      <Dialog
+        fullWidth
+        open={openCreateStaff}
+        onClose={handleCloseStatus}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
+            fontFamily: "Noto Sans Lao",
+            textAlign: "center",
+            fontSize: 25,
+          }}
+        >
+          {"ສ້າງຢູເຊີພະນັກງານ"}
+        </DialogTitle>
+        <DialogContent>
+          <Formik
+            onSubmit={handleFormSubmit}
+            initialValues={initialValues}
+            validationSchema={checkoutSchema}
+          >
+            {({
+              values,
+              errors,
+              touched,
+              handleBlur,
+              handleChange,
+              handleSubmit,
+              setFieldValue,
+            }) => (
+              <form onSubmit={handleSubmit}>
+                <Box
+                  display="grid"
+                  gap="30px"
+                  gridTemplateColumns="repeat(4, minmax(0, 1fr))"
+                  sx={{
+                    "& > div": {
+                      gridColumn: "span 4",
+                    },
+                  }}
+                >
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label={<Typography variant="laoText">ຊື່</Typography>}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.firstName}
+                    name="firstName"
+                    error={!!touched.firstName && !!errors.firstName}
+                    helperText={touched.firstName && errors.firstName}
+                    sx={{ gridColumn: "span 2", fontFamily: "Noto Sans Lao" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label={<Typography variant="laoText">ນາມສະກຸນ</Typography>}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.lastName}
+                    name="lastName"
+                    error={!!touched.lastName && !!errors.lastName}
+                    helperText={touched.lastName && errors.lastName}
+                    sx={{ gridColumn: "span 2" }}
+                  />
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="text"
+                    label={<Typography variant="laoText">ເບີໂທ</Typography>}
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.phonenumber}
+                    name="phonenumber"
+                    error={!!touched.phonenumber && !!errors.phonenumber}
+                    helperText={touched.phonenumber && errors.phonenumber}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+
+                  {/* Date Picker for Birth Date */}
+                  <TextField
+                    fullWidth
+                    variant="filled"
+                    type="date"
+                    label={
+                      <Typography variant="laoText">
+                        ວັນ ເດືອນ ປິ ເກີດ
+                      </Typography>
+                    }
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    value={values.birthDate}
+                    name="birthDate"
+                    error={!!touched.birthDate && !!errors.birthDate}
+                    helperText={touched.birthDate && errors.birthDate}
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ gridColumn: "span 4" }}
+                  />
+                  {/* Image Upload */}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    ref={fileInputRef}
+                    onChange={(event) => {
+                      const file = event.currentTarget.files[0];
+                      setFieldValue("profileImage", file);
+
+                      // Preview image
+                      const reader = new FileReader();
+                      reader.onloadend = () => setPreviewImage(reader.result);
+                      if (file) reader.readAsDataURL(file);
+                    }}
+                    style={{ gridColumn: "span 4", marginBottom: "10px" }}
+                  />
+
+                  {/* Image Preview */}
+                  {previewImage && (
+                    <Box
+                      display="flex"
+                      position="relative"
+                      sx={{ width: "100px", height: "100px" }}
+                    >
+                      <img
+                        src={previewImage}
+                        alt="Preview"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "8px",
+                        }}
+                      />
+                      <CloseIcon
+                        sx={{
+                          position: "absolute",
+                          right: "0",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => {
+                          setPreviewImage(null);
+                          setFieldValue("profileImage", null); // Clear Formik's state
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = ""; // Reset file input
+                          }
+                        }}
+                      />
+                    </Box>
+                  )}
+                </Box>
+                <Box display="flex" justifyContent="end" mt="20px" gap={3}>
+                  <Button
+                    type="submit"
+                    color="secondary"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    ຢືນຢັນ
+                  </Button>
+                  <Button
+                    onClick={handleCloseCreateStaff}
+                    color="error"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    ຍົກເລີກ
+                  </Button>
+                </Box>
+              </form>
+            )}
+          </Formik>
+        </DialogContent>
+      </Dialog>
+
+      {/** DIALOG CONFIRM DELETE STAFF */}
+
+      <Dialog
+        open={openDeleteStaff}
+        onClose={hadleCloseDeleteStaff}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
+            fontFamily: "Noto Sans Lao",
+            textAlign: "center",
+            fontSize: 25,
+          }}
+        >
+          {`ຕ້ອງການລົບຢູເຊີ ${selectIdStaffToDelete?.firstname} ${selectIdStaffToDelete?.lastname}ແທ້ບໍ່`}
+        </DialogTitle>
+        <DialogContent></DialogContent>
+        <DialogActions
+          sx={{ display: "flex", gap: 2, justifyContent: "center" }}
+        >
+          <Button
+            onClick={hadleDeleteStaff}
+            autoFocus
+            variant="contained"
+            color="success"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+          >
+            ຢືນຢັນ
+          </Button>
+          <Button
+            onClick={hadleCloseDeleteStaff}
+            variant="contained"
+            color="error"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+          >
+            ຍົກເລີກ
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/**Toastify Part */}
       <ToastContainer position="top-center" />
     </Box>
   );
+};
+
+const phoneRegExp =
+  /^((\+[1-9]{1,4}[ -]?)|(\([0-9]{2,3}\)[ -]?)|([0-9]{2,4})[ -]?)*?[0-9]{3,4}[ -]?[0-9]{3,4}$/;
+
+const checkoutSchema = yup.object().shape({
+  firstName: yup.string().required("required"),
+  lastName: yup.string().required("required"),
+  phonenumber: yup
+    .string()
+    .matches(phoneRegExp, "Phone number is not valid")
+    .required("required"),
+  birthDate: yup.date().required("Birth date is required"),
+});
+
+const initialValues = {
+  firstName: "",
+  lastName: "",
+  phonenumber: "",
+  birthDate: "",
+  profileImage: null,
 };
 
 export default Team;

@@ -93,23 +93,25 @@ const SideBarUser = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "10px 0 0 0",
               color: colors.grey[100],
             }}
           >
             {!isCollapsed && (
               <Box
                 display="flex"
-                justifyContent="space-between"
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                 TREEKOFF
-                </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
-                </IconButton>
+                <img
+                  src="/TK.png"
+                  alt="Logo"
+                  style={{
+                    height: 100,
+                    display: "block",
+                    margin: "5px auto",
+                  }}
+                />
               </Box>
             )}
           </MenuItem>
@@ -196,21 +198,21 @@ const SideBarUser = () => {
             </Typography>
 
             <Item
-              title="ຕິດຕາມຍອດສົ່ງ"
+              title="ຄີຍອດຈັດສົ່ງ"
               to="/user/tracksend"
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="ຕິດຕາມຍອດຂາຍ"
+              title="ຄີຍອດຂາຍ"
               to="/user/tracksell"
               icon={<AttachMoneyIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="ຕິດຕາມຍອດໝົດອາຍຸ"
+              title="ຄີຍອດໝົດອາຍຸ"
               to="/user/trackexp"
               icon={<DeleteForeverIcon />}
               selected={selected}

@@ -128,7 +128,7 @@ const Tracksend = () => {
           );
         } else {
           return (
-             <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+            <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
               <input
                 type="number"
                 min="0"
@@ -250,7 +250,7 @@ const Tracksend = () => {
   const handeDeleteAll = async () => {
     try {
       const ress = await deleteTrackSend(selectDateBrachCheck, token);
-      fetchDateBrachCheck()
+      fetchDateBrachCheck();
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -301,7 +301,7 @@ const Tracksend = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center">
+    <Box m="20px">
       <Header title="ຄີຍອດຈັດສົ່ງແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
@@ -389,13 +389,15 @@ const Tracksend = () => {
               sx={{ width: "100%" }}
             />
           ) : (
-            <Typography
-              variant="laoText"
-              fontWeight="bold"
-              color={colors.grey[100]}
-            >
-              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
-            </Typography>
+            <Box sx={{ width: "100%", textAlign: "center" }}>
+              <Typography
+                variant="laoText"
+                fontWeight="bold"
+                color={colors.grey[100]}
+              >
+                "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
+              </Typography>
+            </Box>
           )}
         </Box>
       </Box>

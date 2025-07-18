@@ -28,6 +28,9 @@ import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import DonutLargeIcon from "@mui/icons-material/DonutLarge";
+import ShowChartIcon from "@mui/icons-material/ShowChart";
+
 const URL = import.meta.env.VITE_API_URL;
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
@@ -93,23 +96,21 @@ const SideBarAdmin = () => {
             onClick={() => setIsCollapsed(!isCollapsed)}
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
-              margin: "10px 0 20px 0",
+              margin: "10px 0 0 0",
               color: colors.grey[100],
             }}
           >
             {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  TREEKOFF
-                </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
-                  <MenuOutlinedIcon />
-                </IconButton>
+              <Box display="flex" alignItems="center" ml="15px">
+                <img
+                  src="/TK.png"
+                  alt="Logo"
+                  style={{
+                    height: 100,
+                    display: "block",
+                    margin: "5px auto",
+                  }}
+                />
               </Box>
             )}
           </MenuItem>
@@ -219,21 +220,21 @@ const SideBarAdmin = () => {
             </Typography>
 
             <Item
-              title="ຕິດຕາມຍອດສົ່ງ"
+              title="ຄີຍອດຈັດສົ່ງ"
               to="/admin/tracksend"
               icon={<LocalShippingIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="ຕິດຕາມຍອດຂາຍ"
+              title="ຄີຍອດຂາຍ"
               to="/admin/tracksell"
               icon={<AttachMoneyIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="ຕິດຕາມຍອດໝົດອາຍຸ"
+              title="ຄີຍອດໝົດອາຍຸ"
               to="/admin/trackexp"
               icon={<DeleteForeverIcon />}
               selected={selected}
@@ -303,7 +304,7 @@ const SideBarAdmin = () => {
             {/**PIE CHART MENU */}
             <SubMenu
               title="PIE Chart"
-              icon={<BarChartIcon />}
+              icon={<DonutLargeIcon />}
               style={{ color: colors.grey[100] }}
             >
               <Item
@@ -330,13 +331,13 @@ const SideBarAdmin = () => {
             </SubMenu>
             <SubMenu
               title="Line Chart"
-              icon={<BarChartIcon />}
+              icon={<ShowChartIcon />}
               style={{ color: colors.grey[100] }}
             >
               <Item
                 title="Line Chart"
                 to="/admin/line"
-                icon={<LeaderboardIcon />}
+                icon={<ShowChartIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />

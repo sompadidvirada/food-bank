@@ -247,7 +247,7 @@ const Tracksell = () => {
   const handeDeleteAll = async () => {
     try {
       const ress = await deleteTrackSell(selectDateBrachCheck, token);
-      fetchDateBrachCheck()
+      fetchDateBrachCheck();
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -299,7 +299,7 @@ const Tracksell = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center">
+    <Box m="20px">
       <Header title="ຄີຍອດຂາຍແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
@@ -333,7 +333,7 @@ const Tracksell = () => {
             </Box>
             <Box>
               <Button variant="contained" onClick={handeDeleteAll}>
-                <Typography variant="laoText"> ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
+                <Typography variant="laoText">ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>
           </Box>
@@ -387,13 +387,15 @@ const Tracksell = () => {
               sx={{ width: "100%" }}
             />
           ) : (
-            <Typography
-              variant="laoText"
-              fontWeight="bold"
-              color={colors.grey[100]}
-            >
-              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
-            </Typography>
+            <Box sx={{width:"100%", textAlign:"center"}}>
+              <Typography
+                variant="laoText"
+                fontWeight="bold"
+                color={colors.grey[100]}
+              >
+                "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
+              </Typography>
+            </Box>
           )}
         </Box>
       </Box>

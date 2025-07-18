@@ -128,7 +128,7 @@ const Dashboard = () => {
       ) : (
         <Box m="20px">
           {/* HEADER */}
-          <Header title="DASHBOARD" />
+          <Header title="ພາບລວມທັງໝົດ" />
           <Box
             display="flex"
             justifyContent="space-between"
