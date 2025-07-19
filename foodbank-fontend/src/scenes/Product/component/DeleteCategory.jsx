@@ -69,7 +69,7 @@ const DeleteCategory = () => {
         aria-describedby="alert-dialog-slide-description"
       >
         <DialogTitle sx={{ fontFamily: "Noto Sans Lao", alignSelf: "center" }}>
-          {"ລົບໝວດໝູ່"}
+          {"ເລືອກໝວດໝູ່ທີ່ຈະລົບ"}
         </DialogTitle>
         <DialogContent>
           <Formik
@@ -94,7 +94,7 @@ const DeleteCategory = () => {
                       id="category-label"
                       sx={{ fontFamily: "Noto Sans Lao" }}
                     >
-                      CATEGORY
+                      ໝວດໝູ່
                     </InputLabel>
                     <Select
                       labelId="category-label"
@@ -117,14 +117,22 @@ const DeleteCategory = () => {
                     </Select>
                   </FormControl>
                 </Box>
-                <Box display="flex" justifyContent="end" mt="20px">
+                <Box display="flex" justifyContent="end" mt="20px" gap={3}>
                   <Button
                     type="submit"
                     color="secondary"
                     variant="contained"
                     sx={{ fontFamily: "Noto Sans Lao" }}
                   >
-                    ລົບ
+                    ຢືນຢັນ
+                  </Button>
+                  <Button
+                    onClick={handleClose}
+                    color="error"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    ຍົກເລີກ
                   </Button>
                 </Box>
               </form>

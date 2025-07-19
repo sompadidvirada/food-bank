@@ -186,3 +186,32 @@ exports.updateMainStaff = async (req, res) => {
     return res.status(500).json({ message: `Server error.` });
   }
 }
+
+exports.clearPasswordStaff = async (req,res) =>{
+  try{
+    const { id } = req.params
+    if(!id) {
+      return res.status(400).json({ message: `Emty value`})
+    }
+    const checkStaff = await prisma.staff.findFirst({
+      where: {
+        id: Number(id)
+      }
+    })
+    if(!checkStaff) {
+      return res.status(400).json({ message: `Something went wrong.`})
+    }
+
+    await prisma.staff.update({
+      where:{
+        id:Number(id)
+      },data: {
+        password: null
+      }
+    })
+    res.status(200).json({ message: `ລ້າງລະຫັດຜ່ານລຳເລັດ.`})
+  }catch(err) {
+    console.log(err)
+    return res.status(500).json({ message: `server error`})
+  }
+}

@@ -60,10 +60,10 @@ const ReportAll = () => {
 
   const columns = useMemo(
     () => [
-      { field: "id", headerName: "ID", flex: 0.2 },
+      { field: "id", headerName: "ໄອດີ", flex: 0.2 },
       {
         field: "image",
-        headerName: "PICTURE",
+        headerName: "ຮູບພາບ",
         headerAlign: "center",
         flex: 0.2,
         renderCell: (params) => {
@@ -91,7 +91,7 @@ const ReportAll = () => {
       },
       {
         field: "name",
-        headerName: "NAME",
+        headerName: "ຊື່ສິນຄ້າ",
         headerAlign: "center",
         flex: 0.5,
         renderCell: (params) => (
@@ -106,7 +106,7 @@ const ReportAll = () => {
       },
       {
         field: "totalSend",
-        headerName: "SEND",
+        headerName: "ຈຳນວນຈັດສົ່ງ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -132,7 +132,7 @@ const ReportAll = () => {
       {
         field: "totalSell",
         headerAlign: "center", // This centers the column title
-        headerName: "SELL",
+        headerName: "ຈຳນວນຂາຍ",
         type: "number",
         flex: 0.5,
         renderCell: (params) => {
@@ -156,7 +156,7 @@ const ReportAll = () => {
       },
       {
         field: "totalExp",
-        headerName: "EXP",
+        headerName: "ຈຳນວນໝົດອາຍຸ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -181,7 +181,7 @@ const ReportAll = () => {
       },
       {
         field: "totalPriceSend",
-        headerName: "TOTAL SEND",
+        headerName: "ມູນຄ່າຈັດສົ່ງ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -206,7 +206,7 @@ const ReportAll = () => {
       },
       {
         field: "totalPriceSell",
-        headerName: "TOTAL SELL",
+        headerName: "ມູນຄ່າຍອດຂາຍ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -231,7 +231,7 @@ const ReportAll = () => {
       },
       {
         field: "totalPriceEXP",
-        headerName: "TOTAL EXP",
+        headerName: "ມູນຄ່າໝົດອາຍຸ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -256,7 +256,7 @@ const ReportAll = () => {
       },
       {
         field: "percent",
-        headerName: "%",
+        headerName: "ເປີເຊັ່ນໝົດອາຍຸ",
         type: "number",
         flex: 0.5,
         renderCell: (params) => {
@@ -430,6 +430,13 @@ const ReportAll = () => {
             columns={columns}
             disableRowSelectionOnClick
             hideFooter
+            sx={{
+              "& .MuiDataGrid-columnHeaders": {
+                fontFamily: "Noto Sans Lao",
+                fontWeight: "bold", // optional
+                fontSize: "15px", // optional
+              },
+            }}
           />
         </Box>
       </Box>

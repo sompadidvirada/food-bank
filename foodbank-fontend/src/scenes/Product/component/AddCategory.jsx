@@ -111,7 +111,7 @@ const AddCategory = () => {
                     helperText={touched.name && errors.name}
                   />
                 </Box>
-                <Box display="flex" justifyContent="end" mt="20px">
+                <Box display="flex" justifyContent="end" mt="20px" gap={3}>
                   <Button
                     type="submit"
                     color="secondary"
@@ -119,6 +119,14 @@ const AddCategory = () => {
                     sx={{ fontFamily: "Noto Sans Lao" }}
                   >
                     ສ້າງໝວດໝູ່
+                  </Button>
+                  <Button
+                    onClick={handleClose}
+                    color="error"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    ຍົກເລີກ
                   </Button>
                 </Box>
               </form>

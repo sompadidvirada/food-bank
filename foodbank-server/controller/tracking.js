@@ -259,9 +259,16 @@ exports.deleteTracksell = async (req, res) => {
 
     // Prevent deletion if sellDate is older than 7 days
     if (dateToDelete < sevenDaysAgo) {
-      return res
-        .status(403)
-        .json({ message: "Cannot delete data older than 7 days." });
+      const checkRole = await prisma.staff.findFirst({
+        where: {
+          id: Number(req.user.id),
+        },
+      });
+      if (checkRole.role !== "admin") {
+        return res
+          .status(403)
+          .json({ message: "ຢູເຊີພະນັກງານບໍ່ສາມາດລົບລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+      }
     }
 
     const startOfDay = new Date(sellDate);
@@ -301,9 +308,16 @@ exports.deleteTracksend = async (req, res) => {
 
     // Prevent deletion if sellDate is older than 7 days
     if (dateToDelete < sevenDaysAgo) {
-      return res
-        .status(403)
-        .json({ message: "Cannot delete data older than 7 days." });
+      const checkRole = await prisma.staff.findFirst({
+        where: {
+          id: Number(req.user.id),
+        },
+      });
+      if (checkRole.role !== "admin") {
+        return res
+          .status(403)
+          .json({ message: "ຢູເຊີພະນັກງານບໍ່ສາມາດລົບລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+      }
     }
 
     const startOfDay = new Date(sendDate);
@@ -341,9 +355,16 @@ exports.deleteTrackexp = async (req, res) => {
 
     // Prevent deletion if sellDate is older than 7 days
     if (dateToDelete < sevenDaysAgo) {
-      return res
-        .status(403)
-        .json({ message: "Cannot delete data older than 7 days." });
+      const checkRole = await prisma.staff.findFirst({
+        where: {
+          id: Number(req.user.id),
+        },
+      });
+      if (checkRole.role !== "admin") {
+        return res
+          .status(403)
+          .json({ message: "ຢູເຊີພະນັກງານບໍ່ສາມາດລົບລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+      }
     }
 
     const startOfDay = new Date(expDate);
@@ -371,6 +392,18 @@ exports.deleteTrackexp = async (req, res) => {
 exports.updateTrackSell = async (req, res) => {
   try {
     const { sellAt, productId, brachId, sellCount } = req.body;
+
+    const dateToDelete = new Date(sellAt);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "ບໍ່ສາມາດແກ້ໄຂລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+    }
     // Set range for the whole day
     const startOfDay = new Date(sellAt);
     startOfDay.setHours(0, 0, 0, 0);
@@ -400,6 +433,18 @@ exports.updateTrackSell = async (req, res) => {
 exports.updateTrackSend = async (req, res) => {
   try {
     const { sendAt, productId, brachId, sendCount } = req.body;
+
+    const dateToDelete = new Date(sendAt);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "ບໍ່ສາມາດແກ້ໄຂລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+    }
     // Set range for the whole day
     const startOfDay = new Date(sendAt);
     startOfDay.setHours(0, 0, 0, 0);
@@ -429,6 +474,18 @@ exports.updateTrackSend = async (req, res) => {
 exports.updateTrackExp = async (req, res) => {
   try {
     const { expAt, productId, brachId, expCount } = req.body;
+
+    const dateToDelete = new Date(expAt);
+    const today = new Date();
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(today.getDate() - 7);
+
+    // Prevent deletion if sellDate is older than 7 days
+    if (dateToDelete < sevenDaysAgo) {
+      return res
+        .status(403)
+        .json({ message: "ບໍ່ສາມາດແກ້ໄຂລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
+    }
     // Set range for the whole day
     const startOfDay = new Date(expAt);
     startOfDay.setHours(0, 0, 0, 0);

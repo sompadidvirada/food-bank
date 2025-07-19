@@ -4,7 +4,7 @@ const path = require("path");
 const router = express.Router();
 const fs = require("fs");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
-const { getStaffInfos, updateBranchStaff, updateStatusStaff, updateRoleStaff, updateMainStaff } = require("../controller/staffManage");
+const { getStaffInfos, updateBranchStaff, updateStatusStaff, updateRoleStaff, updateMainStaff, clearPasswordStaff } = require("../controller/staffManage");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,6 +22,7 @@ router.put('/updatestaff/:id', authCheck, adminCheck, updateBranchStaff)
 router.put('/updatestatusstaff/:id', authCheck, adminCheck, updateStatusStaff)
 router.put('/updaterolestaff/:id', authCheck, adminCheck, updateRoleStaff)
 router.put('/updateuser/:id',upload.single("image"), updateMainStaff)
+router.put('/clearpassword/:id', authCheck, adminCheck, clearPasswordStaff)
 
 
 {/** GET IMAGES STAFF ROUTE */}

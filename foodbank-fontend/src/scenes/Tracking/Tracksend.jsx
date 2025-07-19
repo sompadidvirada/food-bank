@@ -54,10 +54,10 @@ const Tracksend = () => {
   }
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.2 },
+    { field: "id", headerName: "ໄອດີ", flex: 0.2 },
     {
       field: "image",
-      headerName: "PICTURE",
+      headerName: "ຮູບພາບ",
       flex: 0.2,
       renderCell: (params) => {
         const imageUrl = params.row.image
@@ -83,7 +83,7 @@ const Tracksend = () => {
     },
     {
       field: "name",
-      headerName: "NAME",
+      headerName: "ຊື່ສິນຄ້າ",
       type: "text",
       headerAlign: "left",
       align: "left",
@@ -101,7 +101,7 @@ const Tracksend = () => {
     },
     {
       field: "manage",
-      headerName: "SAND COUNT",
+      headerName: "ຈຳນວນຈັດສົ່ງ",
       flex: 0.5,
       renderCell: (params) => {
         const productId = params.row.id;
@@ -114,9 +114,13 @@ const Tracksend = () => {
           return (
             <Box display="flex-row">
               <span
-                style={{ color: colors.greenAccent[200], fontWeight: "bold" }}
+                style={{
+                  color: colors.greenAccent[200],
+                  fontWeight: "bold",
+                  fontFamily: "Noto Sans Lao",
+                }}
               >
-                Tracked. ({trackedProduct.sendCount})
+                ຍອດທີ່ບັນທຶກ. ({trackedProduct.sendCount})
               </span>
               <DialogEditSend
                 trackedProduct={trackedProduct}
@@ -173,7 +177,7 @@ const Tracksend = () => {
     },
     {
       field: "category",
-      headerName: "CATEGORY",
+      headerName: "ໝວດໝູ່",
       type: "text",
       headerAlign: "left",
       flex: 0.5,
@@ -195,13 +199,13 @@ const Tracksend = () => {
     {
       field: "price",
       type: "number",
-      headerName: "PRICE",
+      headerName: "ລາຄາຕົ້ນທືນ",
       flex: 0.5,
     },
     {
       field: "sellprice",
       type: "number",
-      headerName: "SELL PRICE",
+      headerName: "ລາຄາຂາຍ",
       flex: 0.5,
     },
   ];
@@ -334,7 +338,7 @@ const Tracksend = () => {
               />
             </Box>
             <Box>
-              <Button variant="contained" onClick={handeDeleteAll}>
+              <Button variant="contained" onClick={handeDeleteAll} color="error">
                 <Typography variant="laoText"> ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>
@@ -386,7 +390,14 @@ const Tracksend = () => {
               columns={columns}
               autoHeight
               hideFooter
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiDataGrid-columnHeaders": {
+                  fontFamily: "Noto Sans Lao",
+                  fontWeight: "bold", // optional
+                  fontSize: "16px", // optional
+                },
+              }}
             />
           ) : (
             <Box sx={{ width: "100%", textAlign: "center" }}>

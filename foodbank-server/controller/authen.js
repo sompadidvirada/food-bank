@@ -6,7 +6,7 @@ const fs = require("fs");
 exports.login = async (req, res) => {
   try {
     const { phonenumber, password } = req.body;
-    if (!phonenumber || !password) {
+    if (!phonenumber) {
       return res.status(400).json({ message: `Can't Access.` });
     }
     const checkUser = await prisma.staff.findFirst({
@@ -18,6 +18,8 @@ exports.login = async (req, res) => {
       return res
         .status(404)
         .json({ message: `There's no User with this Phonenumber.` });
+    } else if (checkUser.password === null) {
+      return res.status(200).json({ message: `insert new password` });
     } else if (checkUser.aviable !== true) {
       return res.status(400).json({ message: `This User is not Aviable.` });
     } else if (checkUser.password !== password) {
@@ -149,6 +151,28 @@ exports.currentUser = async (req, res) => {
     });
     res.json({ user });
   } catch (err) {
+    return res.status(500).json({ message: `server error` });
+  }
+};
+exports.createNewPassword = async (req, res) => {
+  try {
+    const { phonenumber, password } = req.body;
+
+    if (!phonenumber || !password) {
+      return res.status(404).json({ message: `Emty value.` });
+    }
+
+    await prisma.staff.update({
+      where: {
+        phonenumber: phonenumber,
+      },
+      data: {
+        password: password,
+      },
+    });
+    res.status(200).json({ message: `Create new password success!` });
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: `server error` });
   }
 };

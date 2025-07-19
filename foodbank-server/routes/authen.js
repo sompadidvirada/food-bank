@@ -4,6 +4,7 @@ const {
   createStaff,
   currentUser,
   deleteStaff,
+  createNewPassword,
 } = require("../controller/authen");
 const multer = require("multer");
 const path = require("path");
@@ -26,5 +27,6 @@ router.post("/current-user", authCheck, currentUser);
 router.post("/createstaff",upload.single("profileImage"), authCheck, adminCheck, createStaff);
 router.post("/current-admin", authCheck, adminCheck, currentUser);
 router.post("/deletestaff", authCheck, adminCheck, deleteStaff);
+router.put("/ceatenewpassword", createNewPassword)
 
 module.exports = router;

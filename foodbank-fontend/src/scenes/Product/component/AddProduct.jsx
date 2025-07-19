@@ -209,7 +209,7 @@ const AddProduct = () => {
                         id="category-label"
                         sx={{ fontFamily: "Noto Sans Lao" }}
                       >
-                        CATEGORY
+                        ໝວດໝູ່
                       </InputLabel>
                       <Select
                         labelId="category-label"
@@ -239,7 +239,7 @@ const AddProduct = () => {
                         id="category-label"
                         sx={{ fontFamily: "Noto Sans Lao" }}
                       >
-                        LifeTime
+                        ອາຍຸສິນຄ້າ
                       </InputLabel>
                       <Select
                         labelId="lifetime-label"
@@ -254,61 +254,61 @@ const AddProduct = () => {
                           value={1}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          1 Day
+                          1 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={2}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          2 Day
+                          2 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={3}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          3 Day
+                          3 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={4}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          4 Day
+                          4 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={5}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          5 Day
+                          5 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={6}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          6 Day
+                          6 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={7}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          7 Day
+                          7 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={8}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          8 Day
+                          8 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={9}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          9 Day
+                          9 ວັນ
                         </MenuItem>
                         <MenuItem
                           value={10}
                           sx={{ fontFamily: "Noto Sans Lao" }}
                         >
-                          10 Day
+                          10 ວັນ
                         </MenuItem>
                       </Select>
                     </FormControl>
@@ -365,9 +365,12 @@ const AddProduct = () => {
                     </Box>
                   )}
                 </Box>
-                <Box display="flex" justifyContent="end" mt="20px">
+                <Box display="flex" justifyContent="end" mt="20px" gap={3}>
                   <Button type="submit" color="secondary" variant="contained" sx={{ fontFamily: "Noto Sans Lao" }}>
                     ສົ່ງຟອມ
+                  </Button>
+                  <Button onClick={handleClose} color="error" variant="contained" sx={{ fontFamily: "Noto Sans Lao" }}>
+                    ຍົກເລີກ
                   </Button>
                 </Box>
               </form>

@@ -4,9 +4,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../component/Header";
 
 const DataGrind = ({ branch, columns }) => {
-
-console.log(branch)
-
+  console.log(branch);
 
   const handlePrint = () => {
     const formatCell = (value) => {
@@ -118,6 +116,13 @@ console.log(branch)
         pagination
         pageSize={10}
         hideFooter
+        sx={{
+          "& .MuiDataGrid-columnHeaders": {
+            fontFamily: "Noto Sans Lao",
+            fontWeight: "bold", // optional
+            fontSize: "15px", // optional
+          },
+        }}
       />
     </Box>
   );

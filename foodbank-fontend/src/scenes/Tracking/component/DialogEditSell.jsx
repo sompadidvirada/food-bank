@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -10,6 +10,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { tokens } from "../../../theme";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { updateTrackSell } from "../../../api/tracking";
+import { toast } from "react-toastify";
 
 const DialogEditSell = ({
   trackedProduct,
@@ -41,9 +42,8 @@ const DialogEditSell = ({
     const updatedForm = {
       ...selectFormtracksell,
       productId: trackedProduct.productsId,
-      sellCount: editCount.sellCount
+      sellCount: editCount.sellCount,
     };
-
 
     try {
       await updateTrackSell(updatedForm, token);
@@ -51,20 +51,21 @@ const DialogEditSell = ({
       handleClose();
     } catch (err) {
       console.error("Update Error:", err);
+      toast.error(err.response.data.message);
     }
   };
   return (
     <React.Fragment>
       <Button
-        variant="outlined"
+        variant="contained"
         onClick={handleClickOpen}
+        color="info"
         sx={{
-          color: colors.blueAccent[200],
-          backgroundColor: colors.blueAccent[700],
-          ml: "10px",
+          fontFamily:"Noto Sans Lao",
+          ml:2
         }}
       >
-        Edit
+        ແກ້ໄຂ
       </Button>
       <Dialog
         open={open}
@@ -76,9 +77,11 @@ const DialogEditSell = ({
           },
         }}
       >
-        <DialogTitle>EDIT SELL COUNT</DialogTitle>
+        <DialogTitle sx={{ fontFamily: "Noto Sans Lao" }}>
+          ແກ້ໄຂຈຳນວນຍອດຂາຍ
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText>
+          <DialogContentText sx={{ fontFamily: "Noto Sans Lao" }}>
             ແກ້ໄຂຈຳນວນທີ່ໄດ້ຂາຍ " ເບີ່ງໃຫ້ດີກ່ອນກົດ "
           </DialogContentText>
           <TextField
@@ -87,7 +90,7 @@ const DialogEditSell = ({
             margin="dense"
             id="sellCount"
             name="sellCount"
-            label="Sell Count"
+            label={<Typography variant="laoText">ຈຳນວນແກ້ໄຂ</Typography>}
             type="number"
             fullWidth
             variant="standard"
@@ -95,15 +98,24 @@ const DialogEditSell = ({
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} sx={{ bgcolor: colors.grey[100] }}>
-            Cancel
+          <Button
+            type="submit"
+            sx={{ fontFamily: "Noto Sans Lao" }}
+            variant="contained"
+            color="success"
+          >
+            ຢືນຢັນ
           </Button>
-          <Button type="submit" sx={{ bgcolor: colors.grey[100] }}>
-            Submit
+          <Button
+            onClick={handleClose}
+            sx={{ fontFamily: "Noto Sans Lao" }}
+            variant="contained"
+            color="error"
+          >
+            ຍົກເລີກ
           </Button>
         </DialogActions>
       </Dialog>
-
     </React.Fragment>
   );
 };

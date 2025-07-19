@@ -97,11 +97,11 @@ const ReportPerBranch = () => {
 
   const columns = useMemo(
     () => [
-      { field: "id", headerName: "ID", flex: 0.2 },
+      { field: "id", headerName: "ໄອດີ", flex: 0.2 },
       {
         field: "image",
-        headerName: "PICTURE",
-        flex: 0.2,
+        headerName: "ຮູບພາບ",
+        flex: 0.5,
         renderCell: (params) => {
           const imageUrl = params.row.image
             ? `${URL}/product_img/${params.row.image}`
@@ -127,8 +127,8 @@ const ReportPerBranch = () => {
       },
       {
         field: "name",
-        headerName: "NAME",
-        flex: 0.5,
+        headerName: "ຊື່ສິນຄ້າ",
+        flex: 0.8,
         renderCell: (params) => (
           <Typography
             variant="laoText"
@@ -139,19 +139,19 @@ const ReportPerBranch = () => {
           </Typography>
         ),
       },
-      { field: "totalSend", headerName: "SEND", type: "number", flex: 0.5 },
-      { field: "totalSell", headerName: "SELL", type: "number", flex: 0.5 },
-      { field: "totalExp", headerName: "EXP", type: "number", flex: 0.5 },
-      { field: "price", headerName: "PRICE", type: "number", flex: 0.5 },
+      { field: "totalSend", headerName: "ຈຳນວນຈັດສົ່ງ", type: "number", flex: 0.5 },
+      { field: "totalSell", headerName: "ຈຳນວນຂາຍ", type: "number", flex: 0.5 },
+      { field: "totalExp", headerName: "ຈຳນວນໝົດອາຍຸ", type: "number", flex: 0.5 },
+      { field: "price", headerName: "ລາຄາຕົ້ນທຶນ", type: "number", flex: 0.5 },
       {
         field: "sellPrice",
-        headerName: "SELL PRICE",
+        headerName: "ລາຄາຂາຍ",
         type: "number",
         flex: 0.5,
       },
       {
         field: "totalPriceSend",
-        headerName: "TOTAL SEND",
+        headerName: "ມູນຄ່າຈັດສົ່ງ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -176,7 +176,7 @@ const ReportPerBranch = () => {
       },
       {
         field: "totalPriceSell",
-        headerName: "TOTAL SELL",
+        headerName: "ມູນຄ່າຍອດຂາຍ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -201,7 +201,7 @@ const ReportPerBranch = () => {
       },
       {
         field: "totalPriceExp",
-        headerName: "TOTAL EXP",
+        headerName: "ມູນຄ່າໝົດອາຍຸ",
         headerAlign: "center",
         type: "number",
         flex: 0.5,
@@ -226,7 +226,7 @@ const ReportPerBranch = () => {
       },
       {
         field: "percent",
-        headerName: "%",
+        headerName: "ເປີເຊັ່ນໝົດອາຍຸ",
         type: "number",
         flex: 0.5,
         renderCell: (params) => {

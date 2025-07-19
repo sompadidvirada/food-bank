@@ -9,6 +9,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -36,7 +37,8 @@ import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { Formik } from "formik";
 import * as yup from "yup";
-import { createStaff, deleteStaff } from "../../api/authen";
+import { clearPasswordStaff, createStaff, deleteStaff } from "../../api/authen";
+import KeyOffIcon from "@mui/icons-material/KeyOff";
 const URL = import.meta.env.VITE_API_URL;
 
 const Team = () => {
@@ -63,6 +65,29 @@ const Team = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [openDeleteStaff, setOpenDeleteStaff] = useState(false);
   const [selectIdStaffToDelete, setSelectIdStaffToDelete] = useState("");
+  const [openClearPassword, setOpenClearPassword] = useState(false);
+
+  const handleOpenClearPassword = (row) => {
+    setOpenClearPassword(true);
+    setSelectIdStaffToDelete(row);
+  };
+
+  const handleCloseClearPassword = () => {
+    setOpenClearPassword(false);
+    setSelectIdStaffToDelete("");
+  };
+
+  const handleClearPassword = async () => {
+    try {
+      const ress = await clearPasswordStaff(selectIdStaffToDelete.id, token);
+      console.log(ress);
+      toast.success(ress.data.message);
+      handleCloseClearPassword();
+    } catch (err) {
+      console.log(err);
+      toast.error("ລອງໃຫ່ມພາຍຫຼັງ");
+    }
+  };
 
   const handleOpenDeleteStaff = (row) => {
     setOpenDeleteStaff(true);
@@ -71,6 +96,7 @@ const Team = () => {
 
   const hadleCloseDeleteStaff = () => {
     setOpenDeleteStaff(false);
+    setSelectIdStaffToDelete("");
   };
 
   const handleOpenCreateStaff = () => {
@@ -238,12 +264,11 @@ const Team = () => {
       setStaffsInfos((prev) =>
         prev.filter((staff) => staff.id !== selectIdStaffToDelete.id)
       );
-
       hadleCloseDeleteStaff();
     } catch (err) {
       console.log(err);
       hadleCloseDeleteStaff();
-      toast.error(`ລອງໄໝ່ພາຍຫຼັງ`)
+      toast.error(`ລອງໄໝ່ພາຍຫຼັງ`);
     }
   };
 
@@ -472,9 +497,45 @@ const Team = () => {
             width="100%"
             height="100%"
           >
-            <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
-              <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
-            </IconButton>
+            <Tooltip
+              title="ລົບລະຫັດຜ່ານ"
+              arrow
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Noto Sans Lao", // or any font you prefer
+                    color: "#fff",
+                    backgroundColor: "#333", // optional
+                  },
+                },
+              }}
+            >
+              <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
+                <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
+              </IconButton>
+            </Tooltip>
+
+            <Tooltip
+              title="ລົບຢູ່ເຊີພະນັກງານ"
+              arrow
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Noto Sans Lao", // or any font you prefer
+                    color: "#fff",
+                    backgroundColor: "#333", // optional
+                  },
+                },
+              }}
+            >
+              <IconButton onClick={() => handleOpenClearPassword(row.row)}>
+                <KeyOffIcon />
+              </IconButton>
+            </Tooltip>
           </Box>
         );
       },
@@ -1011,7 +1072,7 @@ const Team = () => {
             autoFocus
             variant="contained"
             color="success"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}
           >
             ຢືນຢັນ
           </Button>
@@ -1019,7 +1080,48 @@ const Team = () => {
             onClick={hadleCloseDeleteStaff}
             variant="contained"
             color="error"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}
+          >
+            ຍົກເລີກ
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/** DIALOG CONFRIM CLEAR PASSWORD */}
+
+      <Dialog
+        open={openClearPassword}
+        onClose={handleCloseClearPassword}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          sx={{
+            fontFamily: "Noto Sans Lao",
+            textAlign: "center",
+            fontSize: 25,
+          }}
+        >
+          {`ຕ້ອງການລາ້ງລະຫັດ ${selectIdStaffToDelete?.firstname} ${selectIdStaffToDelete?.lastname}ແທ້ບໍ່`}
+        </DialogTitle>
+        <DialogContent></DialogContent>
+        <DialogActions
+          sx={{ display: "flex", gap: 2, justifyContent: "center" }}
+        >
+          <Button
+            onClick={handleClearPassword}
+            variant="contained"
+            color="success"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}
+          >
+            ຢືນຢັນ
+          </Button>
+          <Button
+            onClick={handleCloseClearPassword}
+            variant="contained"
+            color="error"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}
           >
             ຍົກເລີກ
           </Button>

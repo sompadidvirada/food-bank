@@ -58,10 +58,10 @@ const Trackexp = () => {
   }
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 0.2 },
+    { field: "id", headerName: "ໄອດີ", flex: 0.2 },
     {
       field: "image",
-      headerName: "PICTURE",
+      headerName: "ຮູບພາບ",
       flex: 0.2,
       renderCell: (params) => {
         const imageUrl = params.row.image
@@ -87,7 +87,7 @@ const Trackexp = () => {
     },
     {
       field: "name",
-      headerName: "NAME",
+      headerName: "ຊື່ສິນຄ້າ",
       type: "text",
       headerAlign: "left",
       align: "left",
@@ -105,7 +105,7 @@ const Trackexp = () => {
     },
     {
       field: "manage",
-      headerName: "EXP COUNT",
+      headerName: "ຈຳນວນທີ່ໄດ້ໝົດອາຍຸ",
       flex: 0.5,
       renderCell: (params) => {
         const productId = params.row.id;
@@ -118,9 +118,13 @@ const Trackexp = () => {
           return (
             <Box display="flex-row">
               <span
-                style={{ color: colors.greenAccent[200], fontWeight: "bold" }}
+                style={{
+                  color: colors.greenAccent[200],
+                  fontWeight: "bold",
+                  fontFamily: "Noto Sans Lao",
+                }}
               >
-                Tracked. ({trackedProduct.expCount})
+                ຍອດທີ່ບັນທຶກ. ({trackedProduct.expCount})
               </span>
               <DialogEditExp
                 trackedProduct={trackedProduct}
@@ -177,7 +181,7 @@ const Trackexp = () => {
     },
     {
       field: "category",
-      headerName: "CATEGORY",
+      headerName: "ໝວດໝູ່",
       type: "text",
       headerAlign: "left",
       flex: 0.5,
@@ -199,13 +203,13 @@ const Trackexp = () => {
     {
       field: "price",
       type: "number",
-      headerName: "PRICE",
+      headerName: "ລາຄາຕົ້ນທືນ",
       flex: 0.5,
     },
     {
       field: "sellprice",
       type: "number",
-      headerName: "SELL PRICE",
+      headerName: "ລາຄາຂາຍ",
       flex: 0.5,
     },
   ];
@@ -338,7 +342,7 @@ const Trackexp = () => {
               />
             </Box>
             <Box>
-              <Button variant="contained" onClick={handeDeleteAll}>
+              <Button variant="contained" onClick={handeDeleteAll} color="error">
                 <Typography variant="laoText"> ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>
@@ -390,7 +394,14 @@ const Trackexp = () => {
               columns={columns}
               autoHeight
               hideFooter
-              sx={{ width: "100%" }}
+              sx={{
+                width: "100%",
+                "& .MuiDataGrid-columnHeaders": {
+                  fontFamily: "Noto Sans Lao",
+                  fontWeight: "bold", // optional
+                  fontSize: "16px", // optional
+                },
+              }}
             />
           ) : (
             <Box sx={{ width: "100%", textAlign: "center" }}>
