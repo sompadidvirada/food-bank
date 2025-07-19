@@ -4,6 +4,9 @@ import { Login } from "../api/authen";
 import { getAllBranch } from "../api/branch";
 import { updateMainSt } from "../api/ManageTeam";
 import { getAllProduct, getCategorys } from "../api/product";
+import axios from "axios";
+const URL = import.meta.env.VITE_API_URL;
+
 
 const FoodBankStorage = (set, get) => ({
   user: null,
@@ -24,8 +27,34 @@ const FoodBankStorage = (set, get) => ({
   pieSend: null,
   pieExp: null,
   lineChartData: null,
+  calendar: null,
+  getCalendar: async (id) => {
+    try {
+      const res = await axios.get(
+        `${URL}/getcalendar/${id}`
+      );
+      set({ calendar: res.data });
+    } catch (err) {
+      console.error("Failed to fetch brachs:", err.message);
+    }
+  },
+  updateCalendarEventStatus: (updatedEvent) => {
+    set((state) => ({
+      calendar: state.calendar.map((event) =>
+        String(event.id) === String(updatedEvent.id)
+          ? {
+              ...event,
+              extendedProps: {
+                ...event.extendedProps,
+                isSuccess: updatedEvent.isSuccess,
+              },
+            }
+          : event
+      ),
+    }));
+  },
   setLineChartData: (newData) => {
-    set({ lineChartData: newData})
+    set({ lineChartData: newData });
   },
   setPieSell: (newData) => {
     set({ pieSell: newData }); // <-- Add function to update data

@@ -210,6 +210,13 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="ແຜນສັ່ງຊື້"
+              to="/admin/calendaradmin"
+              icon={<FastfoodIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}

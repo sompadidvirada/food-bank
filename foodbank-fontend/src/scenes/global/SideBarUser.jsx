@@ -26,6 +26,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 const URL = import.meta.env.VITE_API_URL;
 
@@ -185,6 +186,13 @@ const SideBarUser = () => {
               title="ຈັດການສິນຄ້າ"
               to="/user/product"
               icon={<FastfoodIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ແຜນສັ່ງຊື້"
+              to="/user/calendar"
+              icon={<CalendarMonthIcon />}
               selected={selected}
               setSelected={setSelected}
             />

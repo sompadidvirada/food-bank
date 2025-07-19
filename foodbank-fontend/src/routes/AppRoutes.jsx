@@ -21,6 +21,8 @@ import PieSell from "../scenes/Pie/PieSell";
 import PieSend from "../scenes/Pie/PieSend";
 import PieExp from "../scenes/Pie/PieExp";
 import LineMain from "../scenes/Line/LineMain";
+import Calendar from "../scenes/calendar/Calendar"
+import CalendarAdmin from "../scenes/calendar/CalendarAdmin";
 
 const router = createBrowserRouter([
   {
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
       { path: "piesend", element: <PieSend /> },
       { path: "pieexp", element: <PieExp /> },
       { path: "line", element: <LineMain /> },
+      { path: "calendaradmin", element: <CalendarAdmin /> },
     ],
   },
   {
@@ -60,6 +63,7 @@ const router = createBrowserRouter([
       { path: "trackexp", element: <Trackexp /> },
       { path: "reportperbranch", element: <ReportPerBranch /> },
       { path: "reportall", element: <ReportAll /> },
+      { path: "calendar", element: <Calendar /> },
     ],
   },
 ]);
