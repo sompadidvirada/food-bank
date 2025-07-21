@@ -23,6 +23,7 @@ import PieExp from "../scenes/Pie/PieExp";
 import LineMain from "../scenes/Line/LineMain";
 import Calendar from "../scenes/calendar/Calendar"
 import CalendarAdmin from "../scenes/calendar/CalendarAdmin";
+import UploadS3 from "../scenes/upload/UploadS3";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       { path: "pieexp", element: <PieExp /> },
       { path: "line", element: <LineMain /> },
       { path: "calendaradmin", element: <CalendarAdmin /> },
+      { path: "uploadimage", element: <UploadS3 /> },
     ],
   },
   {

@@ -25,7 +25,8 @@ import {
   insertTracksend,
 } from "../../api/tracking";
 import DialogEditSend from "./component/DialogEditSend";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const Tracksend = () => {
   const theme = useTheme();
@@ -61,7 +62,7 @@ const Tracksend = () => {
       flex: 0.2,
       renderCell: (params) => {
         const imageUrl = params.row.image
-          ? `${URL}/product_img/${params.row?.image}`
+          ? `${URL}/${params.row?.image}`
           : null;
         return imageUrl ? (
           <img

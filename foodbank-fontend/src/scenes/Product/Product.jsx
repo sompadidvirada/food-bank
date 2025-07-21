@@ -4,6 +4,7 @@ import {
   Dialog,
   DialogContent,
   IconButton,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -20,7 +21,8 @@ import DeleteProduct from "./component/DeleteProduct";
 import AddProduct from "./component/AddProduct";
 import AddCategory from "./component/AddCategory";
 import DeleteCategory from "./component/DeleteCategory";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const Product = () => {
   {
@@ -60,7 +62,7 @@ const Product = () => {
       flex: 0.3,
       renderCell: (params) => {
         const imageUrl = params.row.image
-          ? `${URL}/product_img/${params.row?.image}`
+          ? `${URL}/${params.row?.image}`
           : null;
         return imageUrl ? (
           <img
@@ -170,7 +172,7 @@ const Product = () => {
       renderCell: (params) => (
         <Box display="flex" justifyContent="space-around" width="100%">
           {/* Show EditIcon to everyone */}
-          <EditProduct productRow={params.row} />
+            <EditProduct productRow={params.row} />
           {user?.role === "admin" && <DeleteProduct productRow={params.row} />}
         </Box>
       ),
@@ -225,10 +227,7 @@ const Product = () => {
 
   return (
     <Box ml="20px">
-      <Header
-        title="ລາຍການສິນຄ້າ"
-        subtitle="ຈັດການລາຍການສິນຄ້າ"
-      />
+      <Header title="ລາຍການສິນຄ້າ" subtitle="ຈັດການລາຍການສິນຄ້າ" />
       <Box display={"flex"} gap={5} justifyContent={"center"}>
         <AddProduct />
         <AddCategory />

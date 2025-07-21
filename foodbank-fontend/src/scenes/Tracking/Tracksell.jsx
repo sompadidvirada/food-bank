@@ -22,7 +22,8 @@ import {
   insertTracksell,
 } from "../../api/tracking";
 import DialogEditSell from "./component/DialogEditSell";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const Tracksell = () => {
   const theme = useTheme();
@@ -58,7 +59,7 @@ const Tracksell = () => {
       flex: 0.2,
       renderCell: (params) => {
         const imageUrl = params.row.image
-          ? `${URL}/product_img/${params.row?.image}`
+          ? `${URL}/${params.row?.image}`
           : null;
         return imageUrl ? (
           <img

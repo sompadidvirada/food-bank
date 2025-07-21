@@ -31,7 +31,7 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 
-const URL = import.meta.env.VITE_API_URL;
+const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -121,7 +121,7 @@ const SideBarAdmin = () => {
                 <img
                   onClick={() =>
                     handleImageClick(
-                      `${URL}/staffimage/${
+                      `${URL}/${
                         user?.image || "public/staff_porfile/default-image.JPG"
                       }`
                     )
@@ -129,7 +129,7 @@ const SideBarAdmin = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`${URL}/staffimage/${
+                  src={`${URL}/${
                     user?.image || "public/staff_porfile/default-image.JPG"
                   }`}
                   style={{
@@ -199,6 +199,13 @@ const SideBarAdmin = () => {
             <Item
               title="ແຜນທີສາຂາ"
               to="/admin/map"
+              icon={<MapIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="UPLOAD"
+              to="/admin/uploadimage"
               icon={<MapIcon />}
               selected={selected}
               setSelected={setSelected}

@@ -1,8 +1,21 @@
 const prisma = require("../config/prisma");
 const jwt = require("jsonwebtoken");
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 
+const s3 = new S3Client({
+  region: process.env.BUCKET_REGION,
+  credentials: {
+    accessKeyId: process.env.SECREY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECREY_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 exports.getStaffInfos = async (req, res) => {
   try {
@@ -16,7 +29,7 @@ exports.getStaffInfos = async (req, res) => {
         birdDate: true,
         aviable: true,
         branch: true,
-        image: true
+        image: true,
       },
     });
     res.send(getStaffInfo);
@@ -87,38 +100,49 @@ exports.updateStatusStaff = async (req, res) => {
 
 exports.updateRoleStaff = async (req, res) => {
   try {
-    const { id } = req.params
-    const { role } = req.body
+    const { id } = req.params;
+    const { role } = req.body;
 
     if (!id || !role) {
-      return res.status(400).json({ message: `Can't update role with emty value.` })
+      return res
+        .status(400)
+        .json({ message: `Can't update role with emty value.` });
     }
 
     const respone = await prisma.staff.update({
       where: {
-        id: Number(id)
-      }, data: {
-        role: role
-      }
-    })
-    res.send(respone)
+        id: Number(id),
+      },
+      data: {
+        role: role,
+      },
+    });
+    res.send(respone);
   } catch (err) {
-    console.log(err)
-    return res.status(500).json({ message: `server error.` })
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
   }
-}
+};
 
 exports.updateMainStaff = async (req, res) => {
   try {
     const { id } = req.params;
-    const { firstname, lastname, phonenumber, password } = req.body;
+    const {
+      firstname,
+      lastname,
+      phonenumber,
+      password,
+      imageName,
+      contentType,
+    } = req.body;
+
 
     if (!id || !firstname || !lastname || !phonenumber) {
       return res.status(400).json({ message: `Invalid input data.` });
     }
 
     const exitingUser = await prisma.staff.findUnique({
-      where: { id: Number(id) }
+      where: { id: Number(id) },
     });
 
     if (!exitingUser) {
@@ -133,9 +157,10 @@ exports.updateMainStaff = async (req, res) => {
     });
 
     if (phoneCheck) {
-      return res.status(400).json({ message: `Other User Already Use This Phone number.` });
+      return res
+        .status(400)
+        .json({ message: `Other User Already Use This Phone number.` });
     }
-
 
     const updateData = { firstname, lastname };
     if (password || password !== "") {
@@ -145,19 +170,39 @@ exports.updateMainStaff = async (req, res) => {
       updateData.phonenumber = phonenumber;
     }
 
-    // If there's an image uploaded, delete the old one and update with new one
-    if (req.file && req.file.filename) {
+    let imageUploadUrl = null;
+
+    if (imageName) {
       if (exitingUser.image) {
-        const oldImagePath = path.join(__dirname, '../public/staff_porfile', exitingUser.image);
         try {
-          fs.unlinkSync(oldImagePath); // Synchronously delete the old image
-          console.log('Old image deleted successfully.');
+          const params = {
+            Bucket: process.env.SECREY_AWS_BUCKET_STAFF,
+            Key: exitingUser.image,
+          };
+
+          const command = new DeleteObjectCommand(params); 
+          await s3.send(command);
+
+          console.log("Deleted old image:", exitingUser.image);
         } catch (err) {
-          console.error('Error deleting old image:', err.message);
+          console.error("Error deleting old image:", err.message);
         }
       }
 
-      updateData.image = req.file.filename;
+      const command = new PutObjectCommand({
+        Bucket: process.env.SECREY_AWS_BUCKET_STAFF,
+        Key: imageName,
+        ContentType: contentType,
+        CacheControl: "public, max-age=31536000, immutable",
+      });
+
+      imageUploadUrl = await getSignedUrl(s3, command, { expiresIn: 300 });
+
+      if (!imageUploadUrl) {
+        return res.status(500).json({ message: `Something went wrong.` });
+      }
+
+      updateData.image = imageName;
     }
 
     const updatedStaff = await prisma.staff.update({
@@ -179,39 +224,45 @@ exports.updateMainStaff = async (req, res) => {
       if (err) {
         return res.status(500).json({ message: "Token error." });
       }
-      res.send({ payload, token });
+
+      res.send({
+        payload,
+        token,
+        imageUploadUrl, // <- signed URL for frontend to PUT image
+      });
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: `Server error.` });
   }
-}
+};
 
-exports.clearPasswordStaff = async (req,res) =>{
-  try{
-    const { id } = req.params
-    if(!id) {
-      return res.status(400).json({ message: `Emty value`})
+exports.clearPasswordStaff = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: `Emty value` });
     }
     const checkStaff = await prisma.staff.findFirst({
       where: {
-        id: Number(id)
-      }
-    })
-    if(!checkStaff) {
-      return res.status(400).json({ message: `Something went wrong.`})
+        id: Number(id),
+      },
+    });
+    if (!checkStaff) {
+      return res.status(400).json({ message: `Something went wrong.` });
     }
 
     await prisma.staff.update({
-      where:{
-        id:Number(id)
-      },data: {
-        password: null
-      }
-    })
-    res.status(200).json({ message: `ລ້າງລະຫັດຜ່ານລຳເລັດ.`})
-  }catch(err) {
-    console.log(err)
-    return res.status(500).json({ message: `server error`})
+      where: {
+        id: Number(id),
+      },
+      data: {
+        password: null,
+      },
+    });
+    res.status(200).json({ message: `ລ້າງລະຫັດຜ່ານລຳເລັດ.` });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error` });
   }
-}
+};

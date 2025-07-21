@@ -28,7 +28,8 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
-const URL = import.meta.env.VITE_API_URL;
+
+const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -123,7 +124,7 @@ const SideBarUser = () => {
                 <img
                   onClick={() =>
                     handleImageClick(
-                      `${URL}/staffimage/${
+                      `${URL}/${
                         user?.image || "public/staff_porfile/default-image.JPG"
                       }`
                     )
@@ -131,8 +132,8 @@ const SideBarUser = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`${URL}/staffimage/${
-                    user?.image || "public/staff_porfile/default-image.JPG"
+                  src={`${URL}/${
+                    user?.image || `${URL}/default-user.png`
                   }`}
                   style={{
                     cursor: "pointer",

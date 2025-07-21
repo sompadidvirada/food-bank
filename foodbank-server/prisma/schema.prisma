@@ -72,7 +72,7 @@ model availableproduct {
   id            Int       @id @unique @default(autoincrement())
   aviableStatus Boolean   @default(true)
   updateAt      DateTime? @updatedAt
-  products      products  @relation(fields: [productsId], references: [id])
+  products      products  @relation(fields: [productsId], references: [id], onDelete: Cascade)
   productsId    Int
   branch        branch    @relation(fields: [branchId], references: [id])
   branchId      Int

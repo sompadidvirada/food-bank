@@ -21,7 +21,7 @@ router.get('/getstaffsinfo', authCheck, adminCheck, getStaffInfos)
 router.put('/updatestaff/:id', authCheck, adminCheck, updateBranchStaff)
 router.put('/updatestatusstaff/:id', authCheck, adminCheck, updateStatusStaff)
 router.put('/updaterolestaff/:id', authCheck, adminCheck, updateRoleStaff)
-router.put('/updateuser/:id',upload.single("image"), updateMainStaff)
+router.put('/updateuser/:id', updateMainStaff)
 router.put('/clearpassword/:id', authCheck, adminCheck, clearPasswordStaff)
 
 

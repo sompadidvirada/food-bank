@@ -57,3 +57,19 @@ export const updateMainSt = (id, form, token) => {
     },
   });
 }
+
+export const uploadImageS3 = (imageName, contentType, token) => {
+  return axios.post(
+    `${URL}/upload-s3`, // ← use POST and a generic endpoint
+    {
+      imageName,
+      contentType,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+};
+

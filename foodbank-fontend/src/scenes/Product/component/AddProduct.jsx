@@ -20,6 +20,9 @@ import Slide from "@mui/material/Slide";
 import { NumericFormat } from "react-number-format";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { createProduct } from "../../../api/product";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import axios from "axios";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -33,6 +36,22 @@ const AddProduct = () => {
   const [open, setOpen] = React.useState(false);
   const getProduct = useFoodBankStorage((state) => state.getProduct);
   const token = useFoodBankStorage((state) => state.token);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const typeToExtension = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/jpg": "jpg",
+    "image/webp": "webp",
+  };
+
+  const randomImage = (length = 32) => {
+    const array = new Uint8Array(length);
+    window.crypto.getRandomValues(array); // Secure random numbers
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
+      ""
+    );
+  };
 
   useEffect(() => {
     getCategory();
@@ -47,33 +66,53 @@ const AddProduct = () => {
   };
 
   const handleFormSubmit = async (values, { resetForm }) => {
+    setIsUploading(true); // Show backdrop first
+
+    setTimeout(() => {
+      handleClose();
+    }, 50); // 50ms is usually enough
     try {
-      const formData = new FormData();
+      let productImage = null;
+      let contentType = null;
 
-      // Append all other form fields
-      Object.keys(values).forEach((key) => {
-        if (key === "image") {
-          if (values.image) {
-            formData.append("image", values.image);
-          }
-        } else {
-          formData.append(key, values[key]);
-        }
-      });
+      if (values.image) {
+        const file = values.image;
+        const extension = typeToExtension[file.type];
+        if (!extension) throw new Error("Unsupported file type");
 
-      const createPro = await createProduct(formData, token);
-      console.log(createPro);
+        productImage = `${randomImage()}.${extension}`; // generate name
+        contentType = file.type; // e.g., "image/png"
+      }
 
+      const payload = {
+        name: values.name,
+        price: values.price,
+        sellprice: values.sellprice,
+        lifetime: values.lifetime,
+        category: values.category,
+        productImage, // example: "abc123.jpg"
+        contentType, // example: "image/png"
+      };
+
+      const createPro = await createProduct(payload, token);
+      if (createPro.data.imageUploadUrl) {
+        await axios.put(createPro.data.imageUploadUrl, values.image, {
+          headers: {
+            "Content-Type": contentType,
+          },
+        });
+      }
       // Reset form after submission
+    } catch (err) {
+      console.log(err);
+    } finally {
+      getProduct();
       resetForm(); // Reset Formik values
       setPreviewImage(null); // Clear image preview
       if (fileInputRef.current) {
         fileInputRef.current.value = ""; // Reset file input
       }
-      getProduct();
-      handleClose();
-    } catch (err) {
-      console.log(err);
+      setIsUploading(false); // Hide backdrop
     }
   };
 
@@ -366,10 +405,20 @@ const AddProduct = () => {
                   )}
                 </Box>
                 <Box display="flex" justifyContent="end" mt="20px" gap={3}>
-                  <Button type="submit" color="secondary" variant="contained" sx={{ fontFamily: "Noto Sans Lao" }}>
+                  <Button
+                    type="submit"
+                    color="secondary"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
                     ສົ່ງຟອມ
                   </Button>
-                  <Button onClick={handleClose} color="error" variant="contained" sx={{ fontFamily: "Noto Sans Lao" }}>
+                  <Button
+                    onClick={handleClose}
+                    color="error"
+                    variant="contained"
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
                     ຍົກເລີກ
                   </Button>
                 </Box>
@@ -378,6 +427,12 @@ const AddProduct = () => {
           </Formik>
         </DialogContent>
       </Dialog>
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isUploading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

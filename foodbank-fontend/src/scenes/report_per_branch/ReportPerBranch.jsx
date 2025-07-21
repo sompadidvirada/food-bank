@@ -14,7 +14,8 @@ import CloseIcon from "@mui/icons-material/Close";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Header from "../component/Header";
 import Calendar from "../../component/Calendar";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const LazyBranchDataGrid = lazy(() => import("./component/DataGrind"));
 
@@ -43,7 +44,7 @@ const ReportPerBranch = () => {
     const imageUrls = dataTrack
       .flatMap((branch) => branch.detail || []) // Fallback to empty array if `detail` is undefined
       .map((item) =>
-        item.image ? `${URL}/product_img/${item?.image}` : null
+        item.image ? `${URL}/${item?.image}` : null
       )
       .filter(Boolean);
 
@@ -104,7 +105,7 @@ const ReportPerBranch = () => {
         flex: 0.5,
         renderCell: (params) => {
           const imageUrl = params.row.image
-            ? `${URL}/product_img/${params.row.image}`
+            ? `${URL}/${params.row.image}`
             : null;
           return imageUrl ? (
             <img

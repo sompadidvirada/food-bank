@@ -12,6 +12,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Tooltip,
   useTheme,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -21,7 +22,11 @@ import { NumericFormat } from "react-number-format";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { updateProduct } from "../../../api/product";
 import { toast, ToastContainer } from "react-toastify";
-const URL = import.meta.env.VITE_API_URL;
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+import axios from "axios";
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const EditProduct = ({ productRow }) => {
   {
@@ -36,6 +41,23 @@ const EditProduct = ({ productRow }) => {
   const [imagePreview, setImagePreview] = useState(null); // To store image preview URL
   const [selectedImage, setSelectedImage] = useState(null); // To store the selected image
   const getProduct = useFoodBankStorage((state) => state.getProduct);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const typeToExtension = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp",
+    "image/gif": "gif",
+    "image/svg+xml": "svg",
+  };
+
+  const randomImage = (length = 32) => {
+    const array = new Uint8Array(length);
+    window.crypto.getRandomValues(array); // Secure random numbers
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
+      ""
+    );
+  };
 
   useEffect(() => {
     getCategory();
@@ -53,15 +75,13 @@ const EditProduct = ({ productRow }) => {
     sellprice: "",
     categoryId: "",
     lifetime: "",
-    image: "",
   });
 
   const handleOpen = (productRow) => {
     setEditProduct(productRow);
     setSelectedImage(null);
     if (productRow.image) {
-      const imageUrl = `${URL}/product_img/${productRow.image}`;
-      console.log(imageUrl);
+      const imageUrl = `${URL}/${productRow.image}`;
       setImagePreview(imageUrl); // Set imagePreview to the image URL
     } else {
       setImagePreview(null); // If no image, reset the image preview
@@ -78,52 +98,89 @@ const EditProduct = ({ productRow }) => {
     const { name, value } = e.target;
     setEditProduct({ ...editProduct, [name]: value });
   };
+
   const handleImageChange = (e) => {
     const file = e.target.files[0]; // Get the first file selected by the user
-    if (file) {
-      setSelectedImage(file); // Store the selected image in the state
+    if (!file) return;
 
-      // Create a preview of the selected image using FileReader
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result); // Set the preview image data URL
-      };
-      reader.readAsDataURL(file); // Read the file as a data URL
+    const extension = typeToExtension[file.type]; // keep original extension
+    if (!extension) {
+      alert("Unsupported file type.");
+      return;
     }
+    const imageName = `${randomImage()}.${extension}`;
+
+    setSelectedImage(file); // Store the selected image in the state
+    setEditProduct((prev) => ({
+      ...prev,
+      imageName: imageName,
+      contentType: extension,
+    }));
+    // Create a preview of the selected image using FileReader
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result); // Set the preview image data URL
+    };
+    reader.readAsDataURL(file); // Read the file as a data URL
   };
 
   const handleSubmitEdit = async () => {
-    // Create a FormData object to send the data and image together
-    const formData = new FormData();
-    formData.append("id", editProduct.id);
-    formData.append("name", editProduct.name);
-    formData.append("price", editProduct.price);
-    formData.append("sellprice", editProduct.sellprice);
-    formData.append("categoryId", editProduct.categoryId);
-    formData.append("lifetime", editProduct.lifetime);
-    if (selectedImage) {
-      formData.append("image", selectedImage); // Append the image file if selected
-    }
+    setIsUploading(true); // Show backdrop first
 
-    const update = await updateProduct(editProduct.id, formData, token);
-    await getProduct();
-    toast.success('ອັປເດດສິນຄ້າສຳເລັດ.')
-    setOpen(false);
+    setTimeout(() => {
+      handleClose(); // Close the dialog just after backdrop shows
+    }, 50); // 50ms is usually enough
+
+    try {
+      const update = await updateProduct(editProduct.id, editProduct, token);
+      console.log(update);
+
+      if (update.data.imageUploadUrl) {
+        await axios.put(update.data.imageUploadUrl, selectedImage, {
+          headers: {
+            "Content-Type": editProduct.contentType,
+          },
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    } finally {
+      await getProduct();
+      toast.success("ອັປເດດສິນຄ້າສຳເລັດ.");
+      setOpen(false);
+      setIsUploading(false);
+    }
   };
 
   return (
     <Box>
-      <IconButton onClick={() => handleOpen(productRow)}>
-        <EditIcon
-          sx={{
-            cursor: "pointer",
-            color: colors.blueAccent[500],
-            "&:hover": {
-              color: colors.blueAccent[700],
+      <Tooltip
+        title="ແກ້ໄຂສິນຄ້າ"
+        arrow
+        placement="top"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              fontSize: "14px",
+              fontFamily: "Noto Sans Lao", // or any font you prefer
+              color: "#fff",
+              backgroundColor: "#333", // optional
             },
-          }}
-        />
-      </IconButton>
+          },
+        }}
+      >
+        <IconButton onClick={() => handleOpen(productRow)}>
+          <EditIcon
+            sx={{
+              cursor: "pointer",
+              color: colors.blueAccent[500],
+              "&:hover": {
+                color: colors.blueAccent[700],
+              },
+            }}
+          />
+        </IconButton>
+      </Tooltip>
 
       {/* Modal Edit Product Dialog */}
       <Dialog open={open} onClose={handleClose}>
@@ -262,6 +319,13 @@ const EditProduct = ({ productRow }) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isUploading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

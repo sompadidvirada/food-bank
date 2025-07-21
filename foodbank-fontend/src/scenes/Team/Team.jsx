@@ -39,7 +39,11 @@ import { Formik } from "formik";
 import * as yup from "yup";
 import { clearPasswordStaff, createStaff, deleteStaff } from "../../api/authen";
 import KeyOffIcon from "@mui/icons-material/KeyOff";
-const URL = import.meta.env.VITE_API_URL;
+import axios from "axios";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
+const URL =
+  "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
 const Team = () => {
   const theme = useTheme();
@@ -66,6 +70,22 @@ const Team = () => {
   const [openDeleteStaff, setOpenDeleteStaff] = useState(false);
   const [selectIdStaffToDelete, setSelectIdStaffToDelete] = useState("");
   const [openClearPassword, setOpenClearPassword] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const typeToExtension = {
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/jpg": "jpg",
+    "image/webp": "webp",
+  };
+
+  const randomImage = (length = 32) => {
+    const array = new Uint8Array(length);
+    window.crypto.getRandomValues(array); // Secure random numbers
+    return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
+      ""
+    );
+  };
 
   const handleOpenClearPassword = (row) => {
     setOpenClearPassword(true);
@@ -107,32 +127,55 @@ const Team = () => {
   };
 
   const handleFormSubmit = async (values, { resetForm }) => {
+    setIsUploading(true); // Show backdrop first
+
+    setTimeout(() => {
+      handleCloseCreateStaff(); // Close the dialog just after backdrop shows
+    }, 50); // 50ms is usually enough
     try {
-      const formData = new FormData();
+      let imageStaff = null;
+      let contentType = null;
 
-      // Append all other form fields
-      Object.keys(values).forEach((key) => {
-        if (key === "profileImage") {
-          if (values.profileImage) {
-            formData.append("profileImage", values.profileImage);
-          }
-        } else {
-          formData.append(key, values[key]);
-        }
-      });
-      const ress = await createStaff(formData, token);
+      // If an image is selected
+      if (values.profileImage) {
+        const file = values.profileImage;
+        const extension = typeToExtension[file.type];
+        if (!extension) throw new Error("Unsupported file type");
 
-      console.log(ress);
+        imageStaff = `${randomImage()}.${extension}`; // generate name
+        contentType = file.type; // e.g., "image/png"
+      }
 
-      // Reset form after submission
-      resetForm(); // Reset Formik values
-      setPreviewImage(null); // Clear image preview
-      handleCloseCreateStaff();
+      // Send as plain JSON object
+      const payload = {
+        firstName: values.firstName,
+        lastName: values.lastName,
+        phonenumber: values.phonenumber,
+        birthDate: values.birthDate,
+        imageStaff, // example: "abc123.jpg"
+        contentType, // example: "image/png"
+      };
+
+      const res = await createStaff(payload, token);
+      console.log(res);
+
+      if (res.data.imageUploadUrl) {
+        await axios.put(res.data.imageUploadUrl, values.profileImage, {
+          headers: {
+            "Content-Type": contentType,
+          },
+        });
+      }
+
+      resetForm();
+      setPreviewImage(null);
       if (fileInputRef.current) {
-        fileInputRef.current.value = ""; // Reset file input
+        fileInputRef.current.value = "";
       }
     } catch (err) {
-      console.log(err);
+      console.log("Error during submit:", err);
+    } finally {
+      setIsUploading(false); // Hide backdrop
     }
   };
 
@@ -251,6 +294,11 @@ const Team = () => {
   };
 
   const hadleDeleteStaff = async () => {
+    setIsUploading(true); // Show backdrop first
+
+    setTimeout(() => {
+      hadleCloseDeleteStaff();
+    }, 50); // 50ms is usually enough
     try {
       const res = await deleteStaff(
         {
@@ -264,11 +312,12 @@ const Team = () => {
       setStaffsInfos((prev) =>
         prev.filter((staff) => staff.id !== selectIdStaffToDelete.id)
       );
-      hadleCloseDeleteStaff();
     } catch (err) {
       console.log(err);
       hadleCloseDeleteStaff();
       toast.error(`ລອງໄໝ່ພາຍຫຼັງ`);
+    } finally {
+      setIsUploading(false); // Hide backdrop
     }
   };
 
@@ -300,8 +349,8 @@ const Team = () => {
       headerName: "ຮູບພາບ",
       renderCell: (params) => {
         const imageUrl = params.row.image
-          ? `${URL}/staffimage/${params.row.image}`
-          : null;
+          ? `${URL}/${params.row.image}`
+          : `${URL}/default-user.png`;
         return imageUrl ? (
           <img
             src={imageUrl}
@@ -518,7 +567,7 @@ const Team = () => {
             </Tooltip>
 
             <Tooltip
-              title="ລົບຢູ່ເຊີພະນັກງານ"
+              title="ລ້າງລະຫັດຜ່ານ"
               arrow
               placement="top"
               componentsProps={{
@@ -735,7 +784,7 @@ const Team = () => {
             autoFocus
             variant="contained"
             color="success"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
           >
             ຢືນຢັນ
           </Button>
@@ -743,7 +792,7 @@ const Team = () => {
             onClick={handleCloseStatus}
             variant="contained"
             color="error"
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
           >
             ຍົກເລີກ
           </Button>
@@ -1130,6 +1179,13 @@ const Team = () => {
 
       {/**Toastify Part */}
       <ToastContainer position="top-center" />
+
+      <Backdrop
+        sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+        open={isUploading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
   );
 };

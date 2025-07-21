@@ -14,7 +14,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import Calendar from "../../component/Calendar";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Header from "../component/Header";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const ReportAll = () => {
   const theme = useTheme();
@@ -30,7 +31,7 @@ const ReportAll = () => {
       ? totalData.totalDetail
           .flatMap((item) => item.detail || [])
           .map((item) =>
-            item.image ? `${URL}/product_img/${item.image}` : null
+            item.image ? `${URL}/${item.image}` : null
           )
           .filter(Boolean)
       : [];
@@ -68,7 +69,7 @@ const ReportAll = () => {
         flex: 0.2,
         renderCell: (params) => {
           const imageUrl = params.row.image
-            ? `${URL}/product_img/${params.row.image}`
+            ? `${URL}/${params.row.image}`
             : null;
           return imageUrl ? (
             <img

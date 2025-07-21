@@ -7,7 +7,6 @@ import { getAllProduct, getCategorys } from "../api/product";
 import axios from "axios";
 const URL = import.meta.env.VITE_API_URL;
 
-
 const FoodBankStorage = (set, get) => ({
   user: null,
   token: null,
@@ -30,9 +29,7 @@ const FoodBankStorage = (set, get) => ({
   calendar: null,
   getCalendar: async (id) => {
     try {
-      const res = await axios.get(
-        `${URL}/getcalendar/${id}`
-      );
+      const res = await axios.get(`${URL}/getcalendar/${id}`);
       set({ calendar: res.data });
     } catch (err) {
       console.error("Failed to fetch brachs:", err.message);
@@ -112,7 +109,7 @@ const FoodBankStorage = (set, get) => ({
     }
   },
   setBranchs: (newBranches) => set({ branchs: newBranches }),
-  updateUser: async (form) => {
+  updateUser: async (form, imageFile = null) => {
     const token = get().token;
     const user = get().user;
 
@@ -123,15 +120,29 @@ const FoodBankStorage = (set, get) => ({
 
     try {
       const res = await updateMainSt(user.id, form, token);
+      console.log(res)
+
+      // Upload image if there's a file and signed URL
+      if (imageFile && res.data.imageUploadUrl) {
+        await axios.put(res.data.imageUploadUrl, imageFile, {
+          headers: {
+            "Content-Type": imageFile.type,
+          },
+        });
+      }
+
+      // Update Zustand state with new token + user info
       set({
         user: res.data.payload,
         token: res.data.token,
       });
+
       return res;
     } catch (error) {
       console.error("Error updating user:", error);
     }
   },
+
   getProduct: async () => {
     const token = get().token;
     try {
