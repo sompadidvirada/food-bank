@@ -48,6 +48,7 @@ const Product = () => {
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
   const getProduct = useFoodBankStorage((state) => state.getProduct);
+  const getCategory = useFoodBankStorage((state)=>state.getCategory)
   const branch = useFoodBankStorage((state) => state.branchs);
   const user = useFoodBankStorage((state) => state.user);
 
@@ -199,7 +200,8 @@ const Product = () => {
   }
 
   useEffect(() => {
-    getProduct();
+    getProduct(true);
+    getCategory(true)
   }, []);
 
   {

@@ -37,7 +37,6 @@ const EditProduct = ({ productRow }) => {
   const colors = tokens(theme.palette.mode);
   const categorys = useFoodBankStorage((state) => state.categorys);
   const token = useFoodBankStorage((state) => state.token);
-  const getCategory = useFoodBankStorage((state) => state.getCategory);
   const [imagePreview, setImagePreview] = useState(null); // To store image preview URL
   const [selectedImage, setSelectedImage] = useState(null); // To store the selected image
   const getProduct = useFoodBankStorage((state) => state.getProduct);
@@ -58,10 +57,6 @@ const EditProduct = ({ productRow }) => {
       ""
     );
   };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
 
   {
     /**create varible state */

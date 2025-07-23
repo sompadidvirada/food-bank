@@ -36,8 +36,6 @@ const DeleteCategory = () => {
   };
 
   const handleFormSubmit = async (values, { resetForm }) => {
-    console.log(values);
-
     try {
       const ress = await deleteCategory(values.category, token);
       getCategory(true);

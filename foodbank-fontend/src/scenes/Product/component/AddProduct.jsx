@@ -32,7 +32,6 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const fileInputRef = useRef(null);
   const categorys = useFoodBankStorage((state) => state.categorys);
-  const getCategory = useFoodBankStorage((state) => state.getCategory);
   const [open, setOpen] = React.useState(false);
   const getProduct = useFoodBankStorage((state) => state.getProduct);
   const token = useFoodBankStorage((state) => state.token);
@@ -52,11 +51,6 @@ const AddProduct = () => {
       ""
     );
   };
-
-  useEffect(() => {
-    getCategory();
-  }, []);
-
   const handleClickOpen = () => {
     setOpen(true);
   };

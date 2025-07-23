@@ -35,8 +35,9 @@ app.options("*", cors()); // handle preflight
 readdirSync("./routes").map((item) =>
   app.use("/", require("./routes/" + item))
 );
+const port = process.env.PORT
 
 // Start server
-server.listen(3500, "0.0.0.0", () => {
+server.listen(port, "0.0.0.0", () => {
   console.log("API + Socket.IO running on port 3500");
 });

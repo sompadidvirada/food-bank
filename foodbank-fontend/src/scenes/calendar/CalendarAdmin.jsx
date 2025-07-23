@@ -223,7 +223,6 @@ const CalendarAdmin = () => {
     }
   };
 
-  console.log(calendarad);
   const handleEditEvent = () => {
     setEditEventData({
       id: selectedEventInfUllCalendar?.publicId,
