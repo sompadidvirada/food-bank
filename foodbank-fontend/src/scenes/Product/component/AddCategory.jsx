@@ -35,11 +35,9 @@ const AddCategory = () => {
   };
 
   const handleFormSubmit = async (values, { resetForm }) => {
-    console.log(values);
-
     try {
       const ress = await createCategory(values, token);
-      getCategory();
+      getCategory(true);
       resetForm();
       handleClose();
     } catch (err) {

@@ -126,12 +126,13 @@ model trackexp {
 }
 
 model calendar {
-  id          Int      @id @unique @default(autoincrement())
-  suplyer     String
-  discription String
-  polink      String
-  date        DateTime
-  isSuccess   Boolean   @default(false)
-  staff       staff   @relation(fields: [staffId], references: [id])
-  staffId     Int
+  id           Int      @id @unique @default(autoincrement())
+  suplyer      String
+  discription  String
+  polink       String
+  staff        staff    @relation(fields: [staffId], references: [id])
+  staffId      Int
+  date         DateTime
+  isSuccess    Boolean  @default(false)
+  isPaySuccess Boolean  @default(false)
 }

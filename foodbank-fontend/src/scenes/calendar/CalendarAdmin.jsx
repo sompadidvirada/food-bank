@@ -28,19 +28,25 @@ import {
   detailUpdate,
   getCalendarAdmin,
   updateCalendar,
+  updateSuccessPay,
   updateSuccessPo,
 } from "../../api/calendar";
 import Header from "../component/Header";
 
 const renderEventContent = (eventInfo) => {
   const isSuccess = eventInfo.event.extendedProps?.isSuccess;
+  const isPaySuccess = eventInfo.event.extendedProps?.isPaySuccess;
   return (
     <Box
       sx={{
         fontFamily: "Noto Sans Lao",
         fontSize: "0.9rem",
         color: "#fff",
-        backgroundColor: isSuccess ? "#4caf50" : "#2196f3", // green or blue
+        backgroundColor: isSuccess
+          ? "#007d04ff"
+          : isPaySuccess
+          ? "#00457eff"
+          : "#939d00ff", // green or blue
         borderRadius: "4px",
         padding: "2px 4px",
         overflow: "hidden",
@@ -193,6 +199,29 @@ const CalendarAdmin = () => {
       console.log(err);
     }
   };
+  const handleUpdateStatusEventPayment = async (status) => {
+    try {
+      const updated = await updateSuccessPay(selectedEvent?.id, status);
+      console.log("Updated:", updated.data);
+
+      setCalendarad((prev) => {
+        const updatedList = prev.map((event) =>
+          event.id === String(updated?.data?.id)
+            ? {
+                ...event,
+                extendedProps: {
+                  ...event.extendedProps,
+                  isPaySuccess: updated?.data?.isPaySuccess,
+                },
+              }
+            : event
+        );
+        return [...updatedList]; // force change detection
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   console.log(calendarad);
   const handleEditEvent = () => {
@@ -303,8 +332,9 @@ const CalendarAdmin = () => {
                   sx={{
                     backgroundColor: event.extendedProps?.isSuccess
                       ? colors.greenAccent[500]
-                      : colors.blueAccent[500],
-
+                      : event.extendedProps?.isPaySuccess
+                      ? colors.blueAccent[500]
+                      : "#939d00ff",
                     margin: "10px 0",
                     borderRadius: "2px",
                     cursor: "pointer",
@@ -570,7 +600,7 @@ const CalendarAdmin = () => {
                 : "ປິດ PO ແລ້ວ"}
             </Typography>
           </Box>
-          <Box display={"flex"} flexDirection={"column"} p={2}>
+          <Box display={"flex"} flexDirection={"column"} p={2} borderBottom={"1px solid"}>
             <Typography
               fontFamily={"Noto Sans Lao"}
               alignSelf={"center"}
@@ -578,7 +608,55 @@ const CalendarAdmin = () => {
               color={colors.grey[300]}
               p={2}
             >
-              ອັປເດດສະຖານະ
+              ອັປເດດສະຖານະການຊຳລະ
+            </Typography>
+            {selectedEvent?.extendedProps?.isPaySuccess === false ? (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleUpdateStatusEventPayment(true);
+                  setEventDetailOpen(false);
+                }}
+                sx={{
+                  fontFamily: "Noto Sans Lao",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  width: "30%",
+                  alignSelf: "center",
+                }}
+                color="success"
+              >
+                ຊຳລະແລ້ວ
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleUpdateStatusEventPayment(false);
+                  setEventDetailOpen(false);
+                }}
+                sx={{
+                  fontFamily: "Noto Sans Lao",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  width: "30%",
+                  alignSelf: "center",
+                }}
+                color="error"
+              >
+                ຍັງບໍ່ຊຳລະ
+              </Button>
+            )}
+          </Box>
+          <Box display={"flex"} flexDirection={"column"} p={2} borderBottom={"1px solid"}>
+            <Typography
+              fontFamily={"Noto Sans Lao"}
+              alignSelf={"center"}
+              fontSize={15}
+              color={colors.grey[300]}
+              p={2}
+            >
+              ອັປເດດສະຖານະຮັບເຄື່ອງ
             </Typography>
             {selectedEvent?.extendedProps?.isSuccess === false ? (
               <Button
@@ -614,7 +692,7 @@ const CalendarAdmin = () => {
                 }}
                 color="error"
               >
-                ຍັງບໍ່ທັນຈັດສົ່ງ
+                ຍັງບໍ່ຈັດສົ່ງ
               </Button>
             )}
           </Box>
@@ -684,9 +762,7 @@ const CalendarAdmin = () => {
             margin="dense"
             label={<Typography variant="laoText">ຊື່ບໍລິສັດ</Typography>}
             value={editEventData.title}
-            onChange={(e) =>
-              setEditEventData({ ...editEventData, title: e.target.value })
-            }
+            disabled
           />
           <TextField
             fullWidth

@@ -38,10 +38,20 @@ const LineCharts = ({ isDashboard = false }) => {
           margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" angle={0} textAnchor="end" />
+          <XAxis
+            dataKey="name"
+            angle={0}
+            textAnchor="end"
+            tick={{
+              fontSize: 12,
+              fontFamily: "Noto Sans Lao",
+              fill: "#666",
+            }}
+          />
           <YAxis />
           <Tooltip content={<CustomTooltip />} />
-          <Legend />
+          <Legend content={<CustomLegend />} />
+
           {branches.map((branch) => (
             <Line
               key={branch}
@@ -70,7 +80,7 @@ const CustomTooltip = ({ active, payload, label }) => {
           padding: "10px",
           borderRadius: "8px",
           boxShadow: "0 2px 5px rgba(0,0,0,0.2)",
-          fontFamily: theme.typography.fontFamily,
+          fontFamily: "Noto Sans Lao", // <- set custom font here
         }}
       >
         <p style={{ margin: 0, fontWeight: "bold", color: colors.grey[100] }}>
@@ -82,6 +92,7 @@ const CustomTooltip = ({ active, payload, label }) => {
             style={{
               color: entry.color,
               margin: "4px 0",
+              fontFamily: "Noto Sans Lao",
             }}
           >
             {entry.name}: {entry.value}
@@ -92,6 +103,45 @@ const CustomTooltip = ({ active, payload, label }) => {
   }
 
   return null;
+};
+
+const CustomLegend = ({ payload }) => {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap", // allow wrapping
+        gap: "12px 20px", // row and column spacing
+        padding: "8px 16px",
+      }}
+    >
+      {payload.map((entry, index) => (
+        <div
+          key={`legend-${index}`}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            fontFamily: "Noto Sans Lao",
+            fontSize: 14,
+            color: entry.color,
+            minWidth: "max-content",
+          }}
+        >
+          <span
+            style={{
+              width: 10,
+              height: 10,
+              backgroundColor: entry.color,
+              marginRight: 6,
+              borderRadius: "50%",
+              display: "inline-block",
+            }}
+          />
+          {entry.value}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default LineCharts;

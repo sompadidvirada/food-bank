@@ -28,6 +28,7 @@ import BarChartExp from "../../component/BarChartExp";
 import AddBusinessIcon from "@mui/icons-material/AddBusiness";
 import VerifiedIcon from "@mui/icons-material/Verified";
 import RestoreFromTrashIcon from "@mui/icons-material/RestoreFromTrash";
+import CountUp from "../../component/CountUp";
 
 const Dashboard = () => {
   const theme = useTheme();
@@ -186,9 +187,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.current?.totalSellPrice.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.current?.totalSellPrice || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -216,9 +220,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.current?.totalSendPrice.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.current?.totalSendPrice || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -246,9 +253,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.current?.totalExpPrice.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.current?.totalExpPrice || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -276,10 +286,11 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {!totalSell ||
-                    totalSell?.current?.percentageOfPricetotalExp === null
-                      ? "0"
-                      : totalSell?.current?.percentageOfPricetotalExp}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.current?.percentageOfPricetotalExp || 0}
+                      duration={0.3}
+                    />{" "}
                     %
                   </Typography>
                 }
@@ -306,9 +317,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.lastMonth?.totalSellPriceLast.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.lastMonth?.totalSellPriceLast || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -335,9 +349,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.lastMonth?.totalSendPriceLast.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.lastMonth?.totalSendPriceLast || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -364,9 +381,12 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {totalSell
-                      ? totalSell?.lastMonth?.totalExpPriceLast.toLocaleString()
-                      : 0}{" "}
+                    <CountUp
+                      from={0}
+                      to={totalSell?.lastMonth?.totalExpPriceLast || 0}
+                      duration={0.1}
+                      separator=","
+                    />{" "}
                     ກີບ
                   </Typography>
                 }
@@ -393,11 +413,13 @@ const Dashboard = () => {
               <StatusBox
                 title={
                   <Typography variant="laoText">
-                    {!totalSell ||
-                    totalSell?.lastMonth?.percentageOfPricetotalExpLast === null
-                      ? "0"
-                      : totalSell?.lastMonth
-                          ?.percentageOfPricetotalExpLast}{" "}
+                    <CountUp
+                      from={0}
+                      to={
+                        totalSell?.lastMonth?.percentageOfPricetotalExpLast || 0
+                      }
+                      duration={0.3}
+                    />{" "}
                     %
                   </Typography>
                 }
@@ -439,41 +461,41 @@ const Dashboard = () => {
 
             <Box
               gridColumn="span 4"
-              gridRow="span 2"
+              gridRow="span 3"
               backgroundColor={colors.primary[400]}
               textAlign={"center"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
                 ລາຍການທີ່ຂາຍ
               </Typography>
-              <Box height="90%">
+              <Box height="80%">
                 <PieSellCompo isDashboard={true} dataPie={pieSell} />
               </Box>
             </Box>
 
             <Box
               gridColumn="span 4"
-              gridRow="span 2"
+              gridRow="span 3"
               backgroundColor={colors.primary[400]}
               textAlign={"center"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
                 ລາຍການທີ່ຈັດສົ່ງ
               </Typography>
-              <Box height="90%">
+              <Box height="80%">
                 <PieSendCompo isDashboard={true} dataPie={pieSend} />
               </Box>
             </Box>
             <Box
               gridColumn="span 4"
-              gridRow="span 2"
+              gridRow="span 3"
               backgroundColor={colors.primary[400]}
               textAlign={"center"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0" }}>
+              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
                 ລາຍການທີ່ໝົດອາຍຸ
               </Typography>
-              <Box height="90%">
+              <Box height="80%">
                 <PieExpCompo isDashboard={true} dataPie={pieExp} />
               </Box>
             </Box>

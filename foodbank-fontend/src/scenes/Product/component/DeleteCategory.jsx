@@ -40,8 +40,7 @@ const DeleteCategory = () => {
 
     try {
       const ress = await deleteCategory(values.category, token);
-      console.log(ress)
-      getCategory();
+      getCategory(true);
       resetForm();
       handleClose();
     } catch (err) {

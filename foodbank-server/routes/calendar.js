@@ -8,6 +8,7 @@ const {
   getCalendarAdmin,
   updateSuccessPo,
   detailupdate,
+  updatePaySuccess,
 } = require("../controller/calendar");
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.put("/updatecalendar/:id", updateCalendar);
 router.delete("/deletecalendar/:id", deleteCalendar);
 router.get("/getcalendaradmin", getCalendarAdmin);
 router.put("/updatesuccesspo/:id", updateSuccessPo);
+router.put("/updatepaysuccess/:id", updatePaySuccess)
 router.put("/detailupdate/:id", detailupdate);
 
 module.exports = router;

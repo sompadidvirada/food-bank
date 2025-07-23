@@ -12,7 +12,6 @@ const PieExpCompo = ({ isDashboard = false, dataPie }) => {
       style={{
         width: "100%", // Ensure it spans the full available width
         height: isDashboard ? "100%" : "600px", // Adjust height for dashboard view
-        padding: "0 20px", // Add padding for better spacing
         boxSizing: "border-box", // Ensure padding doesn't affect layout
       }}
     >

@@ -30,6 +30,7 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
 const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -204,13 +205,6 @@ const SideBarAdmin = () => {
               setSelected={setSelected}
             />
             <Item
-              title="UPLOAD"
-              to="/admin/uploadimage"
-              icon={<MapIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
               title="ຈັດການສິນຄ້າ"
               to="/admin/product"
               icon={<FastfoodIcon />}
@@ -220,7 +214,7 @@ const SideBarAdmin = () => {
             <Item
               title="ແຜນສັ່ງຊື້"
               to="/admin/calendaradmin"
-              icon={<FastfoodIcon />}
+              icon={<EditCalendarIcon />}
               selected={selected}
               setSelected={setSelected}
             />

@@ -29,6 +29,11 @@ export const updateSuccessPo = (id, status) => {
     status: status,
   });
 };
+export const updateSuccessPay = (id, status) => {
+  return axios.put(`${URL}/updatepaysuccess/${id}`, {
+    status: status,
+  });
+};
 
 export const detailUpdate = (id, form) => {
   return axios.put(`${URL}/detailupdate/${id}`, form);

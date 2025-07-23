@@ -21,13 +21,10 @@ import MapIcon from "@mui/icons-material/Map";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import BarChartIcon from "@mui/icons-material/BarChart";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
-import AnalyticsIcon from "@mui/icons-material/Analytics";
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import LeaderboardIcon from "@mui/icons-material/Leaderboard";
+import EditCalendarIcon from '@mui/icons-material/EditCalendar';
 
 const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -125,7 +122,7 @@ const SideBarUser = () => {
                   onClick={() =>
                     handleImageClick(
                       `${URL}/${
-                        user?.image || "public/staff_porfile/default-image.JPG"
+                        user?.image || "default-user.png"
                       }`
                     )
                   }
@@ -133,7 +130,7 @@ const SideBarUser = () => {
                   width="100px"
                   height="100px"
                   src={`${URL}/${
-                    user?.image || `${URL}/default-user.png`
+                    user?.image || `default-user.png`
                   }`}
                   style={{
                     cursor: "pointer",
@@ -193,7 +190,7 @@ const SideBarUser = () => {
             <Item
               title="ແຜນສັ່ງຊື້"
               to="/user/calendar"
-              icon={<CalendarMonthIcon />}
+              icon={<EditCalendarIcon />}
               selected={selected}
               setSelected={setSelected}
             />

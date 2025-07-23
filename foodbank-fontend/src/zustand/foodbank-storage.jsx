@@ -50,6 +50,21 @@ const FoodBankStorage = (set, get) => ({
       ),
     }));
   },
+  updateCalendarEventPayment: (updatedEvent) => {
+    set((state) => ({
+      calendar: state.calendar.map((event) =>
+        String(event.id) === String(updatedEvent.id)
+          ? {
+              ...event,
+              extendedProps: {
+                ...event.extendedProps,
+                isPaySuccess: updatedEvent.isPaySuccess,
+              },
+            }
+          : event
+      ),
+    }));
+  },
   setLineChartData: (newData) => {
     set({ lineChartData: newData });
   },
@@ -93,18 +108,22 @@ const FoodBankStorage = (set, get) => ({
     });
     return res;
   },
-  getBrnachs: async () => {
+  getBrnachs: async (force = false) => {
     const token = get().token;
+    const existingBranchs = get().branchs;
+
+    if (!force && existingBranchs && existingBranchs.length > 0) {
+      return;
+    }
+
     try {
       const res = await getAllBranch(token);
-      set({
-        branchs: res.data,
-      });
+      set({ branchs: res.data });
     } catch (err) {
-      if (err.respone?.status === 401) {
+      if (err.response?.status === 401) {
         console.warn("Token expired");
       } else {
-        console.error("Fail to fecth Branchs.", err.message);
+        console.error("Fail to fetch Branchs.", err.message);
       }
     }
   },
@@ -120,7 +139,7 @@ const FoodBankStorage = (set, get) => ({
 
     try {
       const res = await updateMainSt(user.id, form, token);
-      console.log(res)
+      console.log(res);
 
       // Upload image if there's a file and signed URL
       if (imageFile && res.data.imageUploadUrl) {
@@ -143,22 +162,34 @@ const FoodBankStorage = (set, get) => ({
     }
   },
 
-  getProduct: async () => {
+  getProduct: async (force = false) => {
     const token = get().token;
+    const existingProducts = get().products;
+
+    if (!force && existingProducts && existingProducts.length > 0) {
+      return;
+    }
+
     try {
       const ress = await getAllProduct(token);
       set({ products: ress.data });
     } catch (err) {
-      console.log(err);
+      console.log("Failed to fetch products:", err);
     }
   },
-  getCategory: async () => {
+  getCategory: async (force = false) => {
     const token = get().token;
+    const existingCategories = get().categorys;
+
+    if (!force && existingCategories && existingCategories.length > 0) {
+      return;
+    }
+
     try {
       const ress = await getCategorys(token);
       set({ categorys: ress.data.data });
     } catch (err) {
-      console.log(err);
+      console.log("Failed to fetch categories:", err);
     }
   },
 });

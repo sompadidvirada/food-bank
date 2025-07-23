@@ -26,19 +26,25 @@ import {
   deleteCalendar,
   detailUpdate,
   updateCalendar,
+  updateSuccessPay,
   updateSuccessPo,
 } from "../../api/calendar";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 
 const renderEventContent = (eventInfo) => {
   const isSuccess = eventInfo.event.extendedProps?.isSuccess;
+  const isPaySuccess = eventInfo.event.extendedProps?.isPaySuccess;
   return (
     <Box
       sx={{
         fontFamily: "Noto Sans Lao",
         fontSize: "0.9rem",
         color: "#fff",
-        backgroundColor: isSuccess ? "#4caf50" : "#2196f3", // green or blue
+        backgroundColor: isSuccess
+          ? "#007d04ff"
+          : isPaySuccess
+          ? "#00457eff"
+          : "#939d00ff", // green or blue
         borderRadius: "4px",
         padding: "2px 4px",
         overflow: "hidden",
@@ -168,10 +174,18 @@ const Calendar = () => {
   const handleUpdateStatusEvent = async (status) => {
     try {
       const updated = await updateSuccessPo(selectedEvent?.id, status);
-      console.log("Updated:", updated.data);
-
       // Update in Zustand store
       useFoodBankStorage.getState().updateCalendarEventStatus(updated.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleUpdateStatusEventPayment = async (status) => {
+    try {
+      const updated = await updateSuccessPay(selectedEvent?.id, status);
+      console.log(updated)
+      useFoodBankStorage.getState().updateCalendarEventPayment(updated.data);
     } catch (err) {
       console.log(err);
     }
@@ -288,7 +302,9 @@ const Calendar = () => {
                       sx={{
                         backgroundColor: event.extendedProps?.isSuccess
                           ? colors.greenAccent[500]
-                          : colors.blueAccent[500],
+                          : event.extendedProps?.isPaySuccess
+                          ? colors.blueAccent[500]
+                          : "#939d00ff",
                         margin: "10px 0",
                         borderRadius: "2px",
                         cursor: "pointer",
@@ -527,7 +543,7 @@ const Calendar = () => {
               <Box sx={{ wordBreak: "break-all", textAlign: "center" }}>
                 <Link
                   sx={{
-                    color: colors.grey[100],
+                    color: colors.blueAccent[400],
                     fontSize: 18,
                   }}
                   href={selectedEvent?.extendedProps?.poLink}
@@ -564,12 +580,19 @@ const Calendar = () => {
                   : "rgba(21, 255, 0, 0.6)"
               }
             >
-              {selectedEvent?.extendedProps?.isSuccess === false
-                ? "ຍັງບໍ່ປິດ PO"
-                : "ປິດ PO ແລ້ວ"}
+              {selectedEvent?.extendedProps?.isSuccess
+                ? "ປິດ PO ແລ້ວ"
+                : selectedEvent?.extendedProps?.isPaySuccess
+                ? "ຊຳລະແລ້ວ ລໍຖ້າຈັດສົ່ງ"
+                : "ຍັງບໍ່ຊຳລະ"}
             </Typography>
           </Box>
-          <Box display={"flex"} flexDirection={"column"} p={2}>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            p={2}
+            borderBottom={"1px solid"}
+          >
             <Typography
               fontFamily={"Noto Sans Lao"}
               alignSelf={"center"}
@@ -577,7 +600,60 @@ const Calendar = () => {
               color={colors.grey[300]}
               p={2}
             >
-              ອັປເດດສະຖານະ
+              ອັປເດດສະຖານະການຊຳລະ
+            </Typography>
+            {selectedEvent?.extendedProps?.isPaySuccess === false ? (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleUpdateStatusEventPayment(true);
+                  setEventDetailOpen(false);
+                }}
+                sx={{
+                  fontFamily: "Noto Sans Lao",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  width: "30%",
+                  alignSelf: "center",
+                }}
+                color="success"
+              >
+                ຊຳລະແລ້ວ
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={() => {
+                  handleUpdateStatusEventPayment(false);
+                  setEventDetailOpen(false);
+                }}
+                sx={{
+                  fontFamily: "Noto Sans Lao",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  width: "30%",
+                  alignSelf: "center",
+                }}
+                color="error"
+              >
+                ຍັງບໍ່ຊຳລະ
+              </Button>
+            )}
+          </Box>
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            p={2}
+            borderBottom={"1px solid"}
+          >
+            <Typography
+              fontFamily={"Noto Sans Lao"}
+              alignSelf={"center"}
+              fontSize={15}
+              color={colors.grey[300]}
+              p={2}
+            >
+              ອັປເດດສະຖານະຮັບເຄື່ອງ
             </Typography>
             {selectedEvent?.extendedProps?.isSuccess === false ? (
               <Button
@@ -613,7 +689,7 @@ const Calendar = () => {
                 }}
                 color="error"
               >
-                ຍັງບໍ່ທັນຈັດສົ່ງ
+                ຍັງບໍ່ຈັດສົ່ງ
               </Button>
             )}
           </Box>

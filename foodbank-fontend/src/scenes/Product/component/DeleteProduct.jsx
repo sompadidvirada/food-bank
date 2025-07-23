@@ -39,7 +39,7 @@ const DeleteProduct = ({ productRow }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      getProduct();
+      getProduct(true);
       setIsUploading(false);
     }
   };

@@ -106,7 +106,7 @@ const AddProduct = () => {
     } catch (err) {
       console.log(err);
     } finally {
-      getProduct();
+      getProduct(true);
       resetForm(); // Reset Formik values
       setPreviewImage(null); // Clear image preview
       if (fileInputRef.current) {

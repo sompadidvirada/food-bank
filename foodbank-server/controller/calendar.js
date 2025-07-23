@@ -44,6 +44,7 @@ exports.getCalendar = async (req, res) => {
         description: event.discription,
         poLink: event.polink,
         isSuccess: event.isSuccess,
+        isPaySuccess: event.isPaySuccess,
       },
     }));
 
@@ -115,6 +116,7 @@ exports.getCalendarAdmin = async (req, res) => {
         description: event.discription,
         poLink: event.polink,
         isSuccess: event.isSuccess,
+        isPaySuccess: event.isPaySuccess,
       },
     }));
 
@@ -146,15 +148,35 @@ exports.updateSuccessPo = async (req, res) => {
   }
 };
 
+exports.updatePaySuccess = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const update = await prisma.calendar.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        isPaySuccess: Boolean(status),
+      },
+    });
+
+    res.send(update);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error` });
+  }
+};
+
 exports.detailupdate = async (req, res) => {
   try {
     const { id } = req.params;
     const { description, polink } = req.body;
 
-    console.log(req.body)
+    console.log(req.body);
 
-
-    console.log(description, polink)
+    console.log(description, polink);
     if ((!description, !polink)) {
       return res.status(404).json({ message: `Data Not Found` });
     }

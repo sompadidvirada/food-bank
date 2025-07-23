@@ -4,11 +4,11 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-
+import { tokens } from "../../../theme";
 
 const Checkboxs = ({
   branch,
@@ -19,6 +19,9 @@ const Checkboxs = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [localSelected, setLocalSelected] = useState([]);
+
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
 
   const handleClickOpen = () => {
     setLocalSelected(selectedBranchIds || []); // sync with parent
@@ -53,7 +56,7 @@ const Checkboxs = ({
         variant="contained"
         color="success"
         onClick={handleClickOpen}
-        sx={{ color: "black", fontWeight: "bold", fontFamily: "Noto Sans Lao" }}
+        sx={{ color: colors.grey[900], fontWeight: "bold", fontFamily: "Noto Sans Lao" }}
       >
         ເລືອກສາຂາທີ່ບໍ່ຕ້ອງການລວມຍອດຂາຍ
       </Button>

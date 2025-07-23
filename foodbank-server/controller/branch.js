@@ -122,3 +122,32 @@ exports.updateBranchProvice = async (req, res) => {
     return res.status(500).json({ message: `server error` });
   }
 };
+
+exports.cleanAviable = async (req, res) => {
+  try {
+    const getBranches = await prisma.branch.findMany();
+    const getProducts = await prisma.products.findMany();
+
+    // PREPARE DATA FOR INSERT
+    const dataToInsert = [];
+
+    getBranches.forEach((branch) => {
+      getProducts.forEach((product) => {
+        dataToInsert.push({
+          productsId: product.id,
+          branchId: branch.id,
+          aviableStatus: true,
+        });
+      });
+    });
+
+    // BULK INSERT INTO availableproduct
+    await prisma.availableproduct.createMany({
+      data: dataToInsert,
+      skipDuplicates: true, // Skip if (productId, branchId) already exists
+    });
+    res.send('Done!!!')
+  } catch (err) {
+    return res.status(500).json({ message: `server error` });
+  }
+};

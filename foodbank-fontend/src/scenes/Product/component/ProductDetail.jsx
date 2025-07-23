@@ -16,7 +16,8 @@ import SelectStatus from "./SelectStatus";
 import { updateStatusProduct } from "../../../api/product";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { tokens } from "../../../theme";
-const URL = import.meta.env.VITE_API_URL;
+const URL =
+  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
 const ProductDetail = ({
   setOpenDetailDialog,
@@ -26,10 +27,9 @@ const ProductDetail = ({
 }) => {
   const [formUpdateAviable, setFormUpdateAviable] = useState({});
   const token = useFoodBankStorage((state) => state.token);
-    const theme = useTheme();
-    const colors = tokens(theme.palette.mode);
-  
-
+  const theme = useTheme();
+  const colors = tokens(theme.palette.mode);
+  const getProduct = useFoodBankStorage((state)=>state.getProduct)
   const handleCloseDetailDialog = () => {
     setOpenDetailDialog(false);
     setSelectedProduct(null);
@@ -61,6 +61,8 @@ const ProductDetail = ({
       setFormUpdateAviable({});
     } catch (err) {
       console.log(err);
+    } finally {
+      getProduct(true)
     }
   };
 
@@ -80,7 +82,7 @@ const ProductDetail = ({
         <Box display="flex" alignItems="center" justifySelf={"center"} gap={5}>
           <img
             style={{ width: "60px", height: "60px", borderRadius: "5px" }}
-            src={`${URL}/product_img/${selectedProduct?.image}`}
+            src={`${URL}/${selectedProduct?.image}`}
           />
           <Typography variant="h2" fontFamily={"Noto Sans Lao"}>
             {selectedProduct?.name}
@@ -159,7 +161,7 @@ const ProductDetail = ({
                       }}
                     >
                       <Typography
-                        color={ colors.greenAccent[400]}
+                        color={colors.greenAccent[400]}
                         sx={{ fontFamily: "Noto Sans Lao" }}
                       >
                         ອະນຸມັດ
@@ -253,8 +255,9 @@ const ProductDetail = ({
           onClick={handleCloseDetailDialog}
           variant="contained"
           color="error"
+          sx={{ fontFamily: "Noto Sans Lao" }}
         >
-          Close
+          ກັບຄືນ
         </Button>
       </DialogActions>
     </Dialog>

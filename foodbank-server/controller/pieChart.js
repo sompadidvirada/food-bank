@@ -2,13 +2,20 @@ const prisma = require("../config/prisma");
 
 const generateUniqueColors = (count) => {
   const colors = [];
-  const step = 360 / count; // Evenly distribute colors around the HSL wheel
+  const goldenAngle = 137.508;
+
   for (let i = 0; i < count; i++) {
-    const hue = Math.floor(i * step); // Spread hues evenly
-    colors.push(`hsl(${hue}, 70%, 50%)`);
+    const hue = (i * goldenAngle) % 360;
+    const saturation = 60 + (i % 3) * 15; // 60, 75, 90%
+    const lightness = 40 + (i % 4) * 12;  // 40, 52, 64, 76%
+
+    colors.push(`hsl(${Math.round(hue)}, ${saturation}%, ${lightness}%)`);
   }
+
   return colors;
 };
+
+
 
 exports.pieChartSell = async (req, res) => {
   try {

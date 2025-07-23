@@ -145,7 +145,7 @@ const EditProduct = ({ productRow }) => {
     } catch (err) {
       console.log(err);
     } finally {
-      await getProduct();
+      await getProduct(true);
       toast.success("ອັປເດດສິນຄ້າສຳເລັດ.");
       setOpen(false);
       setIsUploading(false);

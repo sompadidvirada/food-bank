@@ -11,6 +11,7 @@ import {
   IconButton,
   Input,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -155,14 +156,30 @@ const Editprofile = () => {
 
   return (
     <Box>
-      <ManageAccountsIcon
-        onClick={() => handleOpen(user)}
-        sx={{
-          ml: "6px",
-          cursor: "pointer",
-          "&:hover": { color: colors.grey[100] },
+      <Tooltip
+        title="ແກ້ໄຂຂໍ້ມູນໂປຟາຍ"
+        arrow
+        placement="top"
+        componentsProps={{
+          tooltip: {
+            sx: {
+              fontSize: "14px",
+              fontFamily: "Noto Sans Lao", // or any font you prefer
+              color: "#fff",
+              backgroundColor: "#333", // optional
+            },
+          },
         }}
-      />
+      >
+        <ManageAccountsIcon
+          onClick={() => handleOpen(user)}
+          sx={{
+            ml: "6px",
+            cursor: "pointer",
+            "&:hover": { color: colors.grey[100] },
+          }}
+        />
+      </Tooltip>
       {/* Modal Edit Product Dialog */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Edit Profile</DialogTitle>
