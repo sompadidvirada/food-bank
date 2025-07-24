@@ -128,8 +128,6 @@ const EditProduct = ({ productRow }) => {
 
     try {
       const update = await updateProduct(editProduct.id, editProduct, token);
-      console.log(update);
-
       if (update.data.imageUploadUrl) {
         await axios.put(update.data.imageUploadUrl, selectedImage, {
           headers: {

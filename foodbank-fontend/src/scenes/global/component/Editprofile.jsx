@@ -18,7 +18,6 @@ import {
 import { tokens } from "../../../theme";
 import CloseIcon from "@mui/icons-material/Close";
 import { toast, ToastContainer } from "react-toastify";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 

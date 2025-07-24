@@ -88,9 +88,9 @@ const Dashboard = () => {
   );
 
   useEffect(() => {
-    getProduct();
-    getBrnachs();
-    getCategory();
+    getProduct(true);
+    getBrnachs(true);
+    getCategory(true);
   }, []);
 
   useEffect(() => {

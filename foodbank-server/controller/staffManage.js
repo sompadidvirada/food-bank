@@ -1,7 +1,5 @@
 const prisma = require("../config/prisma");
 const jwt = require("jsonwebtoken");
-const fs = require("fs");
-const path = require("path");
 const {
   S3Client,
   PutObjectCommand,

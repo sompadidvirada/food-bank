@@ -44,6 +44,7 @@ model branch {
   tracksend  tracksend[]
   trackexp   trackexp[]
   available  availableproduct[]
+  imageTrack imageTrack[]
 }
 
 model products {
@@ -135,4 +136,12 @@ model calendar {
   date         DateTime
   isSuccess    Boolean  @default(false)
   isPaySuccess Boolean  @default(false)
+}
+
+model imageTrack {
+  id        Int      @id @unique @default(autoincrement())
+  date      DateTime
+  imageName String
+  branch    branch  @relation(fields: [branchId], references: [id])
+  branchId  Int
 }

@@ -1,5 +1,20 @@
 const prisma = require("../config/prisma");
 const { parseISO, format } = require("date-fns");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+} = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+
+const s3 = new S3Client({
+  region: process.env.BUCKET_REGION,
+  credentials: {
+    accessKeyId: process.env.SECREY_AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.SECREY_AWS_SECRET_ACCESS_KEY,
+  },
+});
 
 exports.checkTrackSell = async (req, res) => {
   try {
@@ -97,7 +112,6 @@ exports.checkTrackExp = async (req, res) => {
 exports.insertTrackSell = async (req, res) => {
   try {
     const { sellCount, sellAt, userId, productId, brachId } = req.body;
-    console.log(req.body);
     if (!sellCount || !sellAt || !brachId || !userId || !productId) {
       return res.status(400).json({ message: "something went wrong11." });
     }
@@ -147,7 +161,6 @@ exports.insertTrackSell = async (req, res) => {
 exports.insertTrackSend = async (req, res) => {
   try {
     const { sendCount, sendAt, userId, productId, brachId } = req.body;
-    console.log(req.body);
     if (!sendCount || !sendAt || !brachId || !userId || !productId) {
       return res.status(400).json({ message: "something went wrong11." });
     }
@@ -197,7 +210,6 @@ exports.insertTrackSend = async (req, res) => {
 exports.insertTrackExp = async (req, res) => {
   try {
     const { expCount, expAt, userId, productId, brachId } = req.body;
-    console.log(req.body);
     if (!expCount || !expAt || !brachId || !userId || !productId) {
       return res.status(400).json({ message: "something went wrong11." });
     }
@@ -512,3 +524,149 @@ exports.updateTrackExp = async (req, res) => {
     return res.status(500).json({ message: `server error.` });
   }
 };
+
+{
+  /** image tracking */
+}
+
+exports.uploadImageTrack = async (req, res) => {
+  try {
+    const { branchId, Datetime, images } = req.body;
+    if (
+      !branchId ||
+      !Array.isArray(images) ||
+      images.length === 0 ||
+      !Datetime
+    ) {
+      return res.status(400).json({ message: `Invalid or missing values.` });
+    }
+
+    const uploadPromises = images.map(async (img) => {
+      const { imagesName, contentType } = img;
+
+      if (!imagesName || !contentType) {
+        throw new Error("Missing image name or content type.");
+      }
+
+      const command = new PutObjectCommand({
+        Bucket: process.env.SECREY_AWS_BUCKET_IMAGE_TRACK,
+        Key: imagesName,
+        ContentType: contentType,
+        CacheControl: "public, max-age=31536000, immutable",
+      });
+
+      const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
+
+      return {
+        uploadUrl: signedUrl,
+        filename: imagesName,
+        publicUrl: `https://${process.env.SECREY_AWS_BUCKET_IMAGE_TRACK}.s3.${process.env.BUCKET_REGION}.amazonaws.com/${imagesName}`,
+      };
+    });
+
+    const result = await Promise.all(uploadPromises);
+
+    // ✅ Insert to imageTrack table (use only filename and request data)
+    const insertData = result.map((r) => ({
+      branchId: Number(branchId),
+      date: new Date(Datetime), // <- from request
+      imageName: r.filename, // <- from S3 object
+    }));
+
+    await prisma.imageTrack.createMany({
+      data: insertData,
+    });
+
+    return res.status(200).json({
+      message: "Signed URLs generated and data saved.",
+      data: result,
+    });
+  } catch (err) {
+    console.error("Upload error:", err);
+    return res.status(500).json({ message: `Server error.` });
+  }
+};
+exports.checkImageTrack = async (req, res) => {
+  try {
+    const { sellDate, brachId } = req.body;
+    if (!sellDate || !brachId) {
+      return res
+        .status(500)
+        .json({ message: `Something went wrong. No Data.` });
+    }
+
+    const startofDay = new Date(sellDate);
+    const endofDay = new Date(sellDate);
+    startofDay.setUTCHours(0, 0, 0, 0);
+    endofDay.setUTCHours(23, 59, 59, 999);
+
+    const images = await prisma.imageTrack.findMany({
+      where: {
+        date: {
+          gte: startofDay,
+          lt: endofDay,
+        },
+        branchId: Number(brachId),
+      },
+    });
+
+    res.send(images);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
+  }
+};
+
+exports.deleteImages = async (req, res) => {
+  try {
+    const { images, date, branchId } = req.body;
+
+    if (!images || !date || !branchId) {
+      return res.status(400).json({ message: `emty value.` });
+    }
+
+    const keysToDelete = req.body.images;
+
+    const params = {
+      Bucket: process.env.SECREY_AWS_BUCKET_IMAGE_TRACK,
+      Delete: {
+        Objects: keysToDelete.map((key) => ({ Key: key })),
+        Quiet: false, // set to true to suppress response for each object
+      },
+    };
+    const command = new DeleteObjectsCommand(params);
+    await s3.send(command);
+
+    const startofDay = new Date(date);
+    const endofDay = new Date(date);
+    startofDay.setUTCHours(0, 0, 0, 0);
+    endofDay.setUTCHours(23, 59, 59, 999);
+
+    const checkImageInDatabase = await prisma.imageTrack.findMany({
+      where: {
+        date: {
+          gte: startofDay,
+          lt: endofDay,
+        },
+        branchId: Number(branchId),
+      },
+    });
+
+    if (checkImageInDatabase.length > 0) {
+      await prisma.imageTrack.deleteMany({
+        where: {
+          date: {
+            gte: startofDay,
+            lt: endofDay,
+          },
+          branchId: Number(branchId)
+        },
+      });
+    }
+    return res.status(200).json({ message: "Images deleted successfully." });
+  } catch (err) {
+    console.log(err);
+    return res.status(err).json({ message: `server error.` });
+  }
+};
+

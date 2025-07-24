@@ -107,3 +107,29 @@ export const updateTrackExp = (form, token) => {
     },
   });
 };
+
+// upload image tracking 
+
+export const uploadImageTrack = (form, token) => {
+  return axios.post(`${URL}/uploadimagetrack`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
+export const checkImages = (form, token) => {
+  return axios.post(`${URL}/getimagetrack`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
+export const deleteImages = (form, token) => {
+  return axios.post(`${URL}/deleteimagestrack`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

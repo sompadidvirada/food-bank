@@ -17,11 +17,13 @@ import CloseIcon from "@mui/icons-material/Close";
 import { toast, ToastContainer } from "react-toastify";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import {
+  checkImages,
   checkTrackSell,
   deleteTrackSell,
   insertTracksell,
 } from "../../api/tracking";
 import DialogEditSell from "./component/DialogEditSell";
+import UploadImage from "./component/UploadImage";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -31,9 +33,11 @@ const Tracksell = () => {
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
+  const getProduct = useFoodBankStorage((state) => state.getProduct);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState(null);
+  const [checkImage, setCheckImage] = useState([]);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     sellCount: "",
     sellAt: "",
@@ -50,6 +54,9 @@ const Tracksell = () => {
   {
     /** column for DataGrid  */
   }
+  useEffect(() => {
+    getProduct(true);
+  }, []);
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", flex: 0.2 },
@@ -112,7 +119,11 @@ const Tracksell = () => {
           return (
             <Box display="flex-row">
               <span
-                style={{ color: colors.greenAccent[200], fontWeight: "bold", fontFamily:"Noto Sans Lao" }}
+                style={{
+                  color: colors.greenAccent[200],
+                  fontWeight: "bold",
+                  fontFamily: "Noto Sans Lao",
+                }}
               >
                 ຍອດທີ່ບັນທືກ. ({trackedProduct.sellCount})
               </span>
@@ -276,7 +287,9 @@ const Tracksell = () => {
     if (selectDateBrachCheck.brachId && selectDateBrachCheck.sellDate) {
       try {
         const res = await checkTrackSell(selectDateBrachCheck, token);
+        const imageTrackCheck = await checkImages(selectDateBrachCheck, token);
         setChecked(res.data);
+        setCheckImage(imageTrackCheck.data);
       } catch (error) {
         console.error("Error fetching branch check:", error);
       }
@@ -333,7 +346,16 @@ const Tracksell = () => {
               />
             </Box>
             <Box>
-              <Button variant="contained" onClick={handeDeleteAll} color="error">
+              <Button
+                variant="contained"
+                onClick={handeDeleteAll}
+                color="error"
+                disabled={
+                  selectFormtracksell?.sellAt && selectFormtracksell?.brachId
+                    ? false
+                    : true
+                }
+              >
                 <Typography variant="laoText">ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>
@@ -374,28 +396,35 @@ const Tracksell = () => {
           }}
         >
           {selectFormtracksell.sellAt && selectFormtracksell.brachId ? (
-            <DataGrid
-              rows={products?.filter((product) =>
-                product.available?.some(
-                  (item) =>
-                    item.aviableStatus === true &&
-                    item.branchId === selectFormtracksell.brachId
-                )
-              )}
-              columns={columns}
-              autoHeight
-              hideFooter
-               sx={{
-                width: "100%",
-                "& .MuiDataGrid-columnHeaders": {
-                  fontFamily: "Noto Sans Lao",
-                  fontWeight: "bold", // optional
-                  fontSize: "16px", // optional
-                },
-              }}
-            />
+            <Box>
+              <UploadImage
+                selectFormtracksell={selectFormtracksell}
+                checkImage={checkImage}
+                setCheckImage={setCheckImage}
+              />
+              <DataGrid
+                rows={products?.filter((product) =>
+                  product.available?.some(
+                    (item) =>
+                      item.aviableStatus === true &&
+                      item.branchId === selectFormtracksell.brachId
+                  )
+                )}
+                columns={columns}
+                autoHeight
+                hideFooter
+                sx={{
+                  width: "100%",
+                  "& .MuiDataGrid-columnHeaders": {
+                    fontFamily: "Noto Sans Lao",
+                    fontWeight: "bold", // optional
+                    fontSize: "16px", // optional
+                  },
+                }}
+              />
+            </Box>
           ) : (
-            <Box sx={{width:"100%", textAlign:"center"}}>
+            <Box sx={{ width: "100%", textAlign: "center" }}>
               <Typography
                 variant="laoText"
                 fontWeight="bold"

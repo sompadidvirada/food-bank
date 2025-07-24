@@ -134,7 +134,7 @@ const Login = () => {
             fontWeight: "bold",
           }}
         >
-          ເຂົ້າສູ່ລະບົບຂາຍ
+          ເຂົ້າສູ່ລະບົບຈັດຊື້
         </Typography>
         <Formik
           onSubmit={(values, formikHelpers) =>

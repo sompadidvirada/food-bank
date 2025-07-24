@@ -139,8 +139,6 @@ const FoodBankStorage = (set, get) => ({
 
     try {
       const res = await updateMainSt(user.id, form, token);
-      console.log(res);
-
       // Upload image if there's a file and signed URL
       if (imageFile && res.data.imageUploadUrl) {
         await axios.put(res.data.imageUploadUrl, imageFile, {
