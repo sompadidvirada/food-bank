@@ -79,6 +79,7 @@ const OpenStreetMap = () => {
   const [activeOfferBranchId, setActiveOfferBranchId] = useState(null);
   const [isTempMarkerMode, setIsTempMarkerMode] = useState(false);
   const [tempMarkers, setTempMarkers] = useState([]); // [{lat, lng, name, marker}]
+  const user = useFoodBankStorage((state) => state.user);
 
   useEffect(() => {
     getBrnachs();
@@ -102,8 +103,8 @@ const OpenStreetMap = () => {
         }
 
         const marker = L.marker([lat, lng], {
-        icon: customIconNewBranchs,
-      })
+          icon: customIconNewBranchs,
+        })
           .addTo(mapRef.current)
           .bindPopup(
             `<strong>${name}</strong><br/>Lat: ${lat.toFixed(
@@ -817,28 +818,31 @@ const OpenStreetMap = () => {
                               }}
                             />
                           </ListItemIcon>
-
-                          <ListItemIcon
-                            onClick={() =>
-                              handleChangeLocationBranch(branchItem.id)
-                            }
-                            sx={{
-                              cursor: "pointer",
-                              "&:hover .hover-icon": {
-                                color: colors.greenAccent[400],
-                              },
-                            }}
-                          >
-                            <LocalOfferIcon
-                              className="hover-icon"
+                          {user.role !== "admin" ? (
+                            ""
+                          ) : (
+                            <ListItemIcon
+                              onClick={() =>
+                                handleChangeLocationBranch(branchItem.id)
+                              }
                               sx={{
-                                color:
-                                  activeOfferBranchId === branchItem.id
-                                    ? colors.greenAccent[400]
-                                    : colors.grey[100],
+                                cursor: "pointer",
+                                "&:hover .hover-icon": {
+                                  color: colors.greenAccent[400],
+                                },
                               }}
-                            />
-                          </ListItemIcon>
+                            >
+                              <LocalOfferIcon
+                                className="hover-icon"
+                                sx={{
+                                  color:
+                                    activeOfferBranchId === branchItem.id
+                                      ? colors.greenAccent[400]
+                                      : colors.grey[100],
+                                }}
+                              />
+                            </ListItemIcon>
+                          )}
                         </ListItemButton>
                       );
                     })}
@@ -1279,21 +1283,24 @@ const OpenStreetMap = () => {
                               }}
                             />
                           </ListItemIcon>
-
-                          <ListItemIcon
-                            onClick={() => handleClickOpen(branchItem)}
-                            sx={{
-                              cursor: "pointer",
-                              "&:hover .hover-icon": {
-                                color: colors.greenAccent[400],
-                              },
-                            }}
-                          >
-                            <SettingsIcon
-                              className="hover-icon"
-                              sx={{ color: colors.grey[100] }}
-                            />
-                          </ListItemIcon>
+                          {user.role !== "admin" ? (
+                            ""
+                          ) : (
+                            <ListItemIcon
+                              onClick={() => handleClickOpen(branchItem)}
+                              sx={{
+                                cursor: "pointer",
+                                "&:hover .hover-icon": {
+                                  color: colors.greenAccent[400],
+                                },
+                              }}
+                            >
+                              <SettingsIcon
+                                className="hover-icon"
+                                sx={{ color: colors.grey[100] }}
+                              />
+                            </ListItemIcon>
+                          )}
                         </ListItemButton>
                       );
                     })}

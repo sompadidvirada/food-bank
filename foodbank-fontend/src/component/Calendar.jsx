@@ -16,6 +16,7 @@ import {
   getPieChartSend,
 } from "../api/PieChart";
 import { getLineChart } from "../api/lineChart";
+import { getImagesTrack } from "../api/tracking";
 
 export default function Calendar({ selectBranchs }) {
   const {
@@ -30,8 +31,22 @@ export default function Calendar({ selectBranchs }) {
     setPieSend,
     setPieExp,
     setLineChartData,
+    getImageTrack,
   } = useFoodBankStorage();
   const token = useFoodBankStorage((state) => state.token);
+
+  const fecthImageTrack = async () => {
+    try {
+      const updatedQueryForm =
+        selectBranchs && selectBranchs.length > 0
+          ? { ...queryForm, branchs: selectBranchs }
+          : { ...queryForm };
+      const ress = await getImagesTrack(updatedQueryForm, token)
+      getImageTrack(ress.data)
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const fetchLineChartData = async () => {
     try {
@@ -141,6 +156,7 @@ export default function Calendar({ selectBranchs }) {
     if (queryForm.startDate && queryForm.endDate) {
       fecthDataTrack();
       fecthTotalData();
+      fecthImageTrack()
     }
   }, [queryForm.startDate, queryForm.endDate]);
 

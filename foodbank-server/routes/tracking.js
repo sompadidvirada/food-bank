@@ -16,6 +16,7 @@ const {
   uploadImageTrack,
   checkImageTrack,
   deleteImages,
+  fecthImageTrack,
 } = require("../controller/tracking");
 const router = express.Router();
 
@@ -37,5 +38,6 @@ router.post("/deleteimagestrack", authCheck, deleteImages)
 
 router.post("/uploadimagetrack", authCheck, uploadImageTrack)
 router.post("/getimagetrack", authCheck, checkImageTrack)
+router.post("/getimagetracking", authCheck, fecthImageTrack)
 
 module.exports = router;

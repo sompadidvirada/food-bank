@@ -659,7 +659,7 @@ exports.deleteImages = async (req, res) => {
             gte: startofDay,
             lt: endofDay,
           },
-          branchId: Number(branchId)
+          branchId: Number(branchId),
         },
       });
     }
@@ -670,3 +670,24 @@ exports.deleteImages = async (req, res) => {
   }
 };
 
+exports.fecthImageTrack = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    const ress = await prisma.imageTrack.findMany({
+      where: {
+        date: {
+          gte: start,
+          lte: end,
+        },
+      },
+    });
+    res.send(ress)
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error` });
+  }
+};

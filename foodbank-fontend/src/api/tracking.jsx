@@ -133,3 +133,11 @@ export const deleteImages = (form, token) => {
     }
   })
 }
+
+export const getImagesTrack = (form, token) => {
+  return axios.post(`${URL}/getimagetracking`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

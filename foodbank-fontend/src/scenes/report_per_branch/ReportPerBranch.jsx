@@ -94,8 +94,6 @@ const ReportPerBranch = () => {
     });
   }, [dataTrack, filterData]);
 
-  console.log(processedData)
-
   const columns = useMemo(
     () => [
       { field: "id", headerName: "ໄອດີ", flex: 0.2 },

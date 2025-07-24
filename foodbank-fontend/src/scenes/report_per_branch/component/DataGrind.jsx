@@ -1,10 +1,35 @@
-import React from "react";
-import { Box, Typography, Button } from "@mui/material";
+import React, { useState } from "react";
+import { Box, Typography, Button, IconButton } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../../component/Header";
+import useFoodBankStorage from "../../../zustand/foodbank-storage";
+import { format } from "date-fns";
+import FilterIcon from "@mui/icons-material/Filter";
+import ImagePreviewModal from "./ImagePreviewModal";
+const URL =
+  "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
 
 const DataGrind = ({ branch, columns }) => {
-  console.log(branch);
+  const queryForm = useFoodBankStorage((state) => state.queryForm);
+  const imageTrack = useFoodBankStorage((state) => state.imageTrack);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(0);
+
+  const handleImageClick = () => {
+    const filtered = imageTrack.filter((img) => img.branchId === branch?.id);
+    if (filtered.length > 0) {
+      setPreviewIndex(0); // or some logic to find a specific image index
+      setIsModalOpen(true);
+    }
+  };
+
+  // ✅ Put this just before return
+  const filteredImages = imageTrack
+    .filter((img) => img.branchId === branch?.id)
+    .map((img) => ({
+      imageName: img.imageName,
+      date: img.date,
+    }));
 
   const handlePrint = () => {
     const formatCell = (value) => {
@@ -101,12 +126,39 @@ const DataGrind = ({ branch, columns }) => {
             >
               EXP {branch?.totalExp?.toLocaleString() || ""} ກີບ
             </Typography>
-            <Button variant="contained" color="success" onClick={handlePrint}>
-              Print
-            </Button>
+            <Box>
+              <Button variant="contained" color="success" onClick={handlePrint}>
+                Print
+              </Button>
+            </Box>
           </Box>
         }
       />
+
+      <Box
+        display={"flex"}
+        gap={2}
+        justifyContent={"center"}
+        alignItems={"center"}
+      >
+        <Typography variant="laoText" sx={{ fontSize: 20 }}>
+          ເບີ່ງຮູບພາບຂອງສາຂາ {branch?.name} ວັນທີ່:{" "}
+          {format(new Date(queryForm?.startDate), "dd/MM/yyyy")} -{" "}
+          {format(new Date(queryForm?.endDate), "dd/MM/yyyy")}
+        </Typography>
+        <IconButton
+          sx={{ color: "rgba(113, 157, 252, 1)" }}
+          onClick={handleImageClick}
+          disabled={filteredImages.length > 0 ? false : true}
+        >
+          <FilterIcon />
+        </IconButton>
+        {
+          filteredImages.length === 0 && (
+            <Typography variant="laoText" color="red">ບໍ່ມີຮູບພາບ.</Typography>
+          )
+        }
+      </Box>
       <DataGrid
         rows={branch.rowsWithPercent}
         columns={columns}
@@ -123,6 +175,16 @@ const DataGrind = ({ branch, columns }) => {
             fontSize: "15px", // optional
           },
         }}
+      />
+
+      {/* ✅ Add the modal here */}
+      <ImagePreviewModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        images={filteredImages}
+        startIndex={previewIndex}
+        baseUrl={URL}
+        branch={branch}
       />
     </Box>
   );

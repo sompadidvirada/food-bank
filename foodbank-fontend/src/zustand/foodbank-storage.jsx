@@ -27,6 +27,10 @@ const FoodBankStorage = (set, get) => ({
   pieExp: null,
   lineChartData: null,
   calendar: null,
+  imageTrack: null,
+  getImageTrack: (newData) => {
+    set({ imageTrack: newData });
+  },
   getCalendar: async (id) => {
     try {
       const res = await axios.get(`${URL}/getcalendar/${id}`);
