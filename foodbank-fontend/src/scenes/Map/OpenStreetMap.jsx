@@ -780,19 +780,17 @@ const OpenStreetMap = () => {
                   >
                     {filteredBranches?.map((branchItem) => {
                       return (
-                        <ListItemButton
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            backgroundColor: selectedBranches.some(
-                              (b) => b.id === branchItem?.id
-                            )
-                              ? colors.greenAccent[700]
-                              : "transparent",
-                          }}
-                          key={branchItem?.id}
-                        >
-                          <ListItemIcon
+                        <Box display={"flex"} alignItems={"center"}>
+                          <ListItemButton
+                            sx={{
+                              display: "flex",
+                              justifyContent: "space-between",
+                              backgroundColor: selectedBranches.some(
+                                (b) => b.id === branchItem?.id
+                              )
+                                ? colors.greenAccent[700]
+                                : "transparent",
+                            }}
                             onClick={() =>
                               handleBranchClick(
                                 branchItem.latitude,
@@ -800,23 +798,27 @@ const OpenStreetMap = () => {
                                 branchItem.id
                               )
                             }
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 1,
-                            }}
+                            key={branchItem?.id}
                           >
-                            <LocationOnIcon />
-                            <ListItemText
-                              primary={branchItem?.branchname}
-                              primaryTypographyProps={{
-                                fontFamily: "Noto Sans Lao",
-                                color: branchItem.aviable
-                                  ? colors.grey[100]
-                                  : colors.redAccent[500],
+                            <ListItemIcon
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 1,
                               }}
-                            />
-                          </ListItemIcon>
+                            >
+                              <LocationOnIcon />
+                              <ListItemText
+                                primary={branchItem?.branchname}
+                                primaryTypographyProps={{
+                                  fontFamily: "Noto Sans Lao",
+                                  color: branchItem.aviable
+                                    ? colors.grey[100]
+                                    : colors.redAccent[500],
+                                }}
+                              />
+                            </ListItemIcon>
+                          </ListItemButton>
                           {user.role !== "admin" ? (
                             ""
                           ) : (
@@ -842,7 +844,7 @@ const OpenStreetMap = () => {
                               />
                             </ListItemIcon>
                           )}
-                        </ListItemButton>
+                        </Box>
                       );
                     })}
                   </List>

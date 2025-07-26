@@ -463,10 +463,15 @@ const Dashboard = () => {
               gridColumn="span 4"
               gridRow="span 3"
               backgroundColor={colors.primary[400]}
-              textAlign={"center"}
+              display={"flex"}
+              flexDirection={"column"}
+              justifyContent={"space-between"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
-                ລາຍການທີ່ຂາຍ
+              <Typography
+                variant="laoText"
+                sx={{ m: "5px 5px 0 0", fontSize: 18, p: 2 }}
+              >
+                ລາຍການທີ່ຂາຍຂອງແຕ່ລະສາຂາ
               </Typography>
               <Box height="80%">
                 <PieSellCompo isDashboard={true} dataPie={pieSell} />
@@ -477,10 +482,15 @@ const Dashboard = () => {
               gridColumn="span 4"
               gridRow="span 3"
               backgroundColor={colors.primary[400]}
-              textAlign={"center"}
+              display={"flex"}
+              flexDirection={"column"}
+              justifyContent={"space-between"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
-                ລາຍການທີ່ຈັດສົ່ງ
+              <Typography
+                variant="laoText"
+                sx={{ m: "5px 5px 0 0", fontSize: 18, p: 2 }}
+              >
+                ລາຍການທີ່ຈັດສົ່ງຂອງແຕ່ລະສາຂາ
               </Typography>
               <Box height="80%">
                 <PieSendCompo isDashboard={true} dataPie={pieSend} />
@@ -490,10 +500,15 @@ const Dashboard = () => {
               gridColumn="span 4"
               gridRow="span 3"
               backgroundColor={colors.primary[400]}
-              textAlign={"center"}
+              display={"flex"}
+              flexDirection={"column"}
+              justifyContent={"space-between"}
             >
-              <Typography variant="laoText" sx={{ m: "5px 5px 0 0", fontSize:24 }}>
-                ລາຍການທີ່ໝົດອາຍຸ
+              <Typography
+                variant="laoText"
+                sx={{ m: "5px 5px 0 0", fontSize: 18, p: 2 }}
+              >
+                ລາຍການທີ່ໝົດອາຍຸຂອງແຕ່ລະສາຂາ
               </Typography>
               <Box height="80%">
                 <PieExpCompo isDashboard={true} dataPie={pieExp} />
