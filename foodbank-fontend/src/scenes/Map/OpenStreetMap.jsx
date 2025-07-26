@@ -210,14 +210,13 @@ const OpenStreetMap = () => {
   }
 
   const customIconBranchs = L.icon({
-    iconUrl: "/public/coffee-shop.PNG",
+    iconUrl: "/coffee-shop.PNG",
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
   const customIconUser = L.icon({
-    iconUrl: "/public/teenager.PNG",
-    iconSize: [32, 32],
+    iconUrl: "/teenager.PNG",
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
   });
