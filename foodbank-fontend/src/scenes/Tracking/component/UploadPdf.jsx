@@ -1,5 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
+import { styled } from "@mui/material/styles";
+import Button from "@mui/material/Button";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { toast } from "react-toastify";
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+
+const VisuallyHiddenInput = styled("input")({
+  clip: "rect(0 0 0 0)",
+  clipPath: "inset(50%)",
+  height: 1,
+  overflow: "hidden",
+  position: "absolute",
+  bottom: 0,
+  left: 0,
+  whiteSpace: "nowrap",
+  width: 1,
+});
 
 const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
   const products = useFoodBankStorage((state) => state.products);
@@ -13,7 +30,6 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
     const doc = parser.parseFromString(htmlText, "text/html");
 
     const rows = doc.querySelectorAll("table.list tr");
-
     const extracted = [];
 
     rows.forEach((row) => {
@@ -31,10 +47,10 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
           );
           if (!product) {
             console.warn(`⚠️ Menu "${menu}" not found in products`);
+            return;
           }
 
-          // ✅ Only push if all values valid and product is found
-          if (!isNaN(item) && menu && !isNaN(sellCount) && product) {
+          if (!isNaN(item) && menu && !isNaN(sellCount)) {
             extracted.push({
               item,
               menu,
@@ -47,10 +63,7 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
       }
     });
 
-    // Optional: Automatically trigger handleSetSellCount(productId)
-    // Inside extracted.forEach
     extracted.forEach((entry) => {
-      // First update the input display
       setSellCounts((prev) => ({
         ...prev,
         [entry.productId]: entry.sellCount,
@@ -61,11 +74,11 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
         extracted.map((entry) => ({
           productsId: entry.productId,
           sellCount: entry.sellCount,
-          branchId: 1, // or get this from state/context
-          sellAt: new Date().toISOString(), // or actual sell time
+          branchId: 1,
+          sellAt: new Date().toISOString(),
         }))
       );
-      // Then call handleSetSellCount with direct value
+
       setTimeout(() => {
         handleSetSellCount(entry.productId, entry.sellCount);
       }, 150);
@@ -74,7 +87,22 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
 
   return (
     <div className="p-4">
-      <input type="file" accept=".html" onChange={handleFileUpload} />
+      <Button
+        component="label"
+        role={undefined}
+        variant="contained"
+        color="success"
+        tabIndex={-1}
+        startIcon={<AttachFileIcon />}
+        sx={{ fontFamily: "Noto Sans Lao"}}
+      >
+        ອັປໂຫລດຟາຍຍອດຂາຍ
+        <VisuallyHiddenInput
+          type="file"
+          accept=".html"
+          onChange={handleFileUpload}
+        />
+      </Button>
     </div>
   );
 };
