@@ -4,7 +4,7 @@ import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { toast } from "react-toastify";
-import AttachFileIcon from '@mui/icons-material/AttachFile';
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -24,6 +24,12 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
+
+    // ✅ Check for HTML file
+    if (file.type !== "text/html" && !file.name.endsWith(".html")) {
+      toast.error("ຟາຍທີ່ອັປໂຫລດບໍ່ຖືກຕ້ອງ");
+      return;
+    }
 
     const htmlText = await file.text();
     const parser = new DOMParser();
@@ -94,7 +100,7 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
         color="success"
         tabIndex={-1}
         startIcon={<AttachFileIcon />}
-        sx={{ fontFamily: "Noto Sans Lao"}}
+        sx={{ fontFamily: "Noto Sans Lao" }}
       >
         ອັປໂຫລດຟາຍຍອດຂາຍ
         <VisuallyHiddenInput

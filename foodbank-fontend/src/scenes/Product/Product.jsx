@@ -21,6 +21,8 @@ import DeleteProduct from "./component/DeleteProduct";
 import AddProduct from "./component/AddProduct";
 import AddCategory from "./component/AddCategory";
 import DeleteCategory from "./component/DeleteCategory";
+import { toast, ToastContainer } from "react-toastify";
+
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -48,7 +50,7 @@ const Product = () => {
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
   const getProduct = useFoodBankStorage((state) => state.getProduct);
-  const getCategory = useFoodBankStorage((state)=>state.getCategory)
+  const getCategory = useFoodBankStorage((state) => state.getCategory);
   const branch = useFoodBankStorage((state) => state.branchs);
   const user = useFoodBankStorage((state) => state.user);
 
@@ -173,7 +175,7 @@ const Product = () => {
       renderCell: (params) => (
         <Box display="flex" justifyContent="space-around" width="100%">
           {/* Show EditIcon to everyone */}
-            <EditProduct productRow={params.row} />
+          <EditProduct productRow={params.row} />
           {user?.role === "admin" && <DeleteProduct productRow={params.row} />}
         </Box>
       ),
@@ -201,7 +203,7 @@ const Product = () => {
 
   useEffect(() => {
     getProduct(true);
-    getCategory(true)
+    getCategory(true);
   }, []);
 
   {
@@ -324,6 +326,7 @@ const Product = () => {
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
       />
+      <ToastContainer position="top-center" />
     </Box>
   );
 };
