@@ -24,6 +24,7 @@ import {
 } from "../../api/tracking";
 import DialogEditSell from "./component/DialogEditSell";
 import UploadImage from "./component/UploadImage";
+import UploadPdf from "./component/UploadPdf";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -219,8 +220,11 @@ const Tracksell = () => {
     /** function insert tracking to database */
   }
 
-  const handleSetSellCount = async (productId) => {
-    if (!sellCounts[productId]) return; // Prevent empty values
+  const handleSetSellCount = async (productId, externalSellCount = null) => {
+    const countToUse =
+      externalSellCount !== null ? externalSellCount : sellCounts[productId];
+
+    if (!countToUse) return;
 
     if (
       selectFormtracksell.sellAt === "" ||
@@ -232,20 +236,19 @@ const Tracksell = () => {
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      sellCount: sellCounts[productId],
+      sellCount: countToUse,
     };
 
     setSelectFormtracksell(updatedForm);
+
     try {
       const ress = await insertTracksell(updatedForm, token);
 
-      // **Update checked state with new entry**
       setChecked((prevChecked) => [
         ...prevChecked,
-        { productsId: productId, sellCount: sellCounts[productId] },
+        { productsId: productId, sellCount: countToUse },
       ]);
 
-      // Reset input field after submission
       setSellCounts((prev) => ({ ...prev, [productId]: "" }));
     } catch (err) {
       console.log(err);
@@ -358,6 +361,12 @@ const Tracksell = () => {
               >
                 <Typography variant="laoText">ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
+            </Box>
+            <Box>
+              <UploadPdf
+                setSellCounts={setSellCounts}
+                handleSetSellCount={handleSetSellCount}
+              />
             </Box>
           </Box>
         </Box>
