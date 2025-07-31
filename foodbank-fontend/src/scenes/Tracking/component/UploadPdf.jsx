@@ -1,8 +1,6 @@
-import React from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { toast } from "react-toastify";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 
@@ -18,7 +16,7 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
+const UploadPdf = ({ handleSetSellCount, setSellCounts, selectDateBrachCheck }) => {
   const products = useFoodBankStorage((state) => state.products);
 
   const handleFileUpload = async (event) => {
@@ -75,16 +73,6 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
         [entry.productId]: entry.sellCount,
       }));
 
-      console.log(
-        "📦 Payload to backend:",
-        extracted.map((entry) => ({
-          productsId: entry.productId,
-          sellCount: entry.sellCount,
-          branchId: 1,
-          sellAt: new Date().toISOString(),
-        }))
-      );
-
       setTimeout(() => {
         handleSetSellCount(entry.productId, entry.sellCount);
       }, 150);
@@ -97,8 +85,9 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts }) => {
         component="label"
         role={undefined}
         variant="contained"
-        color="success"
+        color="info"
         tabIndex={-1}
+        disabled={selectDateBrachCheck?.sellDate && selectDateBrachCheck?.brachId ? false : true}
         startIcon={<AttachFileIcon />}
         sx={{ fontFamily: "Noto Sans Lao" }}
       >

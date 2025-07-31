@@ -343,7 +343,16 @@ const Trackexp = () => {
               />
             </Box>
             <Box>
-              <Button variant="contained" onClick={handeDeleteAll} color="error">
+              <Button
+                variant="contained"
+                onClick={handeDeleteAll}
+                color="error"
+                disabled={
+                  selectFormtracksell?.expAt && selectFormtracksell?.brachId
+                    ? false
+                    : true
+                }
+              >
                 <Typography variant="laoText"> ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>

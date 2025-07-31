@@ -366,6 +366,7 @@ const Tracksell = () => {
               <UploadPdf
                 setSellCounts={setSellCounts}
                 handleSetSellCount={handleSetSellCount}
+                selectDateBrachCheck={selectDateBrachCheck}
               />
             </Box>
           </Box>

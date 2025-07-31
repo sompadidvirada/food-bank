@@ -25,6 +25,7 @@ import {
   insertTracksend,
 } from "../../api/tracking";
 import DialogEditSend from "./component/DialogEditSend";
+import UploadSend from "./component/UploadSend";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -215,8 +216,11 @@ const Tracksend = () => {
     /** function insert tracking to database */
   }
 
-  const handleSetSendCount = async (productId) => {
-    if (!sendCounts[productId]) return; // Prevent empty values
+  const handleSetSendCount = async (productId, externalSendCount = null) => {
+    const countToUse =
+      externalSendCount !== null ? externalSendCount : sendCounts[productId];
+
+    if (!countToUse) return;
 
     if (
       selectFormtracksell.sendAt === "" ||
@@ -228,7 +232,7 @@ const Tracksend = () => {
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      sendCount: sendCounts[productId],
+      sendCount: countToUse, // ✅ this is either externalSendCount or sendCounts[productId]
     };
 
     setSelectFormtracksell(updatedForm);
@@ -238,7 +242,7 @@ const Tracksend = () => {
       // **Update checked state with new entry**
       setChecked((prevChecked) => [
         ...prevChecked,
-        { productsId: productId, sendCount: sendCounts[productId] },
+        { productsId: productId, sendCount: countToUse },
       ]);
 
       // Reset input field after submission
@@ -339,9 +343,25 @@ const Tracksend = () => {
               />
             </Box>
             <Box>
-              <Button variant="contained" onClick={handeDeleteAll} color="error">
+              <Button
+                variant="contained"
+                onClick={handeDeleteAll}
+                color="error"
+                disabled={
+                  selectFormtracksell?.sendAt && selectFormtracksell?.brachId
+                    ? false
+                    : true
+                }
+              >
                 <Typography variant="laoText"> ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
+            </Box>
+            <Box>
+              <UploadSend
+                setSellCounts={setSellCounts}
+                handleSetSendCount={handleSetSendCount}
+                selectDateBrachCheck={selectDateBrachCheck}
+              />
             </Box>
           </Box>
         </Box>
