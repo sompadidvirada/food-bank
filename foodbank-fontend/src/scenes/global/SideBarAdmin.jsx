@@ -31,6 +31,7 @@ import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -83,10 +84,10 @@ const SideBarAdmin = () => {
           padding: "5px 35px 5px 20px !important",
         },
         "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
+          color: "#34bd36ff !important",
         },
         "& .pro-menu-item.active": {
-          color: "#6870fa !important",
+          color: "#34bd36ff !important",
         },
       }}
     >
@@ -215,6 +216,20 @@ const SideBarAdmin = () => {
               title="ແຜນສັ່ງຊື້"
               to="/admin/calendaradmin"
               icon={<EditCalendarIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການໃບສັ່ງຊຶ້"
+              to="/admin/order"
+              icon={<AssignmentIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການອໍເດີສາຂາ"
+              to="/admin/allorder"
+              icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
             />
