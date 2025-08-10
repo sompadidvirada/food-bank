@@ -11,19 +11,24 @@ export default function SelectBranch({
   selectFormtracksell,
   setSelectFormtracksell,
   setSelectDateBrachCheck,
+  setBranchName = () => {}, // default no-op
 }) {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const brach = useFoodBankStorage((state) => state.branchs);
   const getBrach = useFoodBankStorage((state) => state.getBrnachs);
   const token = useFoodBankStorage((state) => state.token);
-  const getProducts = useFoodBankStorage((state)=>state.getProduct)
+  const getProducts = useFoodBankStorage((state) => state.getProduct);
 
   React.useEffect(() => {
     getBrach();
   }, [token]);
 
   const handleChange = (event) => {
+    const selectedId = event.target.value;
+    // Find the branch object by id
+    const selectedBranch = brach.find((b) => b.id === selectedId);
+
     setSelectFormtracksell((prevState) => ({
       ...prevState, // Keep existing state values
       brachId: event.target.value, // Update only brachId
@@ -32,7 +37,14 @@ export default function SelectBranch({
       ...prevState, // Keep existing state values
       brachId: event.target.value, // Update only brachId
     }));
-    getProducts()
+
+    // Set the branch name if found
+    if (selectedBranch) {
+      setBranchName(selectedBranch.branchname);
+    } else {
+      setBranchName("");
+    }
+    getProducts();
   };
 
   return (

@@ -27,7 +27,7 @@ const ProtectUser = ({ element }) => {
 
   useEffect(() => {
     if (ok === false) {
-      navigate(-1);
+      navigate("/");
     }
   }, [ok, navigate]);
 

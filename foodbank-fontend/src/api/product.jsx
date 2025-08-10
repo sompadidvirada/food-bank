@@ -1,12 +1,8 @@
 import axios from "axios";
 const URL = import.meta.env.VITE_API_URL;
 
-export const getAllProduct = (token) => {
-  return axios.get(`${URL}/getallproduct`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+export const getAllProduct = () => {
+  return axios.get(`${URL}/getallproduct`);
 };
 
 export const updateStatusProduct = (id, form, token) => {

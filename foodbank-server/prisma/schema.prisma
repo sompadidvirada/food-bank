@@ -33,18 +33,21 @@ model staff {
 }
 
 model branch {
-  id         Int                @id @unique @default(autoincrement())
-  branchname String
-  latitude   Float              @default(17.97790669567272) // Add this
-  longitude  Float              @default(102.62220237805069) // Add this
-  staff      staff[]
-  province   String             @default("ນະຄອນຫຼວງວຽງຈັນ")
-  aviable    Boolean            @default(true)
-  tracksell  tracksell[]
-  tracksend  tracksend[]
-  trackexp   trackexp[]
-  available  availableproduct[]
-  imageTrack imageTrack[]
+  id           Int                @id @unique @default(autoincrement())
+  branchname   String
+  latitude     Float              @default(17.97790669567272) // Add this
+  longitude    Float              @default(102.62220237805069) // Add this
+  staff        staff[]
+  phonenumber  String?
+  province     String             @default("ນະຄອນຫຼວງວຽງຈັນ")
+  aviable      Boolean            @default(true)
+  tracksell    tracksell[]
+  tracksend    tracksend[]
+  trackexp     trackexp[]
+  available    availableproduct[]
+  imageTrack   imageTrack[]
+  order        orderTrack[]
+  confirmOrder confirmOrder[]
 }
 
 model products {
@@ -61,6 +64,7 @@ model products {
   available  availableproduct[]
   category   category           @relation(fields: [categoryId], references: [id])
   categoryId Int
+  order      orderTrack[]
 }
 
 model category {
@@ -142,6 +146,27 @@ model imageTrack {
   id        Int      @id @unique @default(autoincrement())
   date      DateTime
   imageName String
-  branch    branch  @relation(fields: [branchId], references: [id])
+  branch    branch   @relation(fields: [branchId], references: [id])
   branchId  Int
+}
+
+model orderTrack {
+  id         Int      @id @unique @default(autoincrement())
+  orderCount Int
+  orderWant  Int      @default(0)
+  orderDate  DateTime
+  products   products @relation(fields: [productsId], references: [id], onDelete: Cascade)
+  productsId Int
+  branch     branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId   Int
+
+  @@unique([productsId, branchId, orderDate])
+}
+
+model confirmOrder {
+  id          Int      @id @unique @default(autoincrement())
+  confirmDate DateTime
+  status      Boolean  @default(true)
+  branch      branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId    Int
 }

@@ -28,6 +28,9 @@ const FoodBankStorage = (set, get) => ({
   lineChartData: null,
   calendar: null,
   imageTrack: null,
+  dateConfirmOrder: {
+    orderDate: "",
+  },
   getImageTrack: (newData) => {
     set({ imageTrack: newData });
   },
@@ -100,6 +103,14 @@ const FoodBankStorage = (set, get) => ({
     set((state) => ({
       queryForm: {
         ...state.queryForm,
+        [key]: value,
+      },
+    }));
+  },
+  setConfirmOrder: (key, value) => {
+    set((state) => ({
+      dateConfirmOrder: {
+        ...state.dateConfirmOrder,
         [key]: value,
       },
     }));

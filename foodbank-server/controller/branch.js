@@ -146,8 +146,30 @@ exports.cleanAviable = async (req, res) => {
       data: dataToInsert,
       skipDuplicates: true, // Skip if (productId, branchId) already exists
     });
-    res.send('Done!!!')
+    res.send("Done!!!");
   } catch (err) {
     return res.status(500).json({ message: `server error` });
+  }
+};
+
+exports.changePhonenumber = async (req, res) => {
+  try {
+    const { phonenumber, branchId } = req.body;
+
+    if (!phonenumber || !branchId) {
+      return res.status(400).json({ message: `emty value` });
+    }
+    const ress = await prisma.branch.update({
+      where: {
+        id: Number(branchId),
+      },
+      data: {
+        phonenumber: phonenumber,
+      },
+    });
+    res.send(ress);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
   }
 };

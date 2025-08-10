@@ -24,11 +24,18 @@ import LineMain from "../scenes/Line/LineMain";
 import Calendar from "../scenes/calendar/Calendar"
 import CalendarAdmin from "../scenes/calendar/CalendarAdmin";
 import UploadS3 from "../scenes/upload/UploadS3";
+import OrderManage from "../scenes/order/OrderManage";
+import CustomerOrder from "../scenes/customerOrder/CustomerOrder";
+import OrderUser from "../scenes/orderUser/OrderUser";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Login />,
+  },
+  {
+    path: "/customerorder",
+    element: <CustomerOrder />,
   },
   {
     path: "/admin",
@@ -52,6 +59,8 @@ const router = createBrowserRouter([
       { path: "line", element: <LineMain /> },
       { path: "calendaradmin", element: <CalendarAdmin /> },
       { path: "uploadimage", element: <UploadS3 /> },
+      { path: "order", element: <OrderManage /> },
+      { path: "allorder", element: <OrderUser /> },
     ],
   },
   {

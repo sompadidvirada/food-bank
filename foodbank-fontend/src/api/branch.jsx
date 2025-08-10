@@ -30,3 +30,10 @@ export const updateProvince = (form, token) => {
         }
     })
 }
+export const changePhonenumber = (form, token) => {
+    return axios.post(`${URL}/changephonenumber`, form, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

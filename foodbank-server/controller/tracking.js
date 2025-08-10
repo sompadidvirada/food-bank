@@ -1,5 +1,7 @@
 const prisma = require("../config/prisma");
 const { parseISO, format } = require("date-fns");
+const { utcToZonedTime } = require("date-fns-tz");
+const timeZone = "Asia/Vientiane";
 const {
   S3Client,
   PutObjectCommand,
@@ -116,8 +118,9 @@ exports.insertTrackSell = async (req, res) => {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedsellAt = parseISO(sellAt); // already in UTC
-    const sellDay = format(formattedsellAt, "EEEE");
-
+    const localDate = utcToZonedTime(formattedsellAt, timeZone);
+    const sellDay = format(localDate, "EEEE");
+    
     const start = new Date(formattedsellAt);
     start.setUTCHours(0, 0, 0, 0);
 
@@ -161,11 +164,13 @@ exports.insertTrackSell = async (req, res) => {
 exports.insertTrackSend = async (req, res) => {
   try {
     const { sendCount, sendAt, userId, productId, brachId } = req.body;
+    console.log(req.body)
     if (!sendCount || !sendAt || !brachId || !userId || !productId) {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedsendAt = parseISO(sendAt); // already in UTC
-    const sendDay = format(formattedsendAt, "EEEE");
+    const localDate = utcToZonedTime(formattedsendAt, timeZone);
+    const sendDay = format(localDate, "EEEE");
 
     const start = new Date(formattedsendAt);
     start.setUTCHours(0, 0, 0, 0);
@@ -214,7 +219,8 @@ exports.insertTrackExp = async (req, res) => {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedexpAt = parseISO(expAt); // already in UTC
-    const expDay = format(formattedexpAt, "EEEE");
+    const localDate = utcToZonedTime(formattedexpAt, timeZone);
+    const expDay = format(localDate, "EEEE");
 
     const start = new Date(formattedexpAt);
     start.setUTCHours(0, 0, 0, 0);

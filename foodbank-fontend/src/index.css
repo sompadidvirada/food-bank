@@ -11,14 +11,6 @@ body,
   overflow: auto;
   overflow-x: hidden;
 }
-@font-face {
-  font-family: 'Noto Sans Lao';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/notosanslao/v21/H4coBX6Mmc_Z4Lz9g_CI3bN1FkqZRrZbHF9TlAc.woff2') format('woff2');
-}
-
 .layout {
   display: flex;
   position: relative;

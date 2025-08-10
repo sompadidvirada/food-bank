@@ -62,7 +62,7 @@ router.get("/product_img/:imageName", (req, res) => {
   /**API routes */
 }
 
-router.get("/getallproduct", authCheck, getProducts);
+router.get("/getallproduct", getProducts);
 router.put("/updateaviable/:id", authCheck, updatePerBrach);
 router.put("/updateproduct/:id", authCheck, updateProduct);
 router.delete("/deleteproduct/:id", authCheck, adminCheck, deleteProduct)
