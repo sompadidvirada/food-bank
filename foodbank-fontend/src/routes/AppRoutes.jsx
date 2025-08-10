@@ -75,6 +75,7 @@ const router = createBrowserRouter([
       { path: "reportperbranch", element: <ReportPerBranch /> },
       { path: "reportall", element: <ReportAll /> },
       { path: "calendar", element: <Calendar /> },
+      { path: "allorder", element: <OrderUser /> },
     ],
   },
 ]);

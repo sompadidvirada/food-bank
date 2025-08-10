@@ -1,5 +1,6 @@
 import React from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
+import { format, parseISO } from "date-fns";
 
 const CompoPrint = ({ componentRef, orders, products }) => {
   const dateConfirmOrder = useFoodBankStorage(
@@ -74,7 +75,8 @@ const CompoPrint = ({ componentRef, orders, products }) => {
   return (
     <div ref={componentRef} style={{ padding: 20, color: "black" }}>
       <p style={{ fontFamily: "Noto Sans Lao", fontSize: 30 }}>
-        ອໍເດີປະຈຳວັນທີ່ {dateConfirmOrder.orderDate}
+        ອໍເດີປະຈຳວັນທີ່{" "}
+        {format(parseISO(dateConfirmOrder.orderDate), "dd/MM/yyyy")}
       </p>
       <table
         border={1}
@@ -88,7 +90,13 @@ const CompoPrint = ({ componentRef, orders, products }) => {
       >
         <thead>
           {/* First header row */}
-          <tr style={{ background: "yellow", fontWeight: "bold", fontFamily:"Noto Sans Lao" }}>
+          <tr
+            style={{
+              background: "yellow",
+              fontWeight: "bold",
+              fontFamily: "Noto Sans Lao",
+            }}
+          >
             <th rowSpan={2}>ລາຍການ</th>
             {branchNames.map((branch) => (
               <th key={branch} rowSpan={1}>
@@ -118,7 +126,13 @@ const CompoPrint = ({ componentRef, orders, products }) => {
           ))}
 
           {/* Totals row */}
-          <tr style={{ fontWeight: "bold", background: "#f2f2f2", fontFamily:"Noto Sans Lao" }}>
+          <tr
+            style={{
+              fontWeight: "bold",
+              background: "#f2f2f2",
+              fontFamily: "Noto Sans Lao",
+            }}
+          >
             <td>ລວມ</td>
             {branchNames.map((branch) => (
               <td key={branch}>{branchTotals[branch]}</td>

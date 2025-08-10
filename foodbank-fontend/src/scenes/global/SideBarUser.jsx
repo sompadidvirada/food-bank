@@ -25,6 +25,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 
 const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -191,6 +192,13 @@ const SideBarUser = () => {
               title="ແຜນສັ່ງຊື້"
               to="/user/calendar"
               icon={<EditCalendarIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການອໍເດີສາຂາ"
+              to="/user/allorder"
+              icon={<AssignmentIcon />}
               selected={selected}
               setSelected={setSelected}
             />
