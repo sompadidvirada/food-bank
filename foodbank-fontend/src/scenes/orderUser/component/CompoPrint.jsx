@@ -1,6 +1,6 @@
 import React from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
-import { format, parseISO } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 
 const CompoPrint = ({ componentRef, orders, products }) => {
   const dateConfirmOrder = useFoodBankStorage(
@@ -76,7 +76,18 @@ const CompoPrint = ({ componentRef, orders, products }) => {
     <div ref={componentRef} style={{ padding: 20, color: "black" }}>
       <p style={{ fontFamily: "Noto Sans Lao", fontSize: 30 }}>
         ອໍເດີປະຈຳວັນທີ່{" "}
-        {format(parseISO(dateConfirmOrder.orderDate), "dd/MM/yyyy")}
+        {dateConfirmOrder?.orderDate
+          ? (() => {
+              const dateValue =
+                typeof dateConfirmOrder.orderDate === "string"
+                  ? parseISO(dateConfirmOrder.orderDate)
+                  : new Date(dateConfirmOrder.orderDate);
+
+              return isValid(dateValue)
+                ? format(dateValue, "dd/MM/yyyy")
+                : "Invalid date";
+            })()
+          : "—"}
       </p>
       <table
         border={1}

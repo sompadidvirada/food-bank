@@ -24,7 +24,11 @@ import AddLinkIcon from "@mui/icons-material/AddLink";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import UnpublishedRoundedIcon from "@mui/icons-material/UnpublishedRounded";
 import CalendarOrderUser from "./component/CalendarOrderUser";
-import { chanheStatusOrder, checkConfirmOrderAll, getAllOrderTrack } from "../../api/preorder";
+import {
+  chanheStatusOrder,
+  checkConfirmOrderAll,
+  getAllOrderTrack,
+} from "../../api/preorder";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -34,6 +38,7 @@ import Slide from "@mui/material/Slide";
 import { changePhonenumber } from "../../api/branch";
 import { toast, ToastContainer } from "react-toastify";
 import PrintCompo from "./component/PrintCompo";
+import { format, isValid, parseISO } from "date-fns";
 
 const URLCUSTOMER = "http://localhost:5173/customerorder";
 
@@ -64,9 +69,10 @@ const OrderUser = () => {
   const [open, setOpen] = useState(false);
   const [idBranch, setIdbranch] = useState("");
   const [value, setValue] = useState("");
-  const dateConfirmOrder = useFoodBankStorage((state)=>state.dateConfirmOrder)
-  const products = useFoodBankStorage((state)=>state.products)
-
+  const dateConfirmOrder = useFoodBankStorage(
+    (state) => state.dateConfirmOrder
+  );
+  const products = useFoodBankStorage((state) => state.products);
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -87,32 +93,33 @@ const OrderUser = () => {
     (item) => item.province === "ນະຄອນຫຼວງວຽງຈັນ"
   );
 
-function generateOrderUrl(baseUrl, orderDate, branchId, branchName) {
-  const params = new URLSearchParams({
-    orderDate,
-    branchId,
-    branchName,
-  });
-  return `${baseUrl}?${params.toString()}`;
-}
+  function generateOrderUrl(baseUrl, orderDate, branchId, branchName) {
+    const params = new URLSearchParams({
+      orderDate,
+      branchId,
+      branchName,
+    });
+    return `${baseUrl}?${params.toString()}`;
+  }
 
-const handleCreateLink = (name, id, phone) => {
-  const url = generateOrderUrl(
-    URLCUSTOMER,
-    dateConfirmOrder?.orderDate,
-    id,
-    name
-  );
+  const handleCreateLink = (name, id, phone) => {
+    const url = generateOrderUrl(
+      URLCUSTOMER,
+      dateConfirmOrder?.orderDate,
+      id,
+      name
+    );
 
-  const phoneNumber = `85620${phone}`;
+    const phoneNumber = `85620${phone}`;
 
-  // Keep URL as-is (encoded), no decodeURIComponent here
-  const message = `ສະບາຍດີນີ້ແມ່ນຂໍຄວາມສົ່ງຈາກພະແນກຈັດຊື້ ລົບກວນກວດລາຍການຂະໜົມຕາມລີ້ງນີ້ແລ້ວກົດຢືນຢັນກ່ອນເວລາ 12:00 ໂມງ ຂອບໃຈ: ${url}`;
+    // Keep URL as-is (encoded), no decodeURIComponent here
+    const message = `ນີ້ແມ່ນລີ້ງກວດລາຍການຂະໜົມ (ແກ້ໄຂໄດ້ບໍ່ເກີນ 12:00): ${url}`;
 
-  const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(message)}`;
-  window.open(whatsappUrl, "_blank");
-};
-
+    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(whatsappUrl, "_blank");
+  };
 
   const fecthconfirmOrder = async () => {
     if (!dateConfirmOrder) return;
@@ -160,22 +167,13 @@ const handleCreateLink = (name, id, phone) => {
     }
   };
 
-  const handlePrint = async() => {
-    try{
-      const ress = await getAllOrderTrack(dateConfirmOrder, token)
-      console.log(ress)
-
-    }catch(err) {
-      console.log(err)
-    }
-  }
-
   useEffect(() => {
-    fecthconfirmOrder();
+    if (dateConfirmOrder.orderDate) {
+      fecthconfirmOrder();
+    }
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
-  
 
   return (
     <Box m="20px">
@@ -186,8 +184,25 @@ const handleCreateLink = (name, id, phone) => {
         alignItems="center"
         gap="20px"
       >
-        <CalendarOrderUser/>
+        <CalendarOrderUser />
         <PrintCompo />
+      </Box>
+      <Box sx={{ p:3}}>
+        <Typography variant="Laotext" sx={{ fontSize:20}}>
+          ລາຍລະອຽດອໍເດີປະຈຳວັນທີ{" "}
+          {dateConfirmOrder?.orderDate
+            ? (() => {
+                const dateValue =
+                  typeof dateConfirmOrder.orderDate === "string"
+                    ? parseISO(dateConfirmOrder.orderDate)
+                    : new Date(dateConfirmOrder.orderDate);
+
+                return isValid(dateValue)
+                  ? format(dateValue, "dd/MM/yyyy")
+                  : "Invalid date";
+              })()
+            : "—"}
+        </Typography>
       </Box>
 
       {dateConfirmOrder?.orderDate ? (
@@ -279,7 +294,13 @@ const handleCreateLink = (name, id, phone) => {
                       {(() => {
                         if (row?.phonenumber) {
                           return (
-                            <Box sx={{ display:"flex", alignItems:"center", justifyContent:"end"}}>
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "end",
+                              }}
+                            >
                               <Typography>{row?.phonenumber}</Typography>
                               <IconButton onClick={() => handleClickOpen(row)}>
                                 <MoreVertIcon />
@@ -309,7 +330,11 @@ const handleCreateLink = (name, id, phone) => {
                             <Box>
                               <Button
                                 onClick={() =>
-                                  handleCreateLink(row.branchname, row.id, row.phonenumber)
+                                  handleCreateLink(
+                                    row.branchname,
+                                    row.id,
+                                    row.phonenumber
+                                  )
                                 }
                                 variant="contained"
                                 sx={{ fontFamily: "Noto Sans Lao" }}

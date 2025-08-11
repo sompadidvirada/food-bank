@@ -73,11 +73,17 @@ const CustomerOrder = () => {
   const readableOrderDate = formatDate(order);
   const readableDeliveryDate = formatDate(delivery);
 
-  const filterProducts = products?.filter((product) =>
-    product.available?.some(
-      (item) => item.aviableStatus === true && item.branchId === brachId
-    )
-  );
+  const filterProducts = products?.filter((product) => {
+    const hasValidCategory = product.category?.name !== "ເຄື່ອງດື່ມ ແອວກໍຮໍ";
+
+    const isAvailable =
+      Array.isArray(product.available) &&
+      product.available.some(
+        (item) => item.aviableStatus === true && item.branchId === 1
+      );
+
+    return hasValidCategory && isAvailable;
+  });
 
   const fecthProducts = async () => {
     try {
@@ -96,7 +102,6 @@ const CustomerOrder = () => {
       console.log(err);
     }
   };
-  console.log(status)
 
   const checkConfirmOr = async () => {
     if (!orderDate || !brachId) return;

@@ -41,6 +41,7 @@ const PrintCompo = () => {
         onClick={fetchDataAndPrint}
         variant="contained"
         color="success"
+        disabled={dateConfirmOrder.orderDate ? false : true}
         startIcon={<LocalPrintshopIcon />}
         sx={{fontFamily:"Noto Sans Lao"}}
       >

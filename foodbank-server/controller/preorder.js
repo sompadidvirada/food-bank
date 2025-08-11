@@ -1,6 +1,6 @@
 const prisma = require("../config/prisma");
 const { parseISO, format, startOfDay, subDays, endOfDay } = require("date-fns");
-const { utcToZonedTime } = require("date-fns-tz");
+const { utcToZonedTime, zonedTimeToUtc } = require("date-fns-tz");
 const timeZone = "Asia/Vientiane";
 
 exports.createPreorder = async (req, res) => {
@@ -151,11 +151,18 @@ exports.deleteOrder = async (req, res) => {
     return res.status(500).json({ message: `server error` });
   }
 };
-function createRange(start, end) {
-  return {
-    start: startOfDay(start),
-    end: endOfDay(end),
-  };
+function createRange(startDate, endDate) {
+  // startDate and endDate are in Asia/Vientiane timezone date objects
+
+  // Convert to start and end of day in the timezone
+  const startZoned = startOfDay(startDate);
+  const endZoned = endOfDay(endDate);
+
+  // Convert those zoned times back to UTC for querying DB
+  const startUtc = zonedTimeToUtc(startZoned, timeZone);
+  const endUtc = zonedTimeToUtc(endZoned, timeZone);
+
+  return { start: startUtc, end: endUtc };
 }
 
 exports.getPassThreeWeekTrack = async (req, res) => {
