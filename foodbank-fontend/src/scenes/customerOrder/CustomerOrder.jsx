@@ -149,6 +149,7 @@ const CustomerOrder = () => {
     fecthOrderTrack();
     checkConfirmOr();
   }, []);
+console.log(cheked)
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -178,7 +179,7 @@ const CustomerOrder = () => {
               variant="contained"
               type="submit"
               onClick={handleComfirmOrder}
-              disabled={status?.status ? true : false}
+              disabled={status?.status || cheked.length === 0 ? true : false}
               color="success"
               sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
             >
