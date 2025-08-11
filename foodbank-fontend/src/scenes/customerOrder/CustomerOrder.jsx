@@ -311,6 +311,7 @@ console.log(cheked)
                                   display: "flex",
                                   gap: "5px",
                                   alignItems: "center",
+                                  justifyContent:"end"
                                 }}
                               >
                                 <input
