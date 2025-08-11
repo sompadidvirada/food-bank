@@ -40,7 +40,7 @@ import { toast, ToastContainer } from "react-toastify";
 import PrintCompo from "./component/PrintCompo";
 import { format, isValid, parseISO } from "date-fns";
 
-const URLCUSTOMER = "http://localhost:5173/customerorder";
+const URLCUSTOMER = "https://treekoff.store/customerorder";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
