@@ -276,7 +276,7 @@ const OrderUser = () => {
                         const checkOrderWant = orderWantFilter.find(
                           (item) => item.branchId === row.id
                         );
-                        if (!checkOrderWant) {
+                        if (!checkOrderWant || checkOrderWant.totalOrderWant === 0) {
                           return (
                             <Box>
                               <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
