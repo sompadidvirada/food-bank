@@ -83,7 +83,7 @@ const OrderUser = () => {
           totalOrderWant: 0,
         };
       }
-      if (item.orderWant > 0) {
+      if (item.orderWant > 0 && item.orderWant !== item.orderCount) {
         acc[item.branchId].totalOrderWant += 1;
       }
       return acc;
@@ -199,7 +199,7 @@ const OrderUser = () => {
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
-  console.log(orderWantFilter);
+  console.log(orderTrack);
 
   return (
     <Box m="20px">
