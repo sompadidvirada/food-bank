@@ -741,7 +741,7 @@ const OrderManage = () => {
               color="info"
               startIcon={<CheckIcon />}
               sx={{ fontFamily: "Noto Sans Lao" }}
-              disabled={status.status ? false : true}
+              disabled={status?.status ? false : true}
               onClick={() => handleConfirmOrderChange(true)}
             >
               ຢືນຢັນອໍເດີສາຂາ
