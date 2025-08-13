@@ -197,7 +197,7 @@ const OrderManage = () => {
         const trackedProduct = checkedOrder?.find(
           (item) => item?.productsId === productId
         );
-        if (trackedProduct) {
+        if (trackedProduct && trackedProduct.orderWant !== 0) {
           return (
             <Typography
               fontFamily={"Noto Sans Lao"}
