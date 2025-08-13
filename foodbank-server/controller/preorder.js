@@ -423,6 +423,7 @@ exports.changeStatusConfirmOrder = async (req, res) => {
       },
       data: {
         status: status,
+        confirmStatus: false
       },
     });
     res.send(ress);
@@ -431,3 +432,25 @@ exports.changeStatusConfirmOrder = async (req, res) => {
     return res.status(500).json({ message: `server error.` });
   }
 };
+
+exports.confirmOrderChange = async (req,res) => {
+  try{
+    const {id} = req.params
+    const { status } = req.body
+    console.log(id, status)
+    if(!id || status === undefined ) {
+      return res.status(400).json({ message: `emty value.`})
+    }
+    const ress = await prisma.confirmOrder.update({
+      where: {
+        id: Number(id)
+      }, data: {
+        confirmStatus: status
+      }
+    })
+    res.send(ress)
+  }catch(err) {
+    console.log(err)
+    return res.status(500).json({ message: `server error`})
+  }
+}

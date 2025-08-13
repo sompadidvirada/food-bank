@@ -3,6 +3,7 @@ import {
   Button,
   IconButton,
   TextField,
+  Tooltip,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -22,6 +23,7 @@ import Paper from "@mui/material/Paper";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 import UnpublishedRoundedIcon from "@mui/icons-material/UnpublishedRounded";
 import CalendarOrderUser from "./component/CalendarOrderUser";
 import {
@@ -199,7 +201,6 @@ const OrderUser = () => {
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
-  console.log(orderTrack);
 
   return (
     <Box m="20px">
@@ -276,7 +277,10 @@ const OrderUser = () => {
                         const checkOrderWant = orderWantFilter.find(
                           (item) => item.branchId === row.id
                         );
-                        if (!checkOrderWant || checkOrderWant.totalOrderWant === 0) {
+                        if (
+                          !checkOrderWant ||
+                          checkOrderWant.totalOrderWant === 0
+                        ) {
                           return (
                             <Box>
                               <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
@@ -311,9 +315,46 @@ const OrderUser = () => {
                         } else {
                           return (
                             <Box>
-                              <CheckCircleRoundedIcon
-                                sx={{ color: colors.greenAccent[300] }}
-                              />
+                              {foundStatus.confirmStatus && (
+                                <Tooltip
+                                  title="ຢືນຢັນການແກ້ໄຂ"
+                                  arrow
+                                  placement="top"
+                                  componentsProps={{
+                                    tooltip: {
+                                      sx: {
+                                        fontSize: "14px",
+                                        fontFamily: "Noto Sans Lao", // or any font you prefer
+                                        color: "#fff",
+                                        backgroundColor: "#333", // optional
+                                      },
+                                    },
+                                  }}
+                                >
+                                  <AssignmentTurnedInIcon
+                                    sx={{ color: colors.blueAccent[500] }}
+                                  />
+                                </Tooltip>
+                              )}
+                              <Tooltip
+                                title="ສາຂາຢືນຢັນອໍເດີ"
+                                arrow
+                                placement="top"
+                                componentsProps={{
+                                  tooltip: {
+                                    sx: {
+                                      fontSize: "14px",
+                                      fontFamily: "Noto Sans Lao", // or any font you prefer
+                                      color: "#fff",
+                                      backgroundColor: "#333", // optional
+                                    },
+                                  },
+                                }}
+                              >
+                                <CheckCircleRoundedIcon
+                                  sx={{ color: colors.greenAccent[300] }}
+                                />
+                              </Tooltip>
                             </Box>
                           );
                         }
@@ -329,15 +370,31 @@ const OrderUser = () => {
                         } else {
                           return (
                             <Box>
-                              <IconButton
-                                onClick={() =>
-                                  handleChangeStatus(foundStatus?.id, false)
-                                }
+                              <Tooltip
+                                title="ແກ້ໄຂສະຖານະກັບຄືນ"
+                                arrow
+                                placement="top"
+                                componentsProps={{
+                                  tooltip: {
+                                    sx: {
+                                      fontSize: "14px",
+                                      fontFamily: "Noto Sans Lao", // or any font you prefer
+                                      color: "#fff",
+                                      backgroundColor: "#333", // optional
+                                    },
+                                  },
+                                }}
                               >
-                                <ChangeCircleIcon
-                                  sx={{ color: colors.blueAccent[200] }}
-                                />
-                              </IconButton>
+                                <IconButton
+                                  onClick={() =>
+                                    handleChangeStatus(foundStatus?.id, false)
+                                  }
+                                >
+                                  <ChangeCircleIcon
+                                    sx={{ color: colors.blueAccent[200] }}
+                                  />
+                                </IconButton>
+                              </Tooltip>
                             </Box>
                           );
                         }
@@ -356,9 +413,26 @@ const OrderUser = () => {
                               }}
                             >
                               <Typography>{row?.phonenumber}</Typography>
-                              <IconButton onClick={() => handleClickOpen(row)}>
+                              <Tooltip
+                                title="ແກ້ໄຂເບີໂທ"
+                                arrow
+                                placement="top"
+                                componentsProps={{
+                                  tooltip: {
+                                    sx: {
+                                      fontSize: "14px",
+                                      fontFamily: "Noto Sans Lao", // or any font you prefer
+                                      color: "#fff",
+                                      backgroundColor: "#333", // optional
+                                    },
+                                  },
+                                }}
+                              >
+                                <IconButton onClick={() => handleClickOpen(row)}>
                                 <MoreVertIcon />
                               </IconButton>
+                              </Tooltip>
+                              
                             </Box>
                           );
                         } else {

@@ -164,9 +164,10 @@ model orderTrack {
 }
 
 model confirmOrder {
-  id          Int      @id @unique @default(autoincrement())
-  confirmDate DateTime
-  status      Boolean  @default(true)
-  branch      branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
-  branchId    Int
+  id            Int      @id @unique @default(autoincrement())
+  confirmDate   DateTime
+  status        Boolean  @default(true)
+  confirmStatus Boolean  @default(false)
+  branch        branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId      Int
 }

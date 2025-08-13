@@ -39,8 +39,8 @@ const PrintCompo = () => {
     <>
       <Button
         onClick={fetchDataAndPrint}
-        variant="contained"
-        color="success"
+        variant="outlined"
+        color="info"
         disabled={dateConfirmOrder.orderDate ? false : true}
         startIcon={<LocalPrintshopIcon />}
         sx={{fontFamily:"Noto Sans Lao"}}

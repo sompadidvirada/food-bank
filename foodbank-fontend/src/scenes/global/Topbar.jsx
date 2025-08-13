@@ -1,5 +1,5 @@
 import { Box, IconButton, useTheme } from "@mui/material";
-import { forwardRef, useContext, useState } from "react";
+import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
@@ -11,6 +11,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
+import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +25,23 @@ const Topbar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const colorMode = useContext(ColorModeContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [openNotification, setOpenNotification] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // If menuRef is set and click is outside, close the menu
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpenNotification(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -33,11 +51,11 @@ const Topbar = () => {
     setOpen(false);
   };
 
-  const handleLogout =  () => {
-    navigate('/')
+  const handleLogout = () => {
+    navigate("/");
     setOpen(false);
     useFoodBankStorage.persist.clearStorage();
-  } 
+  };
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       <Box></Box>
@@ -50,6 +68,40 @@ const Topbar = () => {
             <LightModeOutlinedIcon />
           )}
         </IconButton>
+        <Box sx={{ position: "relative" }} ref={menuRef}>
+          <IconButton
+            onClick={() => setOpenNotification((prev) => !prev)}
+            sx={{ bgcolor: openNotification ? colors.primary[800] : "none" }}
+          >
+            <NotificationsIcon sx={{color: openNotification ? colors.blueAccent[400] : "none"}}/>
+          </IconButton>
+          <Box
+            sx={{
+              position: "absolute",
+              width: 200,
+              minHeight: 100,
+              bgcolor: colors.primary[800],
+              right: 0,
+              zIndex: 999,
+              borderRadius: "10px",
+              p: 2,
+              display: openNotification ? "flex" : "none",
+              flexDirection: "column",
+            }}
+          >
+            <Box>ສາຂາ ໂພນທັນ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box>ສາຂາ ສາຍລົມ</Box>
+          </Box>
+        </Box>
+
         <IconButton onClick={handleClickOpen}>
           <LogoutIcon />
         </IconButton>
@@ -66,15 +118,38 @@ const Topbar = () => {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <DialogTitle sx={{ fontFamily:"Noto Sans Lao", textAlign:"center", fontSize:25}}>{"ອອກຈາກລະບົບ"}</DialogTitle>
+        <DialogTitle
+          sx={{
+            fontFamily: "Noto Sans Lao",
+            textAlign: "center",
+            fontSize: 25,
+          }}
+        >
+          {"ອອກຈາກລະບົບ"}
+        </DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-slide-description" sx={{ fontFamily:"Noto Sans Lao", fontSize: 20}}>
+          <DialogContentText
+            id="alert-dialog-slide-description"
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}
+          >
             ທ່ານຕ້ອງການອອກຈາກລະບົບແທ້ບໍ່ ??
           </DialogContentText>
         </DialogContent>
-        <DialogActions sx={{ display:"flex", justifyContent:"center"}}>
-          <Button onClick={handleLogout} sx={{ fontFamily:"Noto Sans Lao", fontSize:18}} color="success">ຢືນຢັນ</Button>
-          <Button onClick={handleClose} sx={{ fontFamily:"Noto Sans Lao", fontSize:18}} color="error">ຍົກເລີກ</Button>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            onClick={handleLogout}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 18 }}
+            color="success"
+          >
+            ຢືນຢັນ
+          </Button>
+          <Button
+            onClick={handleClose}
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 18 }}
+            color="error"
+          >
+            ຍົກເລີກ
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

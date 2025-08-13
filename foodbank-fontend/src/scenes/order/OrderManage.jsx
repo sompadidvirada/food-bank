@@ -5,11 +5,16 @@ import { DataGrid } from "@mui/x-data-grid";
 import Header from "../component/Header";
 import { Button, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
+import CheckIcon from "@mui/icons-material/Check";
 import SelectBranch from "../Tracking/component/SelectBranch";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import CalendarOrder from "./component/CalendarOrder";
 import {
+  checkConfirmOrderBranch,
   checkTrackOrder,
+  confirmOrderBranch,
+  confirmOrderChange,
   deleteOrderTrack,
   getOrderTrack,
   insertOrder,
@@ -31,6 +36,7 @@ const OrderManage = () => {
   const [checkedOrder, setCheckedOrder] = useState([]);
   const [orderCount, setOrderCount] = useState({});
   const [branchName, setBranchName] = useState("");
+  const [status, setStatus] = useState(null);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     orderCount: "",
     orderDate: "",
@@ -197,7 +203,11 @@ const OrderManage = () => {
         const trackedProduct = checkedOrder?.find(
           (item) => item?.productsId === productId
         );
-        if (trackedProduct && trackedProduct.orderWant !== 0) {
+        if (
+          trackedProduct &&
+          trackedProduct.orderWant !== 0 &&
+          trackedProduct.orderWant !== trackedProduct.orderCount
+        ) {
           return (
             <Typography
               fontFamily={"Noto Sans Lao"}
@@ -559,6 +569,15 @@ const OrderManage = () => {
       console.log(err);
     }
   };
+  const fecthconfirmOrder = async () => {
+    if (!selectDateBrachCheck.orderDate) return;
+    try {
+      const ress = await checkConfirmOrderBranch(selectDateBrachCheck);
+      setStatus(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const fetchDateBrachCheck = async () => {
     if (selectDateBrachCheck.brachId && selectDateBrachCheck.orderDate) {
@@ -590,7 +609,10 @@ const OrderManage = () => {
   };
 
   useEffect(() => {
-    fetchDateBrachCheck();
+    if (selectDateBrachCheck.brachId && selectDateBrachCheck.orderDate) {
+      fetchDateBrachCheck();
+      fecthconfirmOrder();
+    }
   }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate]);
 
   const handleChange = (productId, value) => {
@@ -648,7 +670,22 @@ const OrderManage = () => {
         console.error("Failed to copy: ", err);
       });
   };
+  const handleConfirmOrderChange = async (statuss) => {
+    try {
+      console.log(status.id, status);
+      const ress = await confirmOrderChange(
+        status.id,
+        { status: statuss },
+        token
+      );
+      console.log(ress);
+      setStatus(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
+  console.log(status)
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
@@ -686,6 +723,30 @@ const OrderManage = () => {
           >
             <Typography variant="laoText">ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
           </Button>
+        </Box>
+        <Box>
+          {status?.confirmStatus ? (
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<NewReleasesIcon />}
+              sx={{ fontFamily: "Noto Sans Lao" }}
+              onClick={() => handleConfirmOrderChange(false)}
+            >
+              ຍົກເລີກສະຖານະ
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              color="info"
+              startIcon={<CheckIcon />}
+              sx={{ fontFamily: "Noto Sans Lao" }}
+              disabled={status.status ? false : true}
+              onClick={() => handleConfirmOrderChange(true)}
+            >
+              ຢືນຢັນອໍເດີສາຂາ
+            </Button>
+          )}
         </Box>
         <Box>
           <Button

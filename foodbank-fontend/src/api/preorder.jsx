@@ -70,3 +70,11 @@ export const getAllOrderTrack = (form, token) => {
     }
   })
 }
+
+export const confirmOrderChange = (id,form, token) => {
+  return axios.put(`${URL}/confirmorderchange/${id}`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+} 

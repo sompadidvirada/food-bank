@@ -67,4 +67,5 @@ router.put("/updateaviable/:id", authCheck, updatePerBrach);
 router.put("/updateproduct/:id", authCheck, updateProduct);
 router.delete("/deleteproduct/:id", authCheck, adminCheck, deleteProduct)
 
+
 module.exports = router;
