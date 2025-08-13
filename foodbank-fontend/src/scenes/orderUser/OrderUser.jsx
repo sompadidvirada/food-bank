@@ -389,9 +389,10 @@ const OrderUser = () => {
                                   onClick={() =>
                                     handleChangeStatus(foundStatus?.id, false)
                                   }
+                                  disabled={foundStatus?.confirmStatus ? true : false}
                                 >
                                   <ChangeCircleIcon
-                                    sx={{ color: colors.blueAccent[200] }}
+                                    sx={{ color: foundStatus?.confirmStatus ? "none" : colors.blueAccent[200] }}
                                   />
                                 </IconButton>
                               </Tooltip>

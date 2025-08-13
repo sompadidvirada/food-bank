@@ -685,7 +685,6 @@ const OrderManage = () => {
     }
   };
 
-  console.log(status)
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
