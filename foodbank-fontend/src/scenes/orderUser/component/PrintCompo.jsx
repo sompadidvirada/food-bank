@@ -5,6 +5,7 @@ import LocalPrintshopIcon from "@mui/icons-material/LocalPrintshop";
 import CompoPrint from "./CompoPrint";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { getAllOrderTrack } from "../../../api/preorder";
+import { format, parseISO } from "date-fns";
 
 const PrintCompo = () => {
   const componentRef = useRef();
@@ -14,6 +15,7 @@ const PrintCompo = () => {
   const dateConfirmOrder = useFoodBankStorage(
     (state) => state.dateConfirmOrder
   );
+  const formattedDate = format(parseISO(dateConfirmOrder?.orderDate), "dd/MM/yyyy");
 
   const fetchDataAndPrint = async () => {
     try {
@@ -32,7 +34,7 @@ const PrintCompo = () => {
   };
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: "My Document",
+    documentTitle: `ອໍເດີເບເກີລີ່ປະຈຳວັນທີ່ ${formattedDate}`,
   });
 
   return (
@@ -43,12 +45,16 @@ const PrintCompo = () => {
         color="info"
         disabled={dateConfirmOrder.orderDate ? false : true}
         startIcon={<LocalPrintshopIcon />}
-        sx={{fontFamily:"Noto Sans Lao"}}
+        sx={{ fontFamily: "Noto Sans Lao" }}
       >
         ປີ່ນບິນທັງໝົດ
       </Button>
       <Box display={"none"}>
-        <CompoPrint componentRef={componentRef} orders={orders} products={products}/>
+        <CompoPrint
+          componentRef={componentRef}
+          orders={orders}
+          products={products}
+        />
       </Box>
     </>
   );
