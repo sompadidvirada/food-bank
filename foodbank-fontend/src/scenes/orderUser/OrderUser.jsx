@@ -68,11 +68,27 @@ const OrderUser = () => {
   const [status, setStatus] = useState([]);
   const [open, setOpen] = useState(false);
   const [idBranch, setIdbranch] = useState("");
+  const [orderTrack, setOrderTrack] = useState([]);
   const [value, setValue] = useState("");
   const dateConfirmOrder = useFoodBankStorage(
     (state) => state.dateConfirmOrder
   );
   const products = useFoodBankStorage((state) => state.products);
+  const orderWantFilter = Object.values(
+    orderTrack?.reduce((acc, item) => {
+      if (!acc[item.branchId]) {
+        acc[item.branchId] = {
+          branchId: item.branchId,
+          branch: item.branch,
+          totalOrderWant: 0,
+        };
+      }
+      if (item.orderWant > 0) {
+        acc[item.branchId].totalOrderWant += 1;
+      }
+      return acc;
+    }, {})
+  );
 
   const handleChange = (event) => {
     setValue(event.target.value);
@@ -166,14 +182,24 @@ const OrderUser = () => {
       console.log(err);
     }
   };
+  const handleFecthOrderTrack = async () => {
+    try {
+      const ress = await getAllOrderTrack(dateConfirmOrder, token);
+      setOrderTrack(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     if (dateConfirmOrder.orderDate) {
       fecthconfirmOrder();
+      handleFecthOrderTrack();
     }
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
+  console.log(orderWantFilter);
 
   return (
     <Box m="20px">
@@ -187,8 +213,8 @@ const OrderUser = () => {
         <CalendarOrderUser />
         <PrintCompo />
       </Box>
-      <Box sx={{ p:3}}>
-        <Typography variant="Laotext" sx={{ fontSize:20}}>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="Laotext" sx={{ fontSize: 20 }}>
           ລາຍລະອຽດອໍເດີປະຈຳວັນທີ{" "}
           {dateConfirmOrder?.orderDate
             ? (() => {
@@ -215,8 +241,12 @@ const OrderUser = () => {
                     ສາຂາ{" "}
                   </TableCell>
                   <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
+                    ຈຳນວນລາຍການທີ່ແກ້ໄຂ
+                  </TableCell>
+                  <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
                     ສະຖານະ
                   </TableCell>
+
                   <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
                     ຈັດການ
                   </TableCell>
@@ -240,6 +270,30 @@ const OrderUser = () => {
                       sx={{ fontFamily: "Noto Sans Lao" }}
                     >
                       {row.branchname}
+                    </TableCell>
+                    <TableCell align="right">
+                      {(() => {
+                        const checkOrderWant = orderWantFilter.find(
+                          (item) => item.branchId === row.id
+                        );
+                        if (!checkOrderWant) {
+                          return (
+                            <Box>
+                              <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                                ບໍ່ມີການແກ້ໄຂ
+                              </Typography>
+                            </Box>
+                          );
+                        } else {
+                          return (
+                            <Box>
+                              <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                                {checkOrderWant.totalOrderWant}
+                              </Typography>
+                            </Box>
+                          );
+                        }
+                      })()}
                     </TableCell>
                     <TableCell align="right">
                       {(() => {
