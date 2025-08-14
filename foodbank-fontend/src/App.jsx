@@ -2,19 +2,22 @@ import React from "react";
 import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import AppRoutes from "./routes/AppRoutes";
+import { SocketProvider } from "../socket-io-provider/SocketProvider";
 
 const App = () => {
   const [theme, colorMode] = useMode();
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <div className="app">
-          <AppRoutes />
-        </div>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    <SocketProvider>
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <div className="app">
+            <AppRoutes />
+          </div>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
+    </SocketProvider>
   );
 };
 

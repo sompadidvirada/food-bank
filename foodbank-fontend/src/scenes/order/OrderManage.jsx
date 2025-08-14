@@ -21,6 +21,7 @@ import {
 } from "../../api/preorder";
 import { toast, ToastContainer } from "react-toastify";
 import DialogOrder from "./component/DialogOrder";
+import { useSocket } from "../../../socket-io-provider/SocketProvider";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -30,6 +31,7 @@ const OrderManage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const products = useFoodBankStorage((state) => state.products);
+  const socket = useSocket()
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
   const [checked, setChecked] = useState(null);
@@ -672,18 +674,24 @@ const OrderManage = () => {
   };
   const handleConfirmOrderChange = async (statuss) => {
     try {
-      console.log(status.id, status);
-      const ress = await confirmOrderChange(
-        status.id,
-        { status: statuss },
-        token
-      );
-      console.log(ress);
-      setStatus(ress.data);
+      socket.emit("confirmOrderByAdmin", {
+        id: status.id, status: statuss
+      })
+      //const ress = await confirmOrderChange(
+        //status.id,
+        //{ status: statuss },
+        //token
+      //);
+      //setStatus(ress.data);
     } catch (err) {
       console.log(err);
     }
   };
+  useEffect(()=>{
+    socket.on("updateConfirmStatusOrder", (data) => {
+      setStatus(data)
+    });
+  },[])
 
   return (
     <Box m="20px">

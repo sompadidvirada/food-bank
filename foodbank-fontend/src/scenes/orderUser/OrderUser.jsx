@@ -41,6 +41,7 @@ import { changePhonenumber } from "../../api/branch";
 import { toast, ToastContainer } from "react-toastify";
 import PrintCompo from "./component/PrintCompo";
 import { format, isValid, parseISO } from "date-fns";
+import { useSocket } from "../../../socket-io-provider/SocketProvider";
 
 const URLCUSTOMER = "https://treekoff.store/customerorder";
 
@@ -72,6 +73,7 @@ const OrderUser = () => {
   const [idBranch, setIdbranch] = useState("");
   const [orderTrack, setOrderTrack] = useState([]);
   const [value, setValue] = useState("");
+  const socket = useSocket();
   const dateConfirmOrder = useFoodBankStorage(
     (state) => state.dateConfirmOrder
   );
@@ -149,6 +151,8 @@ const OrderUser = () => {
     }
   };
 
+  console.log(status);
+
   const handleChangeStatus = async (id, status) => {
     try {
       const ress = await chanheStatusOrder(id, { status: status }, token);
@@ -201,6 +205,33 @@ const OrderUser = () => {
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
+  useEffect(() => {
+    socket.on("updateConfirmStatusOrder", (data) => {
+      setStatus((prevStatus) =>
+        prevStatus.map((item) =>
+          item.id === data.id ? { ...item, ...data } : item
+        )
+      );
+    });
+    socket.on("responeConfirmOrderCustomer", (data) => {
+      setStatus((prev) => {
+        const exists = prev.some((item) => item.id === data.id);
+        if (exists) {
+          // update existing item
+          return prev.map((item) =>
+            item.id === data.id ? { ...item, ...data } : item
+          );
+        } else {
+          // add new item
+          return [...prev, data];
+        }
+      });
+    });
+
+    return () => {
+      socket.off("updateConfirmStatusOrder");
+    };
+  }, []);
 
   return (
     <Box m="20px">
@@ -389,10 +420,16 @@ const OrderUser = () => {
                                   onClick={() =>
                                     handleChangeStatus(foundStatus?.id, false)
                                   }
-                                  disabled={foundStatus?.confirmStatus ? true : false}
+                                  disabled={
+                                    foundStatus?.confirmStatus ? true : false
+                                  }
                                 >
                                   <ChangeCircleIcon
-                                    sx={{ color: foundStatus?.confirmStatus ? "none" : colors.blueAccent[200] }}
+                                    sx={{
+                                      color: foundStatus?.confirmStatus
+                                        ? "none"
+                                        : colors.blueAccent[200],
+                                    }}
                                   />
                                 </IconButton>
                               </Tooltip>
@@ -429,11 +466,12 @@ const OrderUser = () => {
                                   },
                                 }}
                               >
-                                <IconButton onClick={() => handleClickOpen(row)}>
-                                <MoreVertIcon />
-                              </IconButton>
+                                <IconButton
+                                  onClick={() => handleClickOpen(row)}
+                                >
+                                  <MoreVertIcon />
+                                </IconButton>
                               </Tooltip>
-                              
                             </Box>
                           );
                         } else {

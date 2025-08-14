@@ -28,6 +28,5 @@ router.post("/confirmorder", confirmOrder)
 router.post("/checkconfirmperbranch", checkConfirmOrderPerBranch)
 router.post("/checkconfirmall", checkConfirmOrderAll)
 router.put("/changestatusconfirm/:id",authCheck, changeStatusConfirmOrder)
-router.put("/confirmorderchange/:id", confirmOrderChange)
 
 module.exports = router;

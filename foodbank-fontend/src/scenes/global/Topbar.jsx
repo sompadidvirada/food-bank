@@ -1,4 +1,4 @@
-import { Box, IconButton, useTheme } from "@mui/material";
+import { Box, IconButton, styled, useTheme } from "@mui/material";
 import { forwardRef, useContext, useEffect, useRef, useState } from "react";
 import { ColorModeContext, tokens } from "../../theme";
 import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
@@ -15,10 +15,18 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import { useNavigate } from "react-router-dom";
+import Badge, { badgeClasses } from "@mui/material/Badge";
+import { useSocket } from "../../../socket-io-provider/SocketProvider";
 
 const Transition = forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+const CartBadge = styled(Badge)`
+  & .${badgeClasses.badge} {
+    top: -12px;
+    right: -6px;
+  }
+`;
 
 const Topbar = () => {
   const [open, setOpen] = useState(false);
@@ -28,6 +36,8 @@ const Topbar = () => {
   const navigate = useNavigate();
   const [openNotification, setOpenNotification] = useState(false);
   const menuRef = useRef(null);
+  const socket = useSocket(); // get the socket instance
+  const user = useFoodBankStorage((state) => state.user);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -73,7 +83,10 @@ const Topbar = () => {
             onClick={() => setOpenNotification((prev) => !prev)}
             sx={{ bgcolor: openNotification ? colors.primary[800] : "none" }}
           >
-            <NotificationsIcon sx={{color: openNotification ? colors.blueAccent[400] : "none"}}/>
+            <NotificationsIcon
+              sx={{ color: openNotification ? colors.blueAccent[400] : "none" }}
+            />
+            <CartBadge badgeContent={21} color="error" overlap="circular" />
           </IconButton>
           <Box
             sx={{
@@ -89,16 +102,14 @@ const Topbar = () => {
               flexDirection: "column",
             }}
           >
-            <Box>ສາຂາ ໂພນທັນ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
-            <Box>ສາຂາ ສາຍລົມ</Box>
+            <Box
+              sx={{ py: 2, borderBottom: "1px solid", cursor: "pointer" }}
+            >
+              ສາຂາ ໂພນທັນ
+            </Box>
+            <Box sx={{ py: 2, borderBottom: "1px solid", cursor: "pointer" }}>
+              ສາຂາ ສາຍລົມ
+            </Box>
           </Box>
         </Box>
 

@@ -1,6 +1,7 @@
 const prisma = require("../config/prisma");
 const { parseISO, format, startOfDay, subDays, endOfDay } = require("date-fns");
 const { utcToZonedTime, zonedTimeToUtc } = require("date-fns-tz");
+const { io } = require("../server");
 const timeZone = "Asia/Vientiane";
 
 exports.createPreorder = async (req, res) => {
@@ -58,7 +59,7 @@ exports.checkOrder = async (req, res) => {
 
 exports.updateOrderTrack = async (req, res) => {
   try {
-    console.log(req.params)
+    console.log(req.params);
     const { id } = req.params;
     const { orderCount } = req.body;
 
@@ -423,7 +424,7 @@ exports.changeStatusConfirmOrder = async (req, res) => {
       },
       data: {
         status: status,
-        confirmStatus: false
+        confirmStatus: false,
       },
     });
     res.send(ress);
@@ -433,24 +434,76 @@ exports.changeStatusConfirmOrder = async (req, res) => {
   }
 };
 
-exports.confirmOrderChange = async (req,res) => {
-  try{
-    const {id} = req.params
-    const { status } = req.body
-    console.log(id, status)
-    if(!id || status === undefined ) {
-      return res.status(400).json({ message: `emty value.`})
+//  SOCKET IO
+
+io.on("connect", (socket) => {
+  console.log("A user connected:", socket.id);
+
+  socket.on("confirmOrderByAdmin", async (data) => {
+    console.log("Received:", data);
+    // send to all clients
+    try {
+      const changeStatus = await prisma.confirmOrder.update({
+        where: {
+          id: Number(data.id),
+        },
+        data: {
+          confirmStatus: data.status,
+        },
+      });
+      io.emit("updateConfirmStatusOrder", changeStatus);
+    } catch (err) {
+      console.error("Error saving message:", err);
     }
-    const ress = await prisma.confirmOrder.update({
-      where: {
-        id: Number(id)
-      }, data: {
-        confirmStatus: status
+  });
+
+  socket.on("confirmOrderCustomer", async (data) => {
+    try {
+      const orderDate = data.orderDate;
+      const brachId = data.brachId;
+      if (!orderDate || !brachId) {
+        return io.emit("responeConfirmOrderCustomer", "emty value.");
       }
-    })
-    res.send(ress)
-  }catch(err) {
-    console.log(err)
-    return res.status(500).json({ message: `server error`})
-  }
-}
+      const formattedOrderAt = parseISO(orderDate); // already in UTC
+
+      const startofDay = new Date(orderDate);
+      const endofDay = new Date(orderDate);
+      startofDay.setUTCHours(0, 0, 0, 0);
+      endofDay.setUTCHours(23, 59, 59, 999);
+
+      const check = await prisma.confirmOrder.findFirst({
+        where: {
+          branchId: Number(brachId),
+          confirmDate: {
+            gte: startofDay,
+            lt: endofDay,
+          },
+        },
+      });
+      if (check) {
+        const update = await prisma.confirmOrder.update({
+          where: {
+            id: Number(check.id),
+          },
+          data: {
+            status: true,
+          },
+        });
+        return io.emit("responeConfirmOrderCustomer", update);
+      }
+      const ress = await prisma.confirmOrder.create({
+        data: {
+          confirmDate: formattedOrderAt,
+          branchId: Number(brachId),
+        },
+      });
+      io.emit("responeConfirmOrderCustomer", ress);
+    } catch (err) {
+      console.error("Error saving message:", err);
+    }
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});

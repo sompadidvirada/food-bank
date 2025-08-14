@@ -23,6 +23,7 @@ import {
 import { useSearchParams } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
 import DialogEditCustomerOrder from "./component/DialogEditCustomerOrder";
+import { useSocket } from "../../../socket-io-provider/SocketProvider";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -49,6 +50,7 @@ const CustomerOrder = () => {
   const [cheked, setChecked] = React.useState([]);
   const [orderCount, setOrderCount] = React.useState({});
   const [status, setStatus] = React.useState([]);
+  const socket = useSocket();
 
   function formatDate(date) {
     return `${date.getDate().toString().padStart(2, "0")}/${(
@@ -135,21 +137,31 @@ const CustomerOrder = () => {
   const handleChange = (productId, value) => {
     setOrderCount((prev) => ({ ...prev, [productId]: value }));
   };
-  const handleComfirmOrder = async() => {
-    try{
-     const ress = await confirmOrderBranch({ orderDate, brachId })
-     setStatus(ress.data)
-    }catch(err){
-      console.log(err)
+
+  const handleComfirmOrder = async () => {
+    try {
+      socket.emit("confirmOrderCustomer", {
+        orderDate: orderDate,
+        brachId: brachId,
+      });
+      //const ress = await confirmOrderBranch({ orderDate, brachId })
+      //setStatus(ress.data)
+    } catch (err) {
+      console.log(err);
     }
-  }
+  };
 
   React.useEffect(() => {
     fecthProducts();
     fecthOrderTrack();
     checkConfirmOr();
   }, []);
-console.log(cheked)
+
+  React.useEffect(() => {
+    socket.on("responeConfirmOrderCustomer", (data) => {
+      setStatus(data);
+    });
+  }, []);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -203,9 +215,9 @@ console.log(cheked)
         </Box>
       </Box>
       {status?.status ? (
-        <Box sx={{ p:5, textAlign:"center"}}>
+        <Box sx={{ p: 5, textAlign: "center" }}>
           <Typography variant="LaoText">ຢືນຢັນຈຳນວນເບເກີລີ້ສຳເລັດ.</Typography>
-          </Box>
+        </Box>
       ) : (
         <Box sx={{ m: 1 }}>
           {/* 🟩 Responsive wrapper */}
@@ -311,7 +323,7 @@ console.log(cheked)
                                   display: "flex",
                                   gap: "5px",
                                   alignItems: "center",
-                                  justifyContent:"end"
+                                  justifyContent: "end",
                                 }}
                               >
                                 <input
