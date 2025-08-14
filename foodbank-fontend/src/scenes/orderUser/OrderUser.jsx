@@ -206,32 +206,35 @@ const OrderUser = () => {
   }, [dateConfirmOrder]);
 
   useEffect(() => {
-    socket.on("updateConfirmStatusOrder", (data) => {
+    const updateHandler = (data) => {
       setStatus((prevStatus) =>
         prevStatus.map((item) =>
           item.id === data.id ? { ...item, ...data } : item
         )
       );
-    });
-    socket.on("responeConfirmOrderCustomer", (data) => {
+    };
+
+    const responseHandler = (data) => {
       setStatus((prev) => {
         const exists = prev.some((item) => item.id === data.id);
         if (exists) {
-          // update existing item
           return prev.map((item) =>
             item.id === data.id ? { ...item, ...data } : item
           );
         } else {
-          // add new item
           return [...prev, data];
         }
       });
-    });
+    };
+
+    socket.on("updateConfirmStatusOrder", updateHandler);
+    socket.on("responeConfirmOrderCustomer", responseHandler);
 
     return () => {
-      socket.off("updateConfirmStatusOrder");
+      socket.off("updateConfirmStatusOrder", updateHandler);
+      socket.off("responeConfirmOrderCustomer", responseHandler);
     };
-  }, []);
+  }, [socket]);
 
   return (
     <Box m="20px">

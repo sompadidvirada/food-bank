@@ -31,7 +31,7 @@ const OrderManage = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const products = useFoodBankStorage((state) => state.products);
-  const socket = useSocket()
+  const socket = useSocket();
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
   const [checked, setChecked] = useState(null);
@@ -108,6 +108,7 @@ const OrderManage = () => {
           <Typography
             fontSize={12}
             fontFamily="Noto Sans Lao"
+            color={colors.grey[100]}
             sx={{
               whiteSpace: "normal",
               wordBreak: "break-word", // breaks long words too
@@ -152,7 +153,15 @@ const OrderManage = () => {
           );
         } else {
           return (
-            <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "5px",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
               <input
                 type="number"
                 min="0"
@@ -675,23 +684,36 @@ const OrderManage = () => {
   const handleConfirmOrderChange = async (statuss) => {
     try {
       socket.emit("confirmOrderByAdmin", {
-        id: status.id, status: statuss
-      })
+        id: status.id,
+        status: statuss,
+      });
       //const ress = await confirmOrderChange(
-        //status.id,
-        //{ status: statuss },
-        //token
+      //status.id,
+      //{ status: statuss },
+      //token
       //);
       //setStatus(ress.data);
     } catch (err) {
       console.log(err);
     }
   };
-  useEffect(()=>{
+  useEffect(() => {
+    const updateHandler = (data) => {
+      setStatus(data);
+    };
+
     socket.on("updateConfirmStatusOrder", (data) => {
-      setStatus(data)
+      setStatus(data);
     });
-  },[])
+    socket.on("responeConfirmOrderCustomer", updateHandler);
+
+    return () => {
+      socket.off("updateConfirmStatusOrder");
+      socket.off("updateConfirmStatusOrder", updateHandler);
+    };
+  }, []);
+
+  console.log(status);
 
   return (
     <Box m="20px">
@@ -723,7 +745,9 @@ const OrderManage = () => {
             onClick={handeDeleteAll}
             color="error"
             disabled={
-              selectFormtracksell?.orderDate && selectFormtracksell?.brachId
+              selectFormtracksell?.orderDate &&
+              selectFormtracksell?.brachId &&
+              checkedOrder.length !== 0 && status.confirmStatus !== true
                 ? false
                 : true
             }

@@ -89,16 +89,32 @@ const Tracksend = () => {
       type: "text",
       headerAlign: "left",
       align: "left",
-      cellClassName: "name-column--cell",
-      flex: 0.5,
+      width: 180,
       renderCell: (params) => (
-        <Typography
-          variant="laoText"
-          fontWeight="bold"
-          color={colors.grey[100]}
+        <Box
+          display="flex"
+          alignItems="center"
+          width="100%"
+          height="100%"
+          sx={{
+            whiteSpace: "normal",
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
         >
-          {params?.value}
-        </Typography>
+          <Typography
+            fontWeight="bold"
+            fontSize={12}
+            color={colors.grey[100]}
+            sx={{
+              fontFamily: "Noto Sans Lao",
+              whiteSpace: "normal",
+              wordBreak: "break-word", // breaks long words too
+            }}
+          >
+            {params?.value}
+          </Typography>
+        </Box>
       ),
     },
     {
@@ -134,7 +150,15 @@ const Tracksend = () => {
           );
         } else {
           return (
-            <div style={{ display: "flex", gap: "5px", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                gap: "5px",
+                alignItems: "center",
+                justifyContent: "center",
+                height: "100%",
+              }}
+            >
               <input
                 type="number"
                 min="0"
