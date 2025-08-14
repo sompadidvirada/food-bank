@@ -151,7 +151,6 @@ const OrderUser = () => {
     }
   };
 
-  console.log(status);
 
   const handleChangeStatus = async (id, status) => {
     try {

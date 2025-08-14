@@ -713,7 +713,6 @@ const OrderManage = () => {
     };
   }, []);
 
-  console.log(status);
 
   return (
     <Box m="20px">
