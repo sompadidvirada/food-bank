@@ -5,7 +5,7 @@ import useFoodBankStorage from "../src/zustand/foodbank-storage";
 const SocketContext = createContext(null);
 
 export const useSocket = () => useContext(SocketContext);
-const envUrl = "http://localhost:3500";
+const envUrl = import.meta.env.VITE_API_URL;
 
 export const SocketProvider = ({ children }) => {
   const socketRef = useRef(null);
