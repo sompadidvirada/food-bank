@@ -3,6 +3,8 @@ import useFoodBankStorage from "../zustand/foodbank-storage";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { currentUser } from "../api/authen";
+import Backdrop from "@mui/material/Backdrop";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const ProtectUser = ({ element }) => {
   const [ok, setOk] = useState(null);
@@ -31,9 +33,16 @@ const ProtectUser = ({ element }) => {
     }
   }, [ok, navigate]);
 
-  if (ok === null) return null;
-
-  return element;
+  return ok === null ? (
+    <Backdrop
+      sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      open
+    >
+      <CircularProgress color="inherit" />
+    </Backdrop>
+  ) : ok === true ? (
+    element
+  ) : null; // don't render anything for false
 };
 
 export default ProtectUser;
