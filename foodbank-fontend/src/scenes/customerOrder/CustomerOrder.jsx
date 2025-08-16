@@ -355,6 +355,7 @@ const CustomerOrder = () => {
                                     appearance: "textfield",
                                     MozAppearance: "textfield",
                                     WebkitAppearance: "none",
+                                    fontSize: "16px",
                                   }}
                                 />
                                 <button
