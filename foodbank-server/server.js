@@ -27,20 +27,6 @@ app.use(
   })
 );
 
-io.use((socket, next) => {
-  const token = socket.handshake.auth.token; // from client auth
-  if (!token) {
-    return next(new Error("Authentication error: No token provided"));
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET);
-    socket.user = decoded; // store user info for later use
-    next(); // allow connection
-  } catch (err) {
-    next(new Error("Authentication error: Invalid token"));
-  }
-});
 
 app.options("*", cors()); // handle preflight
 
