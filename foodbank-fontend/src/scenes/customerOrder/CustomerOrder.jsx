@@ -123,7 +123,6 @@ const CustomerOrder = () => {
       const ress = await updateOrderNeed(prudctId.id, {
         orderWant: orderCount[id],
       });
-      console.log(ress);
       setChecked((prev) =>
         prev.map((item) =>
           item.productsId === id ? { ...item, orderWant: orderCount[id] } : item
@@ -227,7 +226,7 @@ const CustomerOrder = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ fontFamily: "Noto Sans Lao" }}>
-                      ຊື້ລາຍການ
+                      ຊື່ລາຍການ
                     </TableCell>
                     <TableCell
                       align="right"

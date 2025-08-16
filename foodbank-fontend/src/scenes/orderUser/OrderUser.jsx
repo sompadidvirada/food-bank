@@ -155,7 +155,6 @@ const OrderUser = () => {
   const handleChangeStatus = async (id, status) => {
     try {
       const ress = await chanheStatusOrder(id, { status: status }, token);
-      console.log(ress);
       setStatus((prev) =>
         prev.map((item) =>
           item.id === ress.data.id ? { ...item, ...ress.data } : item
@@ -180,7 +179,6 @@ const OrderUser = () => {
         { branchId: idBranch.id, phonenumber: value },
         token
       );
-      console.log(ress);
       getBrnachs(true);
       handleClose();
     } catch (err) {
