@@ -151,7 +151,6 @@ const OrderUser = () => {
     }
   };
 
-
   const handleChangeStatus = async (id, status) => {
     try {
       const ress = await chanheStatusOrder(id, { status: status }, token);
@@ -202,6 +201,7 @@ const OrderUser = () => {
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
+
   useEffect(() => {
     const updateHandler = (data) => {
       setStatus((prevStatus) =>
@@ -212,6 +212,16 @@ const OrderUser = () => {
     };
 
     const responseHandler = (data) => {
+      const confirmDate = new Date(data.confirmDate);
+      const orderDate = new Date(dateConfirmOrder.orderDate);
+
+      // Compare only YYYY-MM-DD
+      const confirmDateStr = confirmDate.toISOString().split("T")[0];
+      const orderDateStr = orderDate.toISOString().split("T")[0];
+
+      if (confirmDateStr !== orderDateStr) {
+        return console.log("block this confirm order cause it's not the date");
+      }
       setStatus((prev) => {
         const exists = prev.some((item) => item.id === data.id);
         if (exists) {

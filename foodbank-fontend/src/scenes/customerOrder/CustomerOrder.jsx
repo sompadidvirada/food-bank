@@ -157,9 +157,22 @@ const CustomerOrder = () => {
   }, []);
 
   React.useEffect(() => {
-    socket.on("responeConfirmOrderCustomer", (data) => {
+    const updateHandlers = (data) => {
+      const confirmDate = new Date(data.confirmDate);
+      const orderDate = new Date(order);
+
+      // Compare only YYYY-MM-DD
+      const confirmDateStr = confirmDate.toISOString().split("T")[0];
+      const orderDateStr = orderDate.toISOString().split("T")[0];
+      if (confirmDateStr !== orderDateStr) {
+        return console.log("block this confirm order cause it's not the date");
+      }
       setStatus(data);
-    });
+    };
+    socket.on("responeConfirmOrderCustomer", updateHandlers);
+    return () => {
+      socket.off("responeConfirmOrderCustomer", updateHandlers);
+    };
   }, []);
 
   return (
