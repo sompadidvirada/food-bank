@@ -202,6 +202,7 @@ const OrderUser = () => {
   }, [dateConfirmOrder]);
 
 
+
   useEffect(() => {
     const updateHandler = (data) => {
       setStatus((prevStatus) =>
@@ -212,15 +213,15 @@ const OrderUser = () => {
     };
 
     const responseHandler = (data) => {
-      const confirmDate = new Date(data.confirmDate);
-      const orderDate = new Date(dateConfirmOrder.orderDate);
+      const confirmDate = new Date(data?.confirmDate);
+      const orderDate = new Date(dateConfirmOrder?.orderDate);
 
       // Compare only YYYY-MM-DD
       const confirmDateStr = confirmDate.toISOString().split("T")[0];
       const orderDateStr = orderDate.toISOString().split("T")[0];
 
       if (confirmDateStr !== orderDateStr) {
-        return console.log("block this confirm order cause it's not the date");
+        return console.log("block this confirm order cause it's not the date", confirmDateStr, orderDateStr);
       }
       setStatus((prev) => {
         const exists = prev.some((item) => item.id === data.id);
@@ -241,7 +242,7 @@ const OrderUser = () => {
       socket.off("updateConfirmStatusOrder", updateHandler);
       socket.off("responeConfirmOrderCustomer", responseHandler);
     };
-  }, [socket]);
+  }, [socket,dateConfirmOrder]);
 
   return (
     <Box m="20px">
