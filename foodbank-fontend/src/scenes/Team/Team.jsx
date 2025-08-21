@@ -547,7 +547,7 @@ const Team = () => {
             height="100%"
           >
             <Tooltip
-              title="ລົບລະຫັດຜ່ານ"
+              title="ລົບຢູເຊີພະນັກງານ"
               arrow
               placement="top"
               componentsProps={{

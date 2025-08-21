@@ -133,7 +133,7 @@ const OrderUser = () => {
     const phoneNumber = `85620${phone}`;
 
     // Keep URL as-is (encoded), no decodeURIComponent here
-    const message = `ນີ້ແມ່ນລີ້ງກວດລາຍການຂະໜົມ (ແກ້ໄຂໄດ້ບໍ່ເກີນ 12:00): ${url}`;
+    const message = `ນີ້ແມ່ນລີ້ງກວດລາຍການຂະໜົມ (ແກ້ໄຂໄດ້ບໍ່ເກີນ 10:30): ${url}`;
 
     const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(
       message
