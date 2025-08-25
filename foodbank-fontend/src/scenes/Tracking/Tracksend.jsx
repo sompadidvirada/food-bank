@@ -36,6 +36,7 @@ const Tracksend = () => {
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
   const [openImageModal, setOpenImageModal] = useState(false);
+  const [productDetail, setProductDetail] = useState([]);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState(null);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
@@ -240,7 +241,8 @@ const Tracksend = () => {
     /** function insert tracking to database */
   }
 
-  const handleSetSendCount = async (productId, externalSendCount = null) => {
+  const handleSetSendCount = async (productId, externalSendCount = null,
+    productOverride = null) => {
     const countToUse =
       externalSendCount !== null ? externalSendCount : sendCounts[productId];
 
@@ -253,10 +255,21 @@ const Tracksend = () => {
       return;
     }
 
+      // get product (either from override or lookup)
+    const product = productOverride || products.find((p) => p.id === productId);
+
+    if (!product) {
+      console.warn(`⚠️ Product with ID ${productId} not found`);
+      return;
+    }
+
+
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      sendCount: countToUse, // ✅ this is either externalSendCount or sendCounts[productId]
+      sendCount: countToUse, 
+      price: product?.price,
+      sellPrice: product?.sellprice
     };
 
     setSelectFormtracksell(updatedForm);
@@ -284,6 +297,7 @@ const Tracksend = () => {
     try {
       const ress = await deleteTrackSend(selectDateBrachCheck, token);
       fetchDateBrachCheck();
+      toast.success(`ລ້າງລາຍການຈັດສົ່ງສຳເລັດ`)
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -331,6 +345,8 @@ const Tracksend = () => {
 
   const handleChange = (productId, value) => {
     setSellCounts((prev) => ({ ...prev, [productId]: value }));
+    const selectedProduct = products.find((p) => p.id === productId);
+    setProductDetail(selectedProduct || null);
   };
 
   return (

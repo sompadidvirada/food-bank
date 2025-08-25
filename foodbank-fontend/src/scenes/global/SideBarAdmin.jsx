@@ -20,20 +20,25 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Editprofile from "./component/Editprofile";
 import MapIcon from "@mui/icons-material/Map";
 import FastfoodIcon from "@mui/icons-material/Fastfood";
-import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import ArticleIcon from "@mui/icons-material/Article";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import CoffeeIcon from '@mui/icons-material/Coffee';
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
 import LeaderboardIcon from "@mui/icons-material/Leaderboard";
 import DonutLargeIcon from "@mui/icons-material/DonutLarge";
 import ShowChartIcon from "@mui/icons-material/ShowChart";
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import GradeIcon from "@mui/icons-material/Grade";
 
-const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
+const URL =
+  "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -173,7 +178,64 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
-
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ຈັດການວັດຖຸດິບ
+            </Typography>
+            <Item
+              title="ຈັດການວັດຖຸດິບ"
+              to="/admin/rawmaterial"
+              icon={<ManageSearchIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຄີຍອດເບີກວັດຖຸດິບ"
+              to="/admin/insertstockrequisition"
+              icon={<CoffeeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ລາຍງານຍອດເບີກວັດຖຸດິບ"
+              to="/admin/stockrequisitionreport"
+              icon={<ArticleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ຈັດການເມນູ TREEKOFF
+            </Typography>
+            <Item
+              title="ຈັດການເມນູ"
+              to="/admin/coffeemenu"
+              icon={<ArticleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຄີຍອດຂາຍ TREEKOFF"
+              to="/admin/insertcoffeesell"
+              icon={<ArticleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title=" REPORT TREEKOFF"
+              to="/admin/reporttreekoffuse"
+              icon={<ArticleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}
@@ -263,6 +325,7 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}

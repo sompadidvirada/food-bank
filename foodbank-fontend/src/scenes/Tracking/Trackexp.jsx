@@ -38,6 +38,7 @@ const Trackexp = () => {
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
+  const [productDetail, setProductDetail] = useState([])
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState(null);
@@ -257,6 +258,8 @@ const Trackexp = () => {
       ...selectFormtracksell,
       productId,
       expCount: expCounts[productId],
+      price: productDetail?.price,
+      sellPrice: productDetail?.sellprice
     };
 
     setSelectFormtracksell(updatedForm);
@@ -331,6 +334,8 @@ const Trackexp = () => {
 
   const handleChange = (productId, value) => {
     setSellCounts((prev) => ({ ...prev, [productId]: value }));
+    const selectProductDetail = products.find((p)=> p.id === productId)
+    setProductDetail(selectProductDetail || null)
   };
 
   return (

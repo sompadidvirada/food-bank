@@ -260,7 +260,7 @@ const ReportPerBranch = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center">
+    <Box m="20px">
       <Header title="ລາຍງານການ ຈັດສົ່ງ ຂາຍ ໝົດອາຍຸ ແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
@@ -277,8 +277,8 @@ const ReportPerBranch = () => {
             gap="20px"
           >
             <Calendar />
-            <Button variant="contained" onClick={handleFilter}>
-              FILTER DATA
+            <Button variant="contained" sx={{ fontFamily:"Noto Sans Lao"}} color="warning" onClick={handleFilter}>
+              ແຍກລາຍການທີ່ບໍ່ໄດ້ຈັດສົ່ງ
             </Button>
           </Box>
         </Box>
@@ -329,7 +329,7 @@ const ReportPerBranch = () => {
             >
               {processedData.map((branch) => (
                 <LazyBranchDataGrid
-                  key={`${branch.id}-${filterData}`} // 👈 key changes when filterData changes
+                  key={`${branch.id}-${filterData}`}
                   branch={branch}
                   columns={columns}
                 />

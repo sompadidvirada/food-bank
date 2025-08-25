@@ -127,8 +127,13 @@ const DataGrind = ({ branch, columns }) => {
               EXP {branch?.totalExp?.toLocaleString() || ""} ກີບ
             </Typography>
             <Box>
-              <Button variant="contained" color="success" onClick={handlePrint}>
-                Print
+              <Button
+                variant="contained"
+                color="info"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+                onClick={handlePrint}
+              >
+                ປິ່ນສະຫລຸບ
               </Button>
             </Box>
           </Box>
@@ -153,11 +158,11 @@ const DataGrind = ({ branch, columns }) => {
         >
           <FilterIcon />
         </IconButton>
-        {
-          filteredImages.length === 0 && (
-            <Typography variant="laoText" color="red">ບໍ່ມີຮູບພາບ.</Typography>
-          )
-        }
+        {filteredImages.length === 0 && (
+          <Typography variant="laoText" color="red">
+            ບໍ່ມີຮູບພາບ.
+          </Typography>
+        )}
       </Box>
       <DataGrid
         rows={branch.rowsWithPercent}

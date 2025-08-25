@@ -16,7 +16,11 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const UploadPdf = ({ handleSetSellCount, setSellCounts, selectDateBrachCheck }) => {
+const UploadPdf = ({
+  handleSetSellCount,
+  setSellCounts,
+  selectDateBrachCheck,
+}) => {
   const products = useFoodBankStorage((state) => state.products);
 
   const handleFileUpload = async (event) => {
@@ -56,10 +60,8 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts, selectDateBrachCheck }) 
 
           if (!isNaN(item) && menu && !isNaN(sellCount)) {
             extracted.push({
-              item,
-              menu,
+              product,
               sellCount,
-              type,
               productId: product.id,
             });
           }
@@ -74,9 +76,12 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts, selectDateBrachCheck }) 
       }));
 
       setTimeout(() => {
-        handleSetSellCount(entry.productId, entry.sellCount);
+        handleSetSellCount(entry.productId, entry.sellCount, entry.product);
       }, 150);
     });
+
+    event.target.value = "";
+    toast.success('ອັປໂຫລດຟາຍຍອດຂາຍສຳເລັດ.')
   };
 
   return (
@@ -87,7 +92,11 @@ const UploadPdf = ({ handleSetSellCount, setSellCounts, selectDateBrachCheck }) 
         variant="contained"
         color="info"
         tabIndex={-1}
-        disabled={selectDateBrachCheck?.sellDate && selectDateBrachCheck?.brachId ? false : true}
+        disabled={
+          selectDateBrachCheck?.sellDate && selectDateBrachCheck?.brachId
+            ? false
+            : true
+        }
         startIcon={<AttachFileIcon />}
         sx={{ fontFamily: "Noto Sans Lao" }}
       >

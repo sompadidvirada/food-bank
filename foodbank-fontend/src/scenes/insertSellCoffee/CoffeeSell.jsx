@@ -7,58 +7,133 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
-import Calendar from "./component/Calendar";
-import SelectBranch from "./component/SelectBranch";
-import { DataGrid } from "@mui/x-data-grid";
-import CloseIcon from "@mui/icons-material/Close";
 import { toast, ToastContainer } from "react-toastify";
+import { useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
+import CloseIcon from "@mui/icons-material/Close";
+import { getCoffeeMenu } from "../../api/coffeeMenu";
+import { useEffect } from "react";
+import CalendarCoffeeSell from "./component/CalendarCoffeeSell";
+import SelectBracnhCoffeeSell from "./component/SelectBracnhCoffeeSell";
+import { DataGrid } from "@mui/x-data-grid";
 import {
-  checkImages,
-  checkTrackSell,
-  deleteTrackSell,
-  insertTracksell,
-} from "../../api/tracking";
-import DialogEditSell from "./component/DialogEditSell";
-import UploadImage from "./component/UploadImage";
-import UploadPdf from "./component/UploadPdf";
+  checkCoffeeSell,
+  deleteAllCoffeeSell,
+  insertCoffeeSell,
+} from "../../api/coffeeSell";
+import EditCoffeeSell from "./component/EditCoffeeSell";
+import UploadFile from "./component/UploadFile";
 const URL =
-  "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
+  "https://treekoff-storage-coffee-menu.s3.ap-southeast-2.amazonaws.com";
 
-const Tracksell = () => {
+const CoffeeSell = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
-  const products = useFoodBankStorage((state) => state.products);
-  const getProduct = useFoodBankStorage((state) => state.getProduct);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
-  const [checked, setChecked] = useState(null);
-  const [checkImage, setCheckImage] = useState([]);
-  const [productDetial, setProductDetial] = useState([]);
-  const [selectFormtracksell, setSelectFormtracksell] = useState({
+  const [coffeeMenu, setCoffeeMenu] = useState([]);
+  const [checked, setChecked] = useState([]);
+  const [sendCounts, setSendCounts] = useState({});
+  const [selectFormtracksend, setSelectFormtracksend] = useState({
+    coffeeMenuId: "",
     sellCount: "",
-    sellAt: "",
-    userId: user.id,
-    productId: "",
+    sellDate: "",
     brachId: "",
   });
   const [selectDateBrachCheck, setSelectDateBrachCheck] = useState({
     sellDate: "",
     brachId: "",
   });
-  const [sellCounts, setSellCounts] = useState({});
 
-  {
-    /** column for DataGrid  */
-  }
+  const handleImageClick = (imageUrl) => {
+    setSelectedImageUrl(imageUrl);
+    setOpenImageModal(true);
+  };
+  const handleCloseImageModal = () => {
+    setOpenImageModal(false);
+    setSelectedImageUrl(null);
+  };
+
+  const fecthCoffeeMenu = async () => {
+    try {
+      const ress = await getCoffeeMenu(token);
+      setCoffeeMenu(ress.data);
+    } catch (err) {
+      console.log(err);
+      toast.error(`erorr.`);
+    }
+  };
+
+  const fecthCoffeeSell = async () => {
+    try {
+      const ress = await checkCoffeeSell(selectDateBrachCheck, token);
+      setChecked(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleSetSell = async (
+    menuId,
+    count = null,
+    productOverride = null
+  ) => {
+    const countToUse = count !== null ? count : sendCounts[menuId];
+
+    if (
+      selectFormtracksend.sellDate === "" ||
+      selectFormtracksend.brachId === ""
+    ) {
+      return;
+    }
+
+    // get product (either from override or lookup)
+    const menu = productOverride || coffeeMenu.find((p) => p.id === menuId);
+
+    if (!menu) {
+      console.warn(`⚠️ Product with ID ${menuId} not found`);
+      return;
+    }
+
+    const updatedForm = {
+      ...selectFormtracksend,
+      coffeeMenuId: menu.id,
+      sellCount: countToUse,
+    };
+    try {
+      const ress = await insertCoffeeSell(updatedForm, token);
+      setChecked((prev) => [...prev, ress.data]);
+      setSendCounts((prev) => ({ ...prev, [menuId]: "" }));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleChange = (menuId, value) => {
+    setSendCounts((prev) => ({ ...prev, [menuId]: value }));
+  };
+
   useEffect(() => {
-    getProduct(true);
-  }, []);
+    if (selectDateBrachCheck.sellDate && selectDateBrachCheck.brachId) {
+      fecthCoffeeSell();
+    }
+    fecthCoffeeMenu();
+  }, [token, selectDateBrachCheck]);
+
+  const handleDeleteAll = async () => {
+    try {
+      const ress = await deleteAllCoffeeSell(selectDateBrachCheck, token);
+      setChecked([]);
+      toast.success(`ລ້າງຂໍ້ມູນສຳເລັດ.`);
+    } catch (err) {
+      console.log(err);
+      toast.error(`ລອງໃຫ່ມພາຍຫຼັງ.`);
+    }
+  };
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", flex: 0.2 },
@@ -95,43 +170,79 @@ const Tracksell = () => {
       headerAlign: "left",
       align: "left",
       width: 180,
-      renderCell: (params) => (
-        <Box
-          display="flex"
-          alignItems="center"
-          width="100%"
-          height="100%"
-          sx={{
-            whiteSpace: "normal",
-            wordWrap: "break-word",
-            overflowWrap: "break-word",
-          }}
-        >
-          <Typography
-            fontWeight="bold"
-            fontSize={12}
-            color={colors.grey[100]}
+      renderCell: (params) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
             sx={{
-              fontFamily: "Noto Sans Lao",
               whiteSpace: "normal",
-              wordBreak: "break-word", // breaks long words too
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
             }}
           >
-            {params?.value}
-          </Typography>
-        </Box>
-      ),
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {params.value}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "size",
+      headerName: "ຂະໜາດຈອກ",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 180,
+      renderCell: (params) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {params.value}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "manage",
       headerName: "ຈຳນວນທີ່ໄດ້ຂາຍ",
       flex: 0.5,
       renderCell: (params) => {
-        const productId = params.row.id;
+        const menuId = params.row.id;
 
-        // Find the tracked product in `checked`
+        // Find the tracked menu ID in `checked`
         const trackedProduct = checked?.find(
-          (item) => item?.productsId === productId
+          (item) => item?.coffeeMenuId === menuId
         );
         if (trackedProduct) {
           return (
@@ -145,11 +256,9 @@ const Tracksell = () => {
               >
                 ຍອດທີ່ບັນທືກ. ({trackedProduct.sellCount})
               </span>
-              <DialogEditSell
+              <EditCoffeeSell
                 trackedProduct={trackedProduct}
-                selectFormtracksell={selectFormtracksell}
-                setSelectFormtracksell={setSelectFormtracksell}
-                fetchDateBrachCheck={fetchDateBrachCheck}
+                setChecked={setChecked}
               />
             </Box>
           );
@@ -167,12 +276,12 @@ const Tracksell = () => {
               <input
                 type="number"
                 min="0"
-                value={sellCounts[productId] || ""}
+                value={sendCounts[menuId] || ""}
                 onChange={(e) =>
-                  handleChange(productId, Math.max(0, e.target.value))
+                  handleChange(menuId, Math.max(0, e.target.value))
                 }
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetSellCount(productId);
+                  if (e.key === "Enter") handleSetSell(menuId);
                   if (e.key === "ArrowUp" || e.key === "ArrowDown")
                     e.preventDefault(); // Prevent up/down arrows
                 }}
@@ -189,7 +298,7 @@ const Tracksell = () => {
                 }}
               />
               <button
-                onClick={() => handleSetSellCount(productId)}
+                onClick={() => handleSetSell(menuId)}
                 style={{
                   background: "#4CAF50",
                   color: "white",
@@ -206,157 +315,11 @@ const Tracksell = () => {
         }
       },
     },
-    {
-      field: "category",
-      headerName: "ໝວດໝູ່",
-      type: "text",
-      headerAlign: "left",
-      flex: 0.5,
-      align: "left",
-      renderCell: (params) => {
-        return params.row.category ? (
-          <Typography
-            variant="laoText"
-            fontWeight="bold"
-            color={colors.grey[100]}
-          >
-            {params.row.category.name}
-          </Typography>
-        ) : (
-          "No Category"
-        );
-      },
-    },
-    {
-      field: "price",
-      type: "number",
-      headerName: "ລາຄາຕົ້ນທືນ",
-      flex: 0.5,
-    },
-    {
-      field: "sellprice",
-      type: "number",
-      headerName: "ລາຄາຂາຍ",
-      flex: 0.5,
-    },
   ];
-
-  {
-    /** function insert tracking to database */
-  }
-
-  const handleSetSellCount = async (
-    productId,
-    count = null,
-    productOverride = null
-  ) => {
-    const countToUse =
-      count !== null ? count : sellCounts[productId];
-
-    if (
-      selectFormtracksell.sendAt === "" ||
-      selectFormtracksell.brachId === ""
-    ) {
-      return;
-    }
-
-    // get product (either from override or lookup)
-    const product = productOverride || products.find((p) => p.id === productId);
-
-    if (!product) {
-      console.warn(`⚠️ Product with ID ${productId} not found`);
-      return;
-    }
-
-    const updatedForm = {
-      ...selectFormtracksell,
-      productId,
-      sendCount: count,
-      sellCount: countToUse,
-      price: product.price,
-      sellPrice: product.sellprice,
-    };
-
-    setSelectFormtracksell(updatedForm);
-
-    try {
-      const ress = await insertTracksell(updatedForm, token);
-
-      setChecked((prevChecked) => [
-        ...prevChecked,
-        { productsId: productId, sellCount: countToUse },
-      ]);
-
-      setSellCounts((prev) => ({ ...prev, [productId]: "" }));
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  {
-    /**function delete all the tracking from the date user selected */
-  }
-
-  const handeDeleteAll = async () => {
-    try {
-      const ress = await deleteTrackSell(selectDateBrachCheck, token);
-      fetchDateBrachCheck();
-      toast.success(`ລ້າງຍອດຂາຍຂອງມື້ນີ້ສຳເລັດ.`)
-    } catch (err) {
-      console.log(err);
-      toast.error("error");
-    }
-  };
-
-  {
-    /** function open modal image  */
-  }
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
-  {
-    /** fucntion fecth the tracking from the database */
-  }
-
-  const fetchDateBrachCheck = async () => {
-    // Ensure that both branch ID and sell date are available
-    if (selectDateBrachCheck.brachId && selectDateBrachCheck.sellDate) {
-      try {
-        const res = await checkTrackSell(selectDateBrachCheck, token);
-        const imageTrackCheck = await checkImages(selectDateBrachCheck, token);
-        setChecked(res.data);
-        setCheckImage(imageTrackCheck.data);
-      } catch (error) {
-        console.error("Error fetching branch check:", error);
-      }
-    }
-  };
-
-  {
-    /**running the function event to fecth the tracking data from database */
-  }
-
-  useEffect(() => {
-    fetchDateBrachCheck();
-  }, [selectDateBrachCheck.brachId, selectDateBrachCheck.sellDate]);
-
-  {
-    /** function handlechange for input insert tracking*/
-  }
-
-  const handleChange = (productId, value) => {
-    setSellCounts((prev) => ({ ...prev, [productId]: value }));
-  };
 
   return (
     <Box m="20px">
-      <Header title="ຄີຍອດຂາຍແຕ່ລະສາຂາ" />
+      <Header title="ຄີຍອດຂາຍ TREEKOFF ແຕ່ລະສາຂາ" />
       <Box
         mt="30px"
         display="grid"
@@ -364,8 +327,6 @@ const Tracksell = () => {
         gridAutoRows="60px"
         gap="20px"
       >
-        {/** Section 1  select calendar and select branches. */}
-
         <Box gridColumn="span 1" backgroundColor={colors.primary[400]}>
           <Box
             display="flex"
@@ -374,26 +335,24 @@ const Tracksell = () => {
             gap="20px"
           >
             <Box>
-              <Calendar
-                selectFormtracksell={selectFormtracksell}
-                setSelectFormtracksell={setSelectFormtracksell}
+              <CalendarCoffeeSell
+                setSelectFormtracksend={setSelectFormtracksend}
                 setSelectDateBrachCheck={setSelectDateBrachCheck}
               />
             </Box>
             <Box>
-              <SelectBranch
-                selectFormtracksell={selectFormtracksell}
-                setSelectFormtracksell={setSelectFormtracksell}
+              <SelectBracnhCoffeeSell
+                setSelectFormtracksend={setSelectFormtracksend}
                 setSelectDateBrachCheck={setSelectDateBrachCheck}
               />
             </Box>
             <Box>
               <Button
                 variant="contained"
-                onClick={handeDeleteAll}
                 color="error"
+                onClick={handleDeleteAll}
                 disabled={
-                  selectFormtracksell?.sellAt && selectFormtracksell?.brachId
+                  selectDateBrachCheck.sellDate && selectDateBrachCheck.brachId
                     ? false
                     : true
                 }
@@ -402,17 +361,16 @@ const Tracksell = () => {
               </Button>
             </Box>
             <Box>
-              <UploadPdf
-                setSellCounts={setSellCounts}
-                handleSetSellCount={handleSetSellCount}
+              <UploadFile
+                handleSetSell={handleSetSell}
                 selectDateBrachCheck={selectDateBrachCheck}
+                coffeeMenu={coffeeMenu}
               />
             </Box>
           </Box>
         </Box>
 
         {/**Section 2 insert data */}
-
         <Box
           sx={{
             height: "100vh",
@@ -444,21 +402,11 @@ const Tracksell = () => {
             },
           }}
         >
-          {selectFormtracksell.sellAt && selectFormtracksell.brachId ? (
+          {/**DATAGRID */}
+          {selectFormtracksend.sellDate && selectFormtracksend.brachId ? (
             <Box>
-              <UploadImage
-                selectFormtracksell={selectFormtracksell}
-                checkImage={checkImage}
-                setCheckImage={setCheckImage}
-              />
               <DataGrid
-                rows={products?.filter((product) =>
-                  product.available?.some(
-                    (item) =>
-                      item.aviableStatus === true &&
-                      item.branchId === selectFormtracksell.brachId
-                  )
-                )}
+                rows={coffeeMenu}
                 columns={columns}
                 autoHeight
                 hideFooter
@@ -467,7 +415,7 @@ const Tracksell = () => {
                   "& .MuiDataGrid-columnHeaders": {
                     fontFamily: "Noto Sans Lao",
                     fontWeight: "bold", // optional
-                    fontSize: "16px", // optional
+                    fontSize: "14px", // optional
                   },
                 }}
               />
@@ -485,6 +433,7 @@ const Tracksell = () => {
           )}
         </Box>
       </Box>
+      <ToastContainer position="top-center" />
       {/** image modal */}
       <Dialog
         open={openImageModal}
@@ -518,11 +467,8 @@ const Tracksell = () => {
           )}
         </DialogContent>
       </Dialog>
-      {/* Snackbar for success message */}
-
-      <ToastContainer position="top-center" />
     </Box>
   );
 };
 
-export default Tracksell;
+export default CoffeeSell;

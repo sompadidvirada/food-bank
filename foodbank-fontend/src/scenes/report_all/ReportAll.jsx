@@ -30,9 +30,7 @@ const ReportAll = () => {
     const imageUrls = Array.isArray(totalData?.totalDetail)
       ? totalData.totalDetail
           .flatMap((item) => item.detail || [])
-          .map((item) =>
-            item.image ? `${URL}/${item.image}` : null
-          )
+          .map((item) => (item.image ? `${URL}/${item.image}` : null))
           .filter(Boolean)
       : [];
 
@@ -61,12 +59,12 @@ const ReportAll = () => {
 
   const columns = useMemo(
     () => [
-      { field: "id", headerName: "ໄອດີ", flex: 0.2 },
+      { field: "id", headerName: "ໄອດີ", flex: 0.1 },
       {
         field: "image",
         headerName: "ຮູບພາບ",
         headerAlign: "center",
-        flex: 0.2,
+        flex: 0.3,
         renderCell: (params) => {
           const imageUrl = params.row.image
             ? `${URL}/${params.row.image}`
@@ -376,8 +374,8 @@ const ReportAll = () => {
   };
 
   return (
-    <Box m="20px" textAlign="center" sx={{ paddingBottom: "60px" }}>
-      <Header title="TRACKING EVERY BRANCH SALE AND EXPIRE" />
+    <Box m="20px" sx={{ paddingBottom: "60px" }}>
+      <Header title="ຕິດຕາມຍອດຂາຍ ສົ່ງ ໝົດອາຍຸຂອງທຸກລາຍການ ທຸກສາຂາ." />
       <Box
         mt="30px"
         display="grid"
@@ -393,8 +391,13 @@ const ReportAll = () => {
             gap="20px"
           >
             <Calendar />
-            <Button variant="contained" color="success" onClick={handlePrint}>
-              Print
+            <Button
+              variant="contained"
+              color="info"
+              onClick={handlePrint}
+              sx={{ fontFamily: "Noto Sans Lao" }}
+            >
+              ປິ່ນລາຍງານ
             </Button>
           </Box>
         </Box>

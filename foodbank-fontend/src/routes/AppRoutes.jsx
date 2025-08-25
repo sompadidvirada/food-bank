@@ -27,6 +27,12 @@ import UploadS3 from "../scenes/upload/UploadS3";
 import OrderManage from "../scenes/order/OrderManage";
 import CustomerOrder from "../scenes/customerOrder/CustomerOrder";
 import OrderUser from "../scenes/orderUser/OrderUser";
+import ManageRawMaterial from "../scenes/rawMaterial/ManageRawMaterial";
+import StockRequisition from "../scenes/stockRequisition/StockRequisition";
+import ReportStockReqiosition from "../scenes/reportStockRequisition/ReportStockReqiosition";
+import CoffeeMenu from "../scenes/coffeeMenu/CoffeeMenu";
+import CoffeeSell from "../scenes/insertSellCoffee/CoffeeSell";
+import ReportTreekoffUse from "../scenes/reportTreekoffUse/ReportTreekoffUse";
 
 const router = createBrowserRouter([
   {
@@ -61,6 +67,12 @@ const router = createBrowserRouter([
       { path: "uploadimage", element: <UploadS3 /> },
       { path: "order", element: <OrderManage /> },
       { path: "allorder", element: <OrderUser /> },
+      { path: "rawmaterial", element: <ManageRawMaterial /> },
+      { path: "insertstockrequisition", element: <StockRequisition /> },
+      { path: "stockrequisitionreport", element: <ReportStockReqiosition /> },
+      { path: "coffeemenu", element: <CoffeeMenu /> },
+      { path: "insertcoffeesell", element: <CoffeeSell /> },
+      { path: "reporttreekoffuse", element: <ReportTreekoffUse /> },
     ],
   },
   {

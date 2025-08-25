@@ -61,8 +61,7 @@ const UploadSend = ({
 
         if (!isNaN(item) && name && !isNaN(sendCount) && product) {
           sendData.push({
-            item,
-            name,
+            product,
             sendCount,
             productId: product.id,
           });
@@ -78,9 +77,13 @@ const UploadSend = ({
       }));
 
       setTimeout(() => {
-        handleSetSendCount(entry.productId, entry.sendCount); // ✅ pass the value directly
+        handleSetSendCount(entry.productId, entry.sendCount, entry.product); // ✅ pass the value directly
       }, 150);
     });
+
+    
+    event.target.value = "";
+    toast.success('ອັປໂຫລດຟາຍຍອດຈັດສົ່ງສຳເລັດ.')
   };
 
   return (

@@ -86,7 +86,7 @@ const Topbar = () => {
             <NotificationsIcon
               sx={{ color: openNotification ? colors.blueAccent[400] : "none" }}
             />
-            <CartBadge badgeContent={21} color="error" overlap="circular" />
+            <CartBadge badgeContent={0} color="error" overlap="circular" />
           </IconButton>
           <Box
             sx={{

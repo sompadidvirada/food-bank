@@ -33,21 +33,23 @@ model staff {
 }
 
 model branch {
-  id           Int                @id @unique @default(autoincrement())
-  branchname   String
-  latitude     Float              @default(17.97790669567272) // Add this
-  longitude    Float              @default(102.62220237805069) // Add this
-  staff        staff[]
-  phonenumber  String?
-  province     String             @default("ນະຄອນຫຼວງວຽງຈັນ")
-  aviable      Boolean            @default(true)
-  tracksell    tracksell[]
-  tracksend    tracksend[]
-  trackexp     trackexp[]
-  available    availableproduct[]
-  imageTrack   imageTrack[]
-  order        orderTrack[]
-  confirmOrder confirmOrder[]
+  id               Int                @id @unique @default(autoincrement())
+  branchname       String
+  latitude         Float              @default(17.97790669567272) // Add this
+  longitude        Float              @default(102.62220237805069) // Add this
+  staff            staff[]
+  phonenumber      String?
+  province         String             @default("ນະຄອນຫຼວງວຽງຈັນ")
+  aviable          Boolean            @default(true)
+  tracksell        tracksell[]
+  tracksend        tracksend[]
+  trackexp         trackexp[]
+  available        availableproduct[]
+  imageTrack       imageTrack[]
+  order            orderTrack[]
+  confirmOrder     confirmOrder[]
+  stockRequisition stockRequisition[]
+  coffeeSell       coffeeSell[]
 }
 
 model products {
@@ -89,6 +91,8 @@ model tracksell {
   id         Int      @id @unique @default(autoincrement())
   sellCount  Int
   sellAt     DateTime
+  price      Int?
+  sellPrice  Int?
   sellDay    String
   products   products @relation(fields: [productsId], references: [id])
   productsId Int
@@ -105,6 +109,8 @@ model tracksend {
   sendCount  Int
   sendAt     DateTime
   sendDay    String
+  price      Int?
+  sellPrice  Int?
   products   products @relation(fields: [productsId], references: [id])
   productsId Int
   staff      staff    @relation(fields: [staffId], references: [id])
@@ -120,6 +126,8 @@ model trackexp {
   expCount   Int
   expAt      DateTime
   expDay     String
+  price      Int?
+  sellPrice  Int?
   products   products @relation(fields: [productsId], references: [id])
   productsId Int
   staff      staff    @relation(fields: [staffId], references: [id])
@@ -170,4 +178,95 @@ model confirmOrder {
   confirmStatus Boolean  @default(false)
   branch        branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
   branchId      Int
+}
+
+model rawMaterial {
+  id                 Int               @id @unique @default(autoincrement())
+  name               String
+  image              String?
+  sizeUnit           String
+  description        String?
+  isActive           Boolean           @default(true)
+  createAt           DateTime          @default(now())
+  materialVariant    materialVariant[]
+  categoryMeterail   categoryMeterail  @relation(fields: [categoryMeterailId], references: [id])
+  categoryMeterailId Int
+}
+
+model categoryMeterail {
+  id          Int           @id @default(autoincrement())
+  name        String
+  rawMaterial rawMaterial[]
+}
+
+model materialVariant {
+  id               Int                      @id @default(autoincrement())
+  rawMaterial      rawMaterial              @relation(fields: [rawMaterialId], references: [id], onDelete: Cascade)
+  rawMaterialId    Int
+  variantName      String
+  quantityInParent Int?
+  parentVariantId  Int?
+  costPriceKip     Float?
+  sellPriceKip     Float?
+  costPriceBath    Float?
+  sellPriceBath    Float?
+  barcode          String?
+  createdAt        DateTime                 @default(now())
+  parentVariant    materialVariant?         @relation("VariantParent", fields: [parentVariantId], references: [id], onDelete: Cascade)
+  childVariants    materialVariant[]        @relation("VariantParent")
+  stockRequisition stockRequisition[]
+  recipeItem       coffeeRecipeIngredient[]
+}
+
+model stockRequisition {
+  id                  Int             @id @default(autoincrement())
+  materialVariant     materialVariant @relation(fields: [materialVariantId], references: [id], onDelete: Cascade)
+  materialVariantId   Int
+  quantityRequisition Int
+  unitPriceKip        Float?
+  unitSellPriceKip    Float?
+  totalPriceKip       Float?
+  unitPriceBath       Float?
+  unitSellPriceBath   Float?
+  totalPriceBath      Float?
+  requisitionDate     DateTime
+  branch              branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  branchId            Int
+
+  @@unique([materialVariantId, branchId, requisitionDate])
+}
+
+model coffeeMenu {
+  id          Int                      @id @unique @default(autoincrement())
+  name        String
+  description String?
+  size        String?
+  image       String?
+  type        String?
+  newMEnu     Boolean @default(false)
+  createAt    DateTime                 @default(now())
+  recipeItem  coffeeRecipeIngredient[]
+  coffeeSell  coffeeSell[]
+}
+
+model coffeeRecipeIngredient {
+  id                Int             @id @unique @default(autoincrement())
+  quantity          Float
+  unit              String
+  coffeeMenu        coffeeMenu      @relation(fields: [coffeeMenuId], references: [id], onDelete: Cascade)
+  coffeeMenuId      Int
+  materialVariant   materialVariant @relation(fields: [materialVariantId], references: [id], onDelete: Cascade)
+  materialVariantId Int
+}
+
+model coffeeSell {
+  id           Int        @id @default(autoincrement())
+  sellCount    Int
+  sellDate     DateTime
+  coffeeMenu   coffeeMenu @relation(fields: [coffeeMenuId], references: [id])
+  coffeeMenuId Int
+  branch       branch     @relation(fields: [branchId], references: [id])
+  branchId     Int
+
+  @@unique([sellDate, coffeeMenuId, branchId])
 }

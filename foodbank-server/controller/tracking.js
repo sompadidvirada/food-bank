@@ -113,8 +113,8 @@ exports.checkTrackExp = async (req, res) => {
 
 exports.insertTrackSell = async (req, res) => {
   try {
-    const { sellCount, sellAt, userId, productId, brachId } = req.body;
-    if (!sellCount || !sellAt || !brachId || !userId || !productId) {
+    const { sellCount, sellAt, userId, productId, brachId, price, sellPrice } = req.body;
+    if (!sellCount || !sellAt || !brachId || !userId || !productId || !price || !sellPrice) {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedsellAt = parseISO(sellAt); // already in UTC
@@ -151,6 +151,8 @@ exports.insertTrackSell = async (req, res) => {
           productsId: Number(productId),
           staffId: Number(userId),
           branchId: Number(brachId),
+          price: Number(price),
+          sellPrice:Number(sellPrice)
         },
       });
       return ress;
@@ -163,9 +165,9 @@ exports.insertTrackSell = async (req, res) => {
 };
 exports.insertTrackSend = async (req, res) => {
   try {
-    const { sendCount, sendAt, userId, productId, brachId } = req.body;
+    const { sendCount, sendAt, userId, productId, brachId, price, sellPrice } = req.body;
     console.log(req.body)
-    if (!sendCount || !sendAt || !brachId || !userId || !productId) {
+    if (!sendCount || !sendAt || !brachId || !userId || !productId || !price || !sellPrice) {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedsendAt = parseISO(sendAt); // already in UTC
@@ -202,6 +204,8 @@ exports.insertTrackSend = async (req, res) => {
           productsId: Number(productId),
           staffId: Number(userId),
           branchId: Number(brachId),
+          price: Number(price),
+          sellPrice:Number(sellPrice)
         },
       });
       return ress;
@@ -214,8 +218,8 @@ exports.insertTrackSend = async (req, res) => {
 };
 exports.insertTrackExp = async (req, res) => {
   try {
-    const { expCount, expAt, userId, productId, brachId } = req.body;
-    if (!expCount || !expAt || !brachId || !userId || !productId) {
+    const { expCount, expAt, userId, productId, brachId, price, sellPrice } = req.body;
+    if (!expCount || !expAt || !brachId || !userId || !productId || !price || !sellPrice) {
       return res.status(400).json({ message: "something went wrong11." });
     }
     const formattedexpAt = parseISO(expAt); // already in UTC
@@ -252,6 +256,8 @@ exports.insertTrackExp = async (req, res) => {
           productsId: Number(productId),
           staffId: Number(userId),
           branchId: Number(brachId),
+          price: Number(price),
+          sellPrice: Number(sellPrice)
         },
       });
       return ress;

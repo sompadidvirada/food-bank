@@ -69,28 +69,32 @@ exports.dashboradData = async (req, res) => {
 
     // === 3. Calculate totals ===
     const totalSendPrice = sendTrack.reduce(
-      (sum, r) => sum + r.sendCount * (r.products?.price || 0),
+      (sum, r) => sum + r.sendCount * (r.price || r.sellPrice || 0),
       0
     );
+
     const totalSellPrice = sellTrack.reduce(
-      (sum, r) => sum + r.sellCount * (r.products?.price || 0),
+      (sum, r) => sum + r.sellCount * (r.sellPrice || r.price || 0),
       0
     );
+
     const totalExpPrice = expTrack.reduce(
-      (sum, r) => sum + r.expCount * (r.products?.price || 0),
+      (sum, r) => sum + r.expCount * (r.price || r.sellPrice || 0),
       0
     );
 
     const totalSendPriceLast = sendTrackLast.reduce(
-      (sum, r) => sum + r.sendCount * (r.products?.price || 0),
+      (sum, r) => sum + r.sendCount * (r.price || r.sellPrice || 0),
       0
     );
+
     const totalSellPriceLast = sellTrackLast.reduce(
-      (sum, r) => sum + r.sellCount * (r.products?.price || 0),
+      (sum, r) => sum + r.sellCount * (r.sellPrice || r.price || 0),
       0
     );
+
     const totalExpPriceLast = expTrackLast.reduce(
-      (sum, r) => sum + r.expCount * (r.products?.price || 0),
+      (sum, r) => sum + r.expCount * (r.price || r.sellPrice || 0),
       0
     );
 
