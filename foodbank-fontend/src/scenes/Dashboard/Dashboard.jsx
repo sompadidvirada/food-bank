@@ -94,7 +94,9 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    fecthTotalSell();
+    if (queryForm.startDate && queryForm.endDate) {
+      fecthTotalSell();
+    }
   }, [token, queryForm, selectBranchs]);
 
   const fecthTotalSell = async () => {
