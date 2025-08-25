@@ -593,7 +593,6 @@ exports.fetchCoffeeSellWithStockRequisition = async (req, res) => {
 exports.fetchCoffeeIngredientUseByMaterialId = async (req, res) => {
   try {
     const { startDate, endDate, materialVariantId } = req.body;
-    console.log(req.body)
     if (!startDate || !endDate || !materialVariantId) {
       return res.status(400).json({ message: `empty value.` });
     }

@@ -16,7 +16,6 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const UploadFile = ({handleSetSell, selectDateBrachCheck, coffeeMenu}) => {
-    console.log(coffeeMenu)
 const handleFileUpload = async (event) => {
   const file = event.target.files[0];
   if (!file) return;

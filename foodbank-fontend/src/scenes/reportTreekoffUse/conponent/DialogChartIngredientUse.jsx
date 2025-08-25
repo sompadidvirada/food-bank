@@ -79,8 +79,6 @@ const DialogChartIngredientUse = ({
     setOpen(false);
   };
 
-  console.log(selectDataBar)
-
   const fecthIngredientuse = async () => {
     try {
       const ress = await getCoffeeIngredientUseByMaterialId(
@@ -98,7 +96,7 @@ const DialogChartIngredientUse = ({
   };
 
   useEffect(() => {
-    if (selectDataBar) {
+    if (selectDataBar && queryForm.startDate && queryForm.endDate) {
       fecthIngredientuse();
     }
   }, [token, selectDataBar]);
