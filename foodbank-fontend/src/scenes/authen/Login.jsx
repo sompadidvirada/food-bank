@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { tokens } from "../../theme";
 import {
   Box,
@@ -21,6 +21,8 @@ import * as yup from "yup";
 import { Link as RouterLink } from "react-router-dom";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import { createNewpassword } from "../../api/authen";
+import { jwtDecode } from "jwt-decode";
+
 
 const Login = () => {
   const navigate = useNavigate();
@@ -31,6 +33,7 @@ const Login = () => {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [newPassword, setNewPassword] = useState(false);
   const actionLogin = useFoodBankStorage((state) => state.actionLogin);
+  const { token, user } = useFoodBankStorage();
 
   const [initialValues, setInitialValues] = useState({
     phonenumber: "",
@@ -41,7 +44,6 @@ const Login = () => {
   const handleFormSubmit = async (values) => {
     try {
       const res = await actionLogin(values);
-      console.log(res);
       if (res.data.message === "insert new password" && res.status === 200) {
         setInitialValues((prev) => ({
           ...prev,
@@ -101,6 +103,29 @@ const Login = () => {
       return;
     }
   };
+
+  useEffect(() => {
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const now = Date.now() / 1000; // in seconds
+
+        if (decoded.exp && decoded.exp > now) {
+          // ✅ Token still valid
+          if (user?.role === "admin") {
+            navigate("/admin", { replace: true });
+          } else if (user?.role === "staff") {
+            navigate("/user", { replace: true });
+          }
+        } else {
+          useFoodBankStorage.persist.clearStorage();
+        }
+      } catch (err) {
+        console.error("Invalid token:", err);
+        useFoodBankStorage.persist.clearStorage();
+      }
+    }
+  }, [token, user, navigate]);
   return (
     <Container
       maxWidth="sm"

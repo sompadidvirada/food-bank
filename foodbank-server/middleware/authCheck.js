@@ -24,10 +24,17 @@ exports.authCheck = async (req, res, next) => {
     }
     next();
   } catch (err) {
+    if (err.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Token expired." });
+    }
+    if (err.name === "JsonWebTokenError") {
+      return res.status(401).json({ message: "Invalid token." });
+    }
     console.log(err);
-    return res.status(500).json({ message: `server error.` });
+    return res.status(500).json({ message: "Server error." });
   }
 };
+
 exports.adminCheck = async (req, res, next) => {
   try {
     const { phonenumber } = req.user;

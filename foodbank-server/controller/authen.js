@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
       image: checkUser.image,
     };
 
-    jwt.sign(payload, process.env.SECRET, { expiresIn: "1d" }, (err, token) => {
+    jwt.sign(payload, process.env.SECRET, { expiresIn: "20h" }, (err, token) => {
       if (err) {
         return res.status(500).json({ message: `Token error` });
       }

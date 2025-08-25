@@ -64,8 +64,10 @@ const Topbar = () => {
   const handleLogout = () => {
     navigate("/");
     setOpen(false);
-    useFoodBankStorage.persist.clearStorage();
+    useFoodBankStorage.setState({ user: null, token: null }); // clear memory
+    useFoodBankStorage.persist.clearStorage(); // clear localStorage
   };
+
   return (
     <Box display="flex" justifyContent="space-between" p={2}>
       <Box></Box>
@@ -102,9 +104,7 @@ const Topbar = () => {
               flexDirection: "column",
             }}
           >
-            <Box
-              sx={{ py: 2, borderBottom: "1px solid", cursor: "pointer" }}
-            >
+            <Box sx={{ py: 2, borderBottom: "1px solid", cursor: "pointer" }}>
               ສາຂາ ໂພນທັນ
             </Box>
             <Box sx={{ py: 2, borderBottom: "1px solid", cursor: "pointer" }}>
