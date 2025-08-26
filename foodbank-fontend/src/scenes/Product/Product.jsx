@@ -21,7 +21,7 @@ import DeleteProduct from "./component/DeleteProduct";
 import AddProduct from "./component/AddProduct";
 import AddCategory from "./component/AddCategory";
 import DeleteCategory from "./component/DeleteCategory";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
@@ -326,7 +326,6 @@ const Product = () => {
         selectedProduct={selectedProduct}
         setSelectedProduct={setSelectedProduct}
       />
-      <ToastContainer position="top-center" />
     </Box>
   );
 };

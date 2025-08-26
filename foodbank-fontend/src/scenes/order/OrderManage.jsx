@@ -19,7 +19,7 @@ import {
   getOrderTrack,
   insertOrder,
 } from "../../api/preorder";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import DialogOrder from "./component/DialogOrder";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
 const URL =
@@ -865,8 +865,6 @@ const OrderManage = () => {
           </Box>
         )}
       </Box>
-
-      <ToastContainer position="top-center" />
     </Box>
   );
 };

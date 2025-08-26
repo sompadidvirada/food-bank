@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   Box,
   FormControl,
@@ -1178,7 +1178,6 @@ const Team = () => {
       </Dialog>
 
       {/**Toastify Part */}
-      <ToastContainer position="top-center" />
 
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}

@@ -15,7 +15,7 @@ import { useState } from "react";
 import CalendarSendMaterial from "./component/CalendarSendMaterial";
 import CloseIcon from "@mui/icons-material/Close";
 import SelecBranch from "./component/SelecBranch";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   deleteAllStockrequisitionByDate,
   getAllRawMaterial,
@@ -659,7 +659,6 @@ const StockRequisition = () => {
           )}
         </DialogContent>
       </Dialog>
-      <ToastContainer position="top-center" />
     </Box>
   );
 };

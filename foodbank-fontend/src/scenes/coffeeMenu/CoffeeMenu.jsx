@@ -16,7 +16,6 @@ import { tokens } from "../../theme";
 import SearchIcon from "@mui/icons-material/Search";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Header from "../component/Header";
-import { ToastContainer } from "react-toastify";
 import {
   getCoffeeMenu,
   getCoffeeMenuIngredientByMenuId,
@@ -338,7 +337,7 @@ const CoffeeMenu = () => {
           )}
         </DialogContent>
       </Dialog>
-      <ToastContainer position="top-center" />
+      
       <DialogDetailCoffeeMenu
         openDetail={openDetail}
         setOpenDetail={setOpenDetail}

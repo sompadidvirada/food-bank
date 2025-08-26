@@ -21,7 +21,7 @@ import { tokens } from "../../../theme";
 import { NumericFormat } from "react-number-format";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { updateProduct } from "../../../api/product";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 import axios from "axios";

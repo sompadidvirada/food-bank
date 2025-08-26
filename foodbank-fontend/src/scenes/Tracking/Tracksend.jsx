@@ -14,7 +14,7 @@ import CalendarSend from "./component/CalendarSend";
 import SelectBranch from "./component/SelectBranch";
 import { DataGrid } from "@mui/x-data-grid";
 import CloseIcon from "@mui/icons-material/Close";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import {
   checkTrackSell,
@@ -507,8 +507,6 @@ const Tracksend = () => {
         </DialogContent>
       </Dialog>
       {/* Snackbar for success message */}
-
-      <ToastContainer position="top-center" />
     </Box>
   );
 };

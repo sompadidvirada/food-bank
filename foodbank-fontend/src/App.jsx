@@ -3,6 +3,7 @@ import { ColorModeContext, useMode } from "./theme";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import AppRoutes from "./routes/AppRoutes";
 import { SocketProvider } from "../socket-io-provider/SocketProvider";
+import { ToastContainer } from "react-toastify";
 
 const App = () => {
   const [theme, colorMode] = useMode();
@@ -14,6 +15,7 @@ const App = () => {
           <CssBaseline />
           <div className="app">
             <AppRoutes />
+            <ToastContainer position="top-center" />
           </div>
         </ThemeProvider>
       </ColorModeContext.Provider>

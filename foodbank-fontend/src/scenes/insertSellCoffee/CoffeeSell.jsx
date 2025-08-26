@@ -10,7 +10,7 @@ import {
 import React from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import CloseIcon from "@mui/icons-material/Close";
@@ -433,7 +433,6 @@ const CoffeeSell = () => {
           )}
         </Box>
       </Box>
-      <ToastContainer position="top-center" />
       {/** image modal */}
       <Dialog
         open={openImageModal}

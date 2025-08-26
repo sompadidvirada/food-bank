@@ -16,7 +16,6 @@ import AddRawMaterial from "./component/AddRawMaterial";
 import SearchIcon from "@mui/icons-material/Search";
 import { tokens } from "../../theme";
 import DeleteCategoryRawMaterial from "./component/DeleteCategoryRawMaterial";
-import { ToastContainer } from "react-toastify";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import { useState } from "react";
 import CloseIcon from "@mui/icons-material/Close";
@@ -410,7 +409,6 @@ const ManageRawMaterial = () => {
           }}
         />
       </Box>
-      <ToastContainer position="top-center" />
       {/** DIALOG OPEN IMAGE */}
 
       <Dialog

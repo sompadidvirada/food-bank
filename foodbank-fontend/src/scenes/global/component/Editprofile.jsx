@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import { tokens } from "../../../theme";
 import CloseIcon from "@mui/icons-material/Close";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 
@@ -300,7 +300,6 @@ const Editprofile = () => {
           )}
         </DialogContent>
       </Dialog>
-      <ToastContainer position="top-center" />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isUploading}

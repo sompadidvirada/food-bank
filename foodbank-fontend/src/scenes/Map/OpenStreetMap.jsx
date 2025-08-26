@@ -34,7 +34,7 @@ import {
   updateBranchLocation,
   updateProvince,
 } from "../../api/branch";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import MinorCrashIcon from "@mui/icons-material/MinorCrash";
 import "leaflet-routing-machine";
 import AssistWalkerIcon from "@mui/icons-material/AssistWalker";
@@ -1545,7 +1545,6 @@ const OpenStreetMap = () => {
           style={{ height: "100%", width: "100%" }}
         ></div>
       </Box>
-      <ToastContainer position="top-center" />
 
       {/** EDIT PROVINCE BRANCH DIALOG */}
 

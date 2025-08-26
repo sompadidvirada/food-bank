@@ -38,7 +38,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Slide from "@mui/material/Slide";
 import { changePhonenumber } from "../../api/branch";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import PrintCompo from "./component/PrintCompo";
 import { format, isValid, parseISO } from "date-fns";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
@@ -585,7 +585,6 @@ const OrderUser = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      <ToastContainer position="top-center" />
     </Box>
   );
 };
