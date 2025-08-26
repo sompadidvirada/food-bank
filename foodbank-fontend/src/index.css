@@ -67,7 +67,15 @@ body,
 .leaflet-routing-container {
   display: none !important;
 }
+
 @media print {
+  /* Allow normal flow for printing */
+  html, body, #root, .app, .content, .layout {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Table split rules */
   table {
     page-break-inside: auto;
     border-collapse: collapse;
@@ -80,11 +88,11 @@ body,
   }
 
   thead {
-    display: table-header-group; /* repeat table header on each page */
+    display: table-header-group; /* repeat table header */
   }
 
   tfoot {
-    display: table-footer-group; /* repeat table footer if you add one */
+    display: table-footer-group;
   }
 
   td, th {
@@ -92,3 +100,4 @@ body,
     page-break-after: auto;
   }
 }
+

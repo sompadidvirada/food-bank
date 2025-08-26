@@ -18,9 +18,16 @@ const PrintReportStockRequisition = ({
 
   const user = useFoodBankStorage((state) => state.user);
 
+  const startDate = queryForm?.startDate
+    ? format(parseISO(queryForm.startDate), "dd/MM/yyyy")
+    : "-";
+  const endDate = queryForm?.endDate
+    ? format(parseISO(queryForm.endDate), "dd/MM/yyyy")
+    : "-";
+
   const handlePrint = useReactToPrint({
     content: () => componentRef.current,
-    documentTitle: `ປີ່ນລາຍງານການເບີກວັດຖຸດີບຂອງ ${branchName} ປະຈຳວັນທີ ${queryForm?.startDate} - ${queryForm?.endDate}`,
+    documentTitle: `ປີ່ນລາຍງານການເບີກວັດຖຸດີບຂອງ ${branchName} ປະຈຳວັນທີ ${startDate} - ${endDate}`,
   });
 
   return (
