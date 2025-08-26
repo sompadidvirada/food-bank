@@ -275,7 +275,7 @@ const StockRequisition = () => {
             display="flex"
             alignItems="center"
             width="100%"
-            justifyContent="center"
+            justifyContent="left"
             height="100%"
             sx={{
               whiteSpace: "normal",
@@ -284,7 +284,7 @@ const StockRequisition = () => {
             }}
           >
             <Typography
-              fontSize={14}
+              fontSize={12}
               color={colors.grey[100]}
               sx={{
                 fontFamily: "Noto Sans Lao",
@@ -314,7 +314,7 @@ const StockRequisition = () => {
 
         if (tracked) {
           return (
-            <Box display="flex-row">
+            <Box display="flex-row" sx={{ height: "100%", width:"100%", justifyItems:"center"}}>
               <span
                 style={{
                   color: colors.greenAccent[200],
@@ -336,7 +336,7 @@ const StockRequisition = () => {
               e.preventDefault();
               handleSetSendCount(materialVariantId, e.currentTarget);
             }}
-            style={{ display: "flex", gap: "5px", alignItems: "center" }}
+            style={{ display: "flex", gap: "5px", alignItems: "center", height:"100%", width:"100%" }}
           >
             <input
               type="number"
