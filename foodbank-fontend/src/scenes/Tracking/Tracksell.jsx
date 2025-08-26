@@ -51,7 +51,6 @@ const Tracksell = () => {
     sellDate: "",
     brachId: "",
   });
-  const [sellCounts, setSellCounts] = useState({});
 
   {
     /** column for DataGrid  */
@@ -164,43 +163,45 @@ const Tracksell = () => {
                 height: "100%",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={sellCounts[productId] || ""}
-                onChange={(e) =>
-                  handleChange(productId, Math.max(0, e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetSellCount(productId);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSetSellCount(productId, e.currentTarget);
                 }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetSellCount(productId)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
-                ✔
-              </button>
+                <input
+                  type="number"
+                  min="0"
+                  name={`sellCount-${productId}`} // important for FormData
+                  defaultValue=""
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                      e.preventDefault();
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  style={{
+                    width: "60px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  ✔
+                </button>
+              </form>
             </div>
           );
         }
@@ -247,11 +248,23 @@ const Tracksell = () => {
 
   const handleSetSellCount = async (
     productId,
-    count = null,
+    countOrForm = null,
     productOverride = null
   ) => {
-    const countToUse =
-      count !== null ? count : sellCounts[productId];
+    let countToUse = 0;
+
+    // Case 1: called from UploadPdf (count passed directly)
+    if (typeof countOrForm === "number") {
+      countToUse = countOrForm;
+    }
+    // Case 2: called from form submit (form element passed)
+    else if (countOrForm instanceof HTMLFormElement) {
+      const formData = new FormData(countOrForm);
+      const rawValue = formData.get(`sellCount-${productId}`);
+      countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+    }
+
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
 
     if (
       selectFormtracksell.sendAt === "" ||
@@ -262,7 +275,6 @@ const Tracksell = () => {
 
     // get product (either from override or lookup)
     const product = productOverride || products.find((p) => p.id === productId);
-
     if (!product) {
       console.warn(`⚠️ Product with ID ${productId} not found`);
       return;
@@ -271,13 +283,11 @@ const Tracksell = () => {
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      sendCount: count,
+      sendCount: countToUse,
       sellCount: countToUse,
       price: product.price,
       sellPrice: product.sellprice,
     };
-
-    setSelectFormtracksell(updatedForm);
 
     try {
       const ress = await insertTracksell(updatedForm, token);
@@ -287,7 +297,10 @@ const Tracksell = () => {
         { productsId: productId, sellCount: countToUse },
       ]);
 
-      setSellCounts((prev) => ({ ...prev, [productId]: "" }));
+      // if came from a form, reset it
+      if (countOrForm instanceof HTMLFormElement) {
+        countOrForm.reset();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -301,7 +314,7 @@ const Tracksell = () => {
     try {
       const ress = await deleteTrackSell(selectDateBrachCheck, token);
       fetchDateBrachCheck();
-      toast.success(`ລ້າງຍອດຂາຍຂອງມື້ນີ້ສຳເລັດ.`)
+      toast.success(`ລ້າງຍອດຂາຍຂອງມື້ນີ້ສຳເລັດ.`);
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -349,10 +362,6 @@ const Tracksell = () => {
   {
     /** function handlechange for input insert tracking*/
   }
-
-  const handleChange = (productId, value) => {
-    setSellCounts((prev) => ({ ...prev, [productId]: value }));
-  };
 
   return (
     <Box m="20px">
@@ -403,7 +412,6 @@ const Tracksell = () => {
             </Box>
             <Box>
               <UploadPdf
-                setSellCounts={setSellCounts}
                 handleSetSellCount={handleSetSellCount}
                 selectDateBrachCheck={selectDateBrachCheck}
               />

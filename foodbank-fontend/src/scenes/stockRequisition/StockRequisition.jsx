@@ -36,7 +36,6 @@ const StockRequisition = () => {
   const colors = tokens(theme.palette.mode);
   const token = useFoodBankStorage((state) => state.token);
   const [rawMaterial, setRawMaterial] = useState([]);
-  const [sendCounts, setSendCounts] = useState({});
   const [rawMaterialVariants, setRawMaterialVariants] = useState([]);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
@@ -75,21 +74,21 @@ const StockRequisition = () => {
       console.log(err);
     }
   };
+  const handleSetSendCount = async (materialVariantId, countOrForm = null) => {
+    let countToUse = 0;
 
-  const handleChange = (materialVariantId, value) => {
-    setSendCounts((prev) => ({ ...prev, [materialVariantId]: value }));
-  };
+    // Case 1: called from UploadFile (count passed directly)
+    if (typeof countOrForm === "number") {
+      countToUse = countOrForm;
+    }
+    // Case 2: called from input form (form element passed)
+    else if (countOrForm instanceof HTMLFormElement) {
+      const formData = new FormData(countOrForm);
+      const rawValue = formData.get(`sendCount-${materialVariantId}`);
+      countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+    }
 
-  const handleSetSendCount = async (
-    materialVariantId,
-    externalSendCount = null
-  ) => {
-    const countToUse =
-      externalSendCount !== null
-        ? externalSendCount
-        : sendCounts[materialVariantId];
-
-    if (!countToUse) return;
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
 
     if (
       selectFormtracksend.requisitionDate === "" ||
@@ -101,6 +100,10 @@ const StockRequisition = () => {
     const materialVarint = rawMaterialVariants?.find(
       (v) => v.materialVariantId === materialVariantId
     );
+    if (!materialVarint) {
+      console.warn(`⚠️ Material variant ${materialVariantId} not found`);
+      return;
+    }
 
     const updatedForm = {
       ...selectFormtracksend,
@@ -116,7 +119,11 @@ const StockRequisition = () => {
     try {
       const ress = await insertStockRequisition(updatedForm, token);
       setChecked((prevChecked) => [...prevChecked, ress.data]);
-      setSendCounts((prev) => ({ ...prev, [materialVariantId]: "" }));
+
+      // reset if input form was used
+      if (countOrForm instanceof HTMLFormElement) {
+        countOrForm.reset();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -299,14 +306,13 @@ const StockRequisition = () => {
       renderCell: (params) => {
         const materialVariantId = rawMaterialVariants.find(
           (item) => item.rawMaterialId === params.row.id
+        )?.materialVariantId;
+
+        const tracked = checked?.find(
+          (item) => item?.materialVariantId === materialVariantId
         );
 
-        const id = materialVariantId?.materialVariantId;
-        // Find the tracked product in `checked`
-        const trackedMaterialVariant = checked?.find(
-          (item) => item?.materialVariantId === id
-        );
-        if (trackedMaterialVariant) {
+        if (tracked) {
           return (
             <Box display="flex-row">
               <span
@@ -316,63 +322,54 @@ const StockRequisition = () => {
                   fontFamily: "Noto Sans Lao",
                 }}
               >
-                ຍອດທີ່ບັນທືກ. ({trackedMaterialVariant.quantityRequisition})
+                ຍອດທີ່ບັນທືກ. ({tracked.quantityRequisition})
               </span>
-              <DialogEdit
-                trackedProduct={trackedMaterialVariant}
-                setChecked={setChecked}
-              />
+              <DialogEdit trackedProduct={tracked} setChecked={setChecked} />
             </Box>
           );
-        } else {
-          return (
-            <div
+        }
+
+        // input mode
+        return (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSetSendCount(materialVariantId, e.currentTarget);
+            }}
+            style={{ display: "flex", gap: "5px", alignItems: "center" }}
+          >
+            <input
+              type="number"
+              name={`sendCount-${materialVariantId}`}
+              min="0"
+              onKeyDown={(e) => {
+                if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                  e.preventDefault();
+              }}
+              onWheel={(e) => e.target.blur()}
               style={{
-                display: "flex",
-                gap: "5px",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "100%",
+                width: "60px",
+                padding: "5px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                textAlign: "center",
+              }}
+            />
+            <button
+              type="submit"
+              style={{
+                background: "#4CAF50",
+                color: "white",
+                border: "none",
+                padding: "5px 10px",
+                cursor: "pointer",
+                borderRadius: "4px",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={sendCounts[id] || ""}
-                onChange={(e) => handleChange(id, Math.max(0, e.target.value))}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetSendCount(id);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
-                }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetSendCount(id)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
-              >
-                ✔
-              </button>
-            </div>
-          );
-        }
+              ✔
+            </button>
+          </form>
+        );
       },
     },
     {
@@ -555,7 +552,6 @@ const StockRequisition = () => {
             </Box>
             <Box>
               <UploadFile
-                setSendCounts={setSendCounts}
                 handleSetSendCount={handleSetSendCount}
                 selectDateBrachCheck={selectDateBrachCheck}
                 rawMaterial={rawMaterial}

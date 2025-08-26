@@ -16,18 +16,13 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const UploadPdf = ({
-  handleSetSellCount,
-  setSellCounts,
-  selectDateBrachCheck,
-}) => {
+const UploadPdf = ({ handleSetSellCount, selectDateBrachCheck }) => {
   const products = useFoodBankStorage((state) => state.products);
 
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // ✅ Check for HTML file
     if (file.type !== "text/html" && !file.name.endsWith(".html")) {
       toast.error("ຟາຍທີ່ອັປໂຫລດບໍ່ຖືກຕ້ອງ");
       return;
@@ -46,19 +41,19 @@ const UploadPdf = ({
         const type = cells[7].textContent.trim();
 
         if (type === "BAKERY/CAKE" || type === "BEVERAGES") {
-          const item = parseInt(cells[0].textContent.trim());
           const menu = cells[2].textContent.trim();
           const sellCount = parseInt(cells[3].textContent.trim());
 
           const product = products.find(
             (p) => p.name.trim().toLowerCase() === menu.toLowerCase()
           );
+
           if (!product) {
             console.warn(`⚠️ Menu "${menu}" not found in products`);
             return;
           }
 
-          if (!isNaN(item) && menu && !isNaN(sellCount)) {
+          if (menu && !isNaN(sellCount)) {
             extracted.push({
               product,
               sellCount,
@@ -69,19 +64,15 @@ const UploadPdf = ({
       }
     });
 
-    extracted.forEach((entry) => {
-      setSellCounts((prev) => ({
-        ...prev,
-        [entry.productId]: entry.sellCount,
-      }));
-
+    // ✅ Just call handleSetSellCount directly
+    extracted.forEach((entry, index) => {
       setTimeout(() => {
         handleSetSellCount(entry.productId, entry.sellCount, entry.product);
-      }, 150);
+      }, 150 * index);
     });
 
     event.target.value = "";
-    toast.success('ອັປໂຫລດຟາຍຍອດຂາຍສຳເລັດ.')
+    toast.success("ອັປໂຫລດຟາຍຍອດຂາຍສຳເລັດ.");
   };
 
   return (

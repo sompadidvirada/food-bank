@@ -18,7 +18,6 @@ const VisuallyHiddenInput = styled("input")({
 });
 
 const UploadSend = ({
-  setSellCounts,
   handleSetSendCount,
   selectDateBrachCheck,
 }) => {
@@ -71,11 +70,6 @@ const UploadSend = ({
 
     // Now use the data to update state and call backend
     sendData.forEach((entry) => {
-      setSellCounts((prev) => ({
-        ...prev,
-        [entry.productId]: entry.sendCount,
-      }));
-
       setTimeout(() => {
         handleSetSendCount(entry.productId, entry.sendCount, entry.product); // ✅ pass the value directly
       }, 150);

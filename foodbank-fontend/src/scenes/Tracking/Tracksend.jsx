@@ -160,43 +160,45 @@ const Tracksend = () => {
                 height: "100%",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={sendCounts[productId] || ""}
-                onChange={(e) =>
-                  handleChange(productId, Math.max(0, e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetSendCount(productId);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSetSendCount(productId, e.currentTarget);
                 }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetSendCount(productId)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
-                ✔
-              </button>
+                <input
+                  type="number"
+                  min="0"
+                  name={`sendCount-${productId}`} // important for FormData
+                  defaultValue=""
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                      e.preventDefault();
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  style={{
+                    width: "60px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  ✔
+                </button>
+              </form>
             </div>
           );
         }
@@ -241,13 +243,26 @@ const Tracksend = () => {
     /** function insert tracking to database */
   }
 
-  const handleSetSendCount = async (productId, externalSendCount = null,
-    productOverride = null) => {
-    const countToUse =
-      externalSendCount !== null ? externalSendCount : sendCounts[productId];
+  const handleSetSendCount = async (
+    productId,
+    countOrForm = null,
+    externalSendCount = null,
+    productOverride = null
+  ) => {
+    let countToUse = 0;
 
-    if (!countToUse) return;
+    // Case 1: called from UploadPdf (count passed directly)
+    if (typeof countOrForm === "number") {
+      countToUse = countOrForm;
+    }
+    // Case 2: called from form submit (form element passed)
+    else if (countOrForm instanceof HTMLFormElement) {
+      const formData = new FormData(countOrForm);
+      const rawValue = formData.get(`sendCount-${productId}`);
+      countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+    }
 
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
     if (
       selectFormtracksell.sendAt === "" ||
       selectFormtracksell.brachId === ""
@@ -255,7 +270,7 @@ const Tracksend = () => {
       return;
     }
 
-      // get product (either from override or lookup)
+    // get product (either from override or lookup)
     const product = productOverride || products.find((p) => p.id === productId);
 
     if (!product) {
@@ -263,16 +278,13 @@ const Tracksend = () => {
       return;
     }
 
-
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      sendCount: countToUse, 
+      sendCount: countToUse,
       price: product?.price,
-      sellPrice: product?.sellprice
+      sellPrice: product?.sellprice,
     };
-
-    setSelectFormtracksell(updatedForm);
     try {
       const ress = await insertTracksend(updatedForm, token);
 
@@ -282,8 +294,10 @@ const Tracksend = () => {
         { productsId: productId, sendCount: countToUse },
       ]);
 
-      // Reset input field after submission
-      setSellCounts((prev) => ({ ...prev, [productId]: "" }));
+      // if came from a form, reset it
+      if (countOrForm instanceof HTMLFormElement) {
+        countOrForm.reset();
+      }
     } catch (err) {
       console.log(err);
     }
@@ -297,7 +311,7 @@ const Tracksend = () => {
     try {
       const ress = await deleteTrackSend(selectDateBrachCheck, token);
       fetchDateBrachCheck();
-      toast.success(`ລ້າງລາຍການຈັດສົ່ງສຳເລັດ`)
+      toast.success(`ລ້າງລາຍການຈັດສົ່ງສຳເລັດ`);
     } catch (err) {
       console.log(err);
       toast.error("error");
@@ -342,12 +356,6 @@ const Tracksend = () => {
   {
     /** function handlechange for input insert tracking*/
   }
-
-  const handleChange = (productId, value) => {
-    setSellCounts((prev) => ({ ...prev, [productId]: value }));
-    const selectedProduct = products.find((p) => p.id === productId);
-    setProductDetail(selectedProduct || null);
-  };
 
   return (
     <Box m="20px">
@@ -398,7 +406,6 @@ const Tracksend = () => {
             </Box>
             <Box>
               <UploadSend
-                setSellCounts={setSellCounts}
                 handleSetSendCount={handleSetSendCount}
                 selectDateBrachCheck={selectDateBrachCheck}
               />

@@ -38,7 +38,7 @@ const Trackexp = () => {
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
-  const [productDetail, setProductDetail] = useState([])
+  const [productDetail, setProductDetail] = useState([]);
   const [openImageModal, setOpenImageModal] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState(null);
@@ -163,43 +163,45 @@ const Trackexp = () => {
                 height: "100%",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={expCounts[productId] || ""}
-                onChange={(e) =>
-                  handleChange(productId, Math.max(0, e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetExpCount(productId);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSetExpCount(productId, e.currentTarget);
                 }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetExpCount(productId)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
-                ✔
-              </button>
+                <input
+                  type="number"
+                  min="0"
+                  name={`expCount-${productId}`} // important for FormData
+                  defaultValue=""
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                      e.preventDefault();
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  style={{
+                    width: "60px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  ✔
+                </button>
+              </form>
             </div>
           );
         }
@@ -244,8 +246,13 @@ const Trackexp = () => {
     /** function insert tracking to database */
   }
 
-  const handleSetExpCount = async (productId) => {
-    if (!expCounts[productId]) return; // Prevent empty values
+  const handleSetExpCount = async (productId, countOrForm) => {
+    const formData = new FormData(countOrForm);
+    const rawValue = formData.get(`expCount-${productId}`);
+
+    const countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
 
     if (
       selectFormtracksell.expAt === "" ||
@@ -254,26 +261,22 @@ const Trackexp = () => {
       return;
     }
 
+    const product = products.find((p) => p.id === productId);
+
     const updatedForm = {
       ...selectFormtracksell,
       productId,
-      expCount: expCounts[productId],
-      price: productDetail?.price,
-      sellPrice: productDetail?.sellprice
+      expCount: countToUse,
+      price: product?.price,
+      sellPrice: product?.sellprice,
     };
 
-    setSelectFormtracksell(updatedForm);
     try {
       const ress = await insertTrackExp(updatedForm, token);
 
       // **Update checked state with new entry**
-      setChecked((prevChecked) => [
-        ...prevChecked,
-        { productsId: productId, expCount: expCounts[productId] },
-      ]);
-
-      // Reset input field after submission
-      setSellCounts((prev) => ({ ...prev, [productId]: "" }));
+      setChecked((prevChecked) => [...prevChecked, ress.data]);
+      countOrForm.reset();
     } catch (err) {
       console.log(err);
     }
@@ -334,8 +337,8 @@ const Trackexp = () => {
 
   const handleChange = (productId, value) => {
     setSellCounts((prev) => ({ ...prev, [productId]: value }));
-    const selectProductDetail = products.find((p)=> p.id === productId)
-    setProductDetail(selectProductDetail || null)
+    const selectProductDetail = products.find((p) => p.id === productId);
+    setProductDetail(selectProductDetail || null);
   };
 
   return (
