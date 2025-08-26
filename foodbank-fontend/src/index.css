@@ -67,3 +67,28 @@ body,
 .leaflet-routing-container {
   display: none !important;
 }
+@media print {
+  table {
+    page-break-inside: auto;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+
+  thead {
+    display: table-header-group; /* repeat table header on each page */
+  }
+
+  tfoot {
+    display: table-footer-group; /* repeat table footer if you add one */
+  }
+
+  td, th {
+    page-break-inside: avoid;
+    page-break-after: auto;
+  }
+}
