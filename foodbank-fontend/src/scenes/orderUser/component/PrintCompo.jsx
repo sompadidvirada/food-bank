@@ -15,7 +15,9 @@ const PrintCompo = () => {
   const dateConfirmOrder = useFoodBankStorage(
     (state) => state.dateConfirmOrder
   );
-  const formattedDate = format(parseISO(dateConfirmOrder?.orderDate), "dd/MM/yyyy");
+  const formattedDate = dateConfirmOrder?.orderDate
+    ? format(parseISO(dateConfirmOrder.orderDate), "dd/MM/yyyy")
+    : "";
 
   const fetchDataAndPrint = async () => {
     try {

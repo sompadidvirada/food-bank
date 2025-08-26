@@ -268,7 +268,7 @@ const ReportStockReqiosition = () => {
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
             <Typography
               sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
-              color={colors.grey[100]}
+              color={colors.blueAccent[300]}
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avarageReq)
@@ -276,6 +276,43 @@ const ReportStockReqiosition = () => {
                   : `${avarageReq.toFixed(3)} (${
                       selectedVariant?.variantName
                     }) / ມື້`
+                : "-"}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "averageRequisitiomonth",
+      headerName: "ໃຊ້ສະເລ່ຍຕໍ່ເດືອນ",
+      type: "number",
+      headerAlign: "right",
+      flex: 0.35,
+      align: "right",
+      renderCell: (params) => {
+        const selectedVariant = rawMaterialVariants.find(
+          (v) => v.rawMaterialId === params.row.id
+        );
+
+        const stockReq = stockRequisitionData
+          ?.find((v) => v.id === params.row.id)
+          ?.Allstockrequisition.find(
+            (r) => r.id === selectedVariant?.materialVariantId
+          );
+        const avarageReq = stockReq?.quantityRequition / diffDays;
+
+        return (
+          <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
+            <Typography
+              sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
+              color={colors.greenAccent[300]}
+            >
+              {stockReq?.quantityRequition != null
+                ? Number.isInteger(avarageReq)
+                  ? `${(avarageReq * 30)} (${selectedVariant?.variantName}) / ມື້`
+                  : `${(avarageReq * 30).toFixed(3)} (${
+                      selectedVariant?.variantName
+                    }) / ເດືອນ`
                 : "-"}
             </Typography>
           </Box>
