@@ -122,7 +122,9 @@ const ContentToPrint = forwardRef(
                   {matchReq?.quantityRequition !== null
                     ? Number.isInteger(matchReq?.quantityRequition)
                       ? `${matchReq?.quantityRequition} (${row.variantName})`
-                      : `${matchReq?.quantityRequition.toFixed(3)} (${row.variantName})`
+                      : `${matchReq?.quantityRequition.toFixed(3)} (${
+                          row.variantName
+                        })`
                     : "-"}
                 </td>
 
@@ -161,9 +163,7 @@ const ContentToPrint = forwardRef(
                   {matchReq?.totalPriceKip !== null
                     ? Number.isInteger(matchReq?.totalPriceKip)
                       ? `${matchReq?.totalPriceKip.toLocaleString("en-US")} ກິບ`
-                      : `${matchReq?.totalPriceKip
-                          .toLocaleString("en-US")
-                          .toFixed(3)}`
+                      : `${matchReq?.totalPriceKip.toFixed(3)}`
                     : "-"}
                 </td>
                 <td
@@ -178,9 +178,7 @@ const ContentToPrint = forwardRef(
                       ? `${matchReq?.totalPriceBath.toLocaleString(
                           "en-US"
                         )} ບາດ`
-                      : `${matchReq?.totalPriceBath
-                          .toLocaleString("en-US")
-                          .toFixed(3)}`
+                      : `${matchReq?.totalPriceBath.toFixed(3)}`
                     : "-"}
                 </td>
               </tr>
