@@ -142,11 +142,11 @@ const CoffeeSell = () => {
   };
 
   const columns = [
-    { field: "id", headerName: "ໄອດີ", flex: 0.2 },
+    { field: "id", headerName: "ໄອດີ", width:60 },
     {
       field: "image",
       headerName: "ຮູບພາບ",
-      flex: 0.2,
+      width:80,
       renderCell: (params) => {
         const imageUrl = params.row.image
           ? `${URL}/${params.row?.image}`
@@ -175,7 +175,7 @@ const CoffeeSell = () => {
       type: "text",
       headerAlign: "left",
       align: "left",
-      width: 180,
+      width: 250,
       renderCell: (params) => {
         return (
           <Box
@@ -210,7 +210,7 @@ const CoffeeSell = () => {
       type: "text",
       headerAlign: "left",
       align: "left",
-      width: 180,
+      width: 100,
       renderCell: (params) => {
         return (
           <Box
@@ -243,6 +243,7 @@ const CoffeeSell = () => {
       field: "manage",
       headerName: "ຈຳນວນທີ່ໄດ້ຂາຍ",
       flex: 0.5,
+      headerAlign:"left",
       renderCell: (params) => {
         const menuId = params.row.id;
 
@@ -275,7 +276,7 @@ const CoffeeSell = () => {
                 display: "flex",
                 gap: "5px",
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent: "left",
                 height: "100%",
               }}
             >

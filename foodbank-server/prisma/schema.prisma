@@ -243,7 +243,8 @@ model coffeeMenu {
   size        String?
   image       String?
   type        String?
-  newMEnu     Boolean @default(false)
+  sellPrice   Float?
+  newMEnu     Boolean                  @default(false)
   createAt    DateTime                 @default(now())
   recipeItem  coffeeRecipeIngredient[]
   coffeeSell  coffeeSell[]

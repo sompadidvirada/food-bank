@@ -34,7 +34,7 @@ const DialogAddIngredientCofeeMenu = ({
   materialVariantChildOnly,
   setSelectitem,
   selectItem,
-  fecthCoffeeMenuIngredientByMenuId
+  fecthCoffeeMenuIngredientByMenuId,
 }) => {
   const [open, setOpen] = React.useState(false);
   const token = useFoodBankStorage((state) => state.token);
@@ -51,11 +51,10 @@ const DialogAddIngredientCofeeMenu = ({
     (opt) => opt.materialVariantLastChildId === selected.materialVariantId
   );
 
-
   const handleAddIngredientCoffeeMenu = async () => {
     try {
       const ress = await addIngredientCoffeeMenu(selected, token);
-      fecthCoffeeMenuIngredientByMenuId(parentData.id)
+      fecthCoffeeMenuIngredientByMenuId(parentData.id);
       toast.success(`ເພີມວັດຖຸດິບສຳເລັດ`);
       handleClose();
     } catch (err) {
@@ -70,7 +69,7 @@ const DialogAddIngredientCofeeMenu = ({
         coffeeMenuId: parentData.id,
       }));
     }
-  }, [parentData,selectedOption]);
+  }, [parentData, selectedOption]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -150,7 +149,11 @@ const DialogAddIngredientCofeeMenu = ({
                 return (
                   <Box display="flex" alignItems="center" gap={1}>
                     <Avatar
-                      src={selectedOption?.image ? `${URLMATERIAL}/${selectedOption?.image}` : `${URLMATERIAL}/coffee-default.png`}
+                      src={
+                        selectedOption?.image
+                          ? `${URLMATERIAL}/${selectedOption?.image}`
+                          : `${URLMATERIAL}/coffee-default.png`
+                      }
                       alt={selectedOption?.name}
                       sx={{ width: 24, height: 24 }}
                     />
@@ -165,7 +168,11 @@ const DialogAddIngredientCofeeMenu = ({
                 <MenuItem key={opt.id} value={opt.materialVariantLastChildId}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Avatar
-                      src={opt.image ? `${URLMATERIAL}/${opt.image}` : `${URLMATERIAL}/coffee-default.png`}
+                      src={
+                        opt.image
+                          ? `${URLMATERIAL}/${opt.image}`
+                          : `${URLMATERIAL}/coffee-default.png`
+                      }
                       alt={opt.name}
                       sx={{ width: 24, height: 24 }}
                     />
@@ -209,7 +216,9 @@ const DialogAddIngredientCofeeMenu = ({
                 input: {
                   startAdornment: (
                     <InputAdornment position="start">
-                      {selectedOption?.sizeUnit ? selectedOption?.sizeUnit : ""}
+                      <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                        {selectedOption?.sizeUnit || ""}
+                      </Typography>
                     </InputAdornment>
                   ),
                 },

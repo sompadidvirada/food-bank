@@ -143,7 +143,9 @@ const ComponentToPrint = forwardRef(
                     color: totalCalcu < 0 ? "green" : "red", // 👈 check negative here
                   }}
                 >
-                  {totalCalcu?.toLocaleString()} ({row.sizeUnit})
+                  {totalCalcu
+                    ? `${totalCalcu.toLocaleString()} (${row.sizeUnit})`
+                    : 0}
                 </td>
                 <td
                   style={{

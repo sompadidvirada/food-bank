@@ -22,6 +22,8 @@ const {
   updateStockRequisition,
   deleteAllStockRequisitionByDate,
   getStockRequisitionAllItem,
+  calculatePriceKipByExchangeRate,
+  updateMaterialVariantByExchangeRate,
 } = require("../controller/material");
 const router = express.Router();
 
@@ -59,5 +61,10 @@ router.post("/getstockrequisitionbydate", authCheck, checkStockRequisitionByDate
 router.post("/getstockrequisitionall", authCheck, getStockRequisitionAllItem)
 router.put("/updatestockrequisition/:id", authCheck, updateStockRequisition)
 router.post("/deleteallstockrequisitionusedate", authCheck, deleteAllStockRequisitionByDate)
+
+
+// exchangeRate 
+
+router.post("/exchangeratecalcu",authCheck, updateMaterialVariantByExchangeRate)
 
 module.exports = router;

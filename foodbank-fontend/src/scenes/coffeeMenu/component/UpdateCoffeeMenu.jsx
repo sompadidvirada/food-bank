@@ -60,6 +60,8 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
     description: "",
     image: "",
     size: "",
+    type: "",
+    sellPrice: "",
   });
 
   const handleChange = (e) => {
@@ -91,6 +93,8 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       name: row?.name,
       description: row?.description,
       size: row?.size,
+      type: row?.type,
+      sellPrice:row?.sellPrice
     });
 
     setPreviewImage(row?.image ? `${URL}/${row?.image}` : null); // optional preview
@@ -102,6 +106,9 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       name: "",
       description: "",
       image: "",
+      type: "",
+      size: "",
+      sellPrice: "",
     });
     setPreviewImage("");
     setOpen(false);
@@ -124,6 +131,8 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       name: formData.name,
       description: formData.description,
       size: formData.size,
+      type: formData.type,
+      sellPrice: formData.sellPrice,
       image: productImage,
       contentType: contentType,
     };
@@ -235,6 +244,69 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
                 <MenuItem value="SHORT">SHORT</MenuItem>
               </Select>
             </FormControl>
+            <FormControl fullWidth>
+              <InputLabel
+                id="size-label"
+                sx={{
+                  fontSize: "16px",
+                  fontFamily: "Noto Sans Lao",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "gray",
+                  },
+                  "&.Mui-focused": {
+                    color: colors.grey[100], // 👈 label turns red on focus
+                  },
+                }}
+              >
+                ປະເພດເຄື່ອງດື່ມ
+              </InputLabel>
+              <Select
+                labelId="size-label"
+                value={formData.type}
+                onChange={handleChange}
+                name="type"
+              >
+                <MenuItem value="COFFEE">COFFEE</MenuItem>
+                <MenuItem value="CHOCOLATE">CHOCOLATE</MenuItem>
+                <MenuItem value="TEA">TEA</MenuItem>
+                <MenuItem value="ITALIAN SODA">ITALIAN SODA</MenuItem>
+                <MenuItem value="MILK">MILK</MenuItem>
+                <MenuItem value="EXTRA">EXTRA</MenuItem>
+                <MenuItem value="COCOA">COCOA</MenuItem>
+                <MenuItem value="MATCHA">MATCHA</MenuItem>
+                <MenuItem value="FRUIT JUICE">FRUIT JUICE</MenuItem>
+              </Select>
+            </FormControl>
+
+            <TextField
+              label="ລາຄາຂາຍ"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontFamily: "Noto Sans Lao",
+                },
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Noto Sans Lao",
+                  color: colors.grey[100],
+                  opacity: 0.5,
+                },
+                "& .MuiInputLabel-shrink": {
+                  // 👇 fix label cut when shrink
+                  transform: "translate(14px, -9px) scale(0.75)",
+                  fontFamily: "Noto Sans Lao",
+                  color: colors.grey[100],
+                },
+                mt: 1,
+              }}
+              name="sellPrice"
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              inputProps={{
+                min: 1,
+              }}
+              value={formData.sellPrice}
+              onChange={handleChange}
+              fullWidth
+            />
 
             <TextField
               label="ລາຍລະອຽດວັດຖຸດິບ"

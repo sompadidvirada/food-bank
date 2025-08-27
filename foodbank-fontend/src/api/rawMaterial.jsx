@@ -145,3 +145,11 @@ export const getAllStockrequisition = (form, token) => {
         }
     })
 }
+
+export const exchangeRateCalcurate = (form, token) => {
+    return axios.post(`${URL}/exchangeratecalcu`, form, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

@@ -31,6 +31,7 @@ import DialogEditRawMaterial from "./component/DialogEditRawMaterial";
 import DeleteRawMaterial from "./component/DeleteRawMaterial";
 import AddMaterialVariant from "./component/AddMaterialVariant";
 import ImageModal from "../../component/ImageModal";
+import ExchageRate from "./component/ExchageRate";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -254,6 +255,7 @@ const ManageRawMaterial = () => {
       type: "number",
       headerAlign: "center",
       align: "center",
+      width:120,
       renderCell: ({ row }) => {
         return (
           <Box
@@ -276,16 +278,16 @@ const ManageRawMaterial = () => {
       headerAlign: "center",
       sortable: false,
       align: "center",
+      width:180,
       renderCell: ({ row }) => {
         return (
           <Box
             display="flex"
-            justifyContent="center"
             alignItems="center"
             width="100%"
             height="100%"
           >
-            <Typography fontFamily="Noto Sans Lao">{row.barcode}</Typography>
+            <Typography fontFamily="Noto Sans Lao" sx={{ fontSize:13}}>{row.barcode}</Typography>
           </Box>
         );
       },
@@ -296,7 +298,7 @@ const ManageRawMaterial = () => {
       headerAlign: "center",
       sortable: false,
       align: "center",
-      width: 180,
+      flex:1,
       renderCell: ({ row }) => {
         return (
           <Box
@@ -343,6 +345,7 @@ const ManageRawMaterial = () => {
             categoryRawMaterial={categoryRawMaterial}
             fecthAllRawMaterial={fecthAllRawMaterial}
           />
+          <ExchageRate  fecthAllRawMaterial={fecthAllRawMaterial}/>
         </Box>
         <Box
           display="flex"
@@ -398,7 +401,7 @@ const ManageRawMaterial = () => {
             "& .MuiDataGrid-columnHeaders": {
               fontFamily: "Noto Sans Lao",
               fontWeight: "bold", // optional
-              fontSize: "16px", // optional
+              fontSize: "14px", // optional
             },
           }}
         />

@@ -34,14 +34,23 @@ const DialogDetailCoffeeMenu = ({
   parentData,
   setSelectitem,
   materialVariantChildOnly,
-  fecthCoffeeMenuIngredientByMenuId
+  fecthCoffeeMenuIngredientByMenuId,
 }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
   const handleClose = () => {
     setOpenDetail(false);
+    setSelectitem([]);
   };
+
+  const totalAllUse = selectItem?.reduce(
+    (sum, item) => sum + item.totalUseKip,
+    0
+  );
+
+  const percentage =
+    totalAllUse > 0 ? (totalAllUse / parentData.sellPrice ) * 100 : 0;
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", width: 60, sortable: false },
@@ -114,6 +123,32 @@ const DialogDetailCoffeeMenu = ({
       ),
     },
     {
+      field: "totalUseKip",
+      headerName: "ເປັນມູນຄ່າ",
+      width: 180,
+      headerAlign: "right",
+      sortable: false,
+      renderCell: ({ row }) => (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="right"
+          width="100%"
+          height="100%"
+        >
+          <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+            {row?.totalUseKip !== undefined
+              ? new Intl.NumberFormat("en-US", {
+                  minimumFractionDigits: row.totalUseKip % 1 !== 0 ? 2 : 0, // 👈 if float, show 2 decimals
+                  maximumFractionDigits: 2,
+                }).format(row.totalUseKip)
+              : ""}{" "}
+            ກີບ
+          </Typography>
+        </Box>
+      ),
+    },
+    {
       field: "manage",
       headerName: "ຈັດການ",
       flex: 1,
@@ -140,6 +175,13 @@ const DialogDetailCoffeeMenu = ({
         open={openDetail}
         slots={{
           transition: Transition,
+        }}
+        PaperProps={{
+          sx: {
+            width: "800px",
+            height: "800px",
+            borderRadius: 3,
+          },
         }}
         keepMounted
         onClose={handleClose}
@@ -176,8 +218,22 @@ const DialogDetailCoffeeMenu = ({
                 parentData={parentData}
                 materialVariantChildOnly={materialVariantChildOnly}
                 setSelectitem={setSelectitem}
-                fecthCoffeeMenuIngredientByMenuId={fecthCoffeeMenuIngredientByMenuId}
+                fecthCoffeeMenuIngredientByMenuId={
+                  fecthCoffeeMenuIngredientByMenuId
+                }
               />
+              <Box>
+                <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                  ລາຄາຂາຍປະຈຸບັນ: {parentData?.sellPrice.toLocaleString()} ກີບ
+                </Typography>
+                <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                  ລາຄາຕົ້ນທືນທັງໝົດຂອງວັດຖຸດິບ:{" "}
+                  {Number(totalAllUse?.toFixed(3)).toLocaleString()} ກີບ
+                </Typography>
+                <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+                  ແຍກອອກເປັນເປີເຊັນ: {percentage.toFixed(2)}%
+                </Typography>
+              </Box>
             </Box>
           </Box>
         </DialogTitle>

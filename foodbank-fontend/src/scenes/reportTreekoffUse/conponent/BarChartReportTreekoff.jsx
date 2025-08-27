@@ -52,6 +52,8 @@ const BarChartReportTreekoff = ({ data, queryForm,branchName }) => {
     setSelectDataBar(barData);
   };
 
+  console.log(data)
+
   return (
     <Box sx={{ width: "100%", height: 600 }}>
       <ResponsiveBar /* or Bar for fixed dimensions */

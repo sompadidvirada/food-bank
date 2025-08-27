@@ -4,24 +4,23 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  IconButton,
   Slide,
   TextField,
-  Tooltip,
 } from "@mui/material";
-import React, { useState } from "react";
-import ChangeCircleIcon from "@mui/icons-material/ChangeCircle";
+import React, { useRef } from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
-import { updateIngredientCoffeeMenu } from "../../../api/coffeeMenu";
+import { useState } from "react";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import { exchangeRateCalcurate } from "../../../api/rawMaterial";
 import { toast } from "react-toastify";
-
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const EditIngredientCoffeeMenu = ({ row, setSelectitem }) => {
+const ExchageRate = ({ fecthAllRawMaterial }) => {
   const token = useFoodBankStorage((state) => state.token);
   const [open, setOpen] = useState(false);
+  const formRef = useRef(null);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -29,55 +28,44 @@ const EditIngredientCoffeeMenu = ({ row, setSelectitem }) => {
 
   const handleClose = () => {
     setOpen(false);
+    if (formRef.current) {
+    formRef.current.reset();
+  }
   };
 
-  const handleCreateCategoryRawMaterial = async (event) => {
+  const handleExchangeRate = async (event) => {
     event.preventDefault();
-    const form = event.currentTarget; // 👈 reference the form
+    const form = event.currentTarget;
     const formData = new FormData(event.currentTarget);
-    const quantity = formData.get("quantity");
-    if (!quantity) {
+    const exchangeRate = formData.get("exchangeRate");
+    if (!exchangeRate) {
       return;
     }
     try {
-      const ress = await updateIngredientCoffeeMenu(
-        row.id,
-        { quantity: quantity },
+      const ress = await exchangeRateCalcurate(
+        { exchangeRate: exchangeRate },
         token
       );
-      console.log(ress)
-      setSelectitem((prev) =>
-        prev.map((item) => (item.id === ress.data.id ? { ...item, ...ress.data } : item))
-      );
-      toast.success(`ແກ້ໄຂບໍລິມາດສຳເລັດ`);
-      form.reset(); // 👈 reset all fields
+      console.log(ress);
+      fecthAllRawMaterial();
+      toast.success(`ອັປເດດເລດເງີນ ${exchangeRate} ສຳເລັດ`);
       handleClose();
+      form.reset();
     } catch (err) {
       console.log(err);
     }
   };
-
   return (
     <Box>
-      <IconButton onClick={handleClickOpen}>
-        <Tooltip
-          title="ແກ້ໄຂບໍລິມາດວັດຖຸດິບ"
-          arrow
-          placement="top"
-          componentsProps={{
-            tooltip: {
-              sx: {
-                fontSize: "14px",
-                fontFamily: "Noto Sans Lao", // or any font you prefer
-                color: "#fff",
-                backgroundColor: "#333", // optional
-              },
-            },
-          }}
-        >
-          <ChangeCircleIcon />
-        </Tooltip>{" "}
-      </IconButton>
+      <Button
+        color="secondary"
+        variant="contained"
+        sx={{ fontFamily: "Noto Sans Lao" }}
+        startIcon={<AttachMoneyIcon />}
+        onClick={handleClickOpen}
+      >
+        ປ່ຽນເລດເງີນ
+      </Button>
       <Dialog
         open={open}
         slots={{
@@ -87,12 +75,17 @@ const EditIngredientCoffeeMenu = ({ row, setSelectitem }) => {
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
       >
-        <form onSubmit={handleCreateCategoryRawMaterial}>
+        <form onSubmit={handleExchangeRate} ref={formRef}>
           <DialogContent>
             <TextField
-              name="quantity"
-              helperText="ກະລຸນາໃສ່ຈຳນວນບໍລິມາດທີ່ຕ້ອງການແກ້ໄຂ"
+              name="exchangeRate"
+              helperText="ໃສ່ເລດເງີນທີ່ຕ້ອງການປ່ຽນລາຄາສິນຄ້າ..."
               id="demo-helper-text-misaligned"
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              inputProps={{
+                min: 1,
+              }}
               FormHelperTextProps={{
                 sx: {
                   fontFamily: "Noto Sans Lao",
@@ -129,4 +122,4 @@ const EditIngredientCoffeeMenu = ({ row, setSelectitem }) => {
   );
 };
 
-export default EditIngredientCoffeeMenu;
+export default ExchageRate;

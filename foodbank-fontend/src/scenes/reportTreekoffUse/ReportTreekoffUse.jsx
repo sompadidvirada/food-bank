@@ -20,44 +20,7 @@ import BarChartReportTreekoff from "./conponent/BarChartReportTreekoff";
 import { getReportCoffeeSell } from "../../api/reportCoffeeSell";
 import { format, parseISO } from "date-fns";
 import { getRawMaterialVariantToInsert } from "../../api/rawMaterial";
-
-const data = [
-  {
-    country: "AD",
-    "hot dog": 193,
-    burger: 100,
-  },
-  {
-    country: "AE",
-    "hot dog": 6,
-    burger: 187,
-  },
-  {
-    country: "AF",
-    "hot dog": 77,
-    burger: 167,
-  },
-  {
-    country: "AG",
-    "hot dog": 167,
-    burger: 37,
-  },
-  {
-    country: "AI",
-    "hot dog": 60,
-    burger: 23,
-  },
-  {
-    country: "AL",
-    "hot dog": 160,
-    burger: 99,
-  },
-  {
-    country: "AM",
-    "hot dog": 197,
-    burger: 180,
-  },
-];
+import FilterReportDialog from "./conponent/FilterReportDialog";
 
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
@@ -68,6 +31,7 @@ const ReportTreekoffUse = () => {
   const token = useFoodBankStorage((state) => state.token);
   const [reportCoffeeUse, setReportCoffeeUse] = useState([]);
   const [rawMaterial, setRawMaterial] = useState([]);
+  const [filteredReport, setFilteredReport] = useState(reportCoffeeUse);
   const [queryForm, setQueryFormState] = useState({
     startDate: "",
     endDate: "",
@@ -98,6 +62,10 @@ const ReportTreekoffUse = () => {
       fecthReportCoffeeUse();
     }
   }, [token, queryForm]);
+
+  useEffect(() => {
+    setFilteredReport(reportCoffeeUse); // reset filtered report when data changes
+  }, [reportCoffeeUse]);
 
   useEffect(() => {
     fecthRawMaterial();
@@ -173,11 +141,15 @@ const ReportTreekoffUse = () => {
 
         {/**Section 2 grap data */}
         <Box>
-          <Typography>something</Typography>
+          <FilterReportDialog
+            reportCoffeeUse={reportCoffeeUse}
+            setFilteredReport={setFilteredReport}
+            colors={colors}
+          />
         </Box>
         <Box>
           <BarChartReportTreekoff
-            data={reportCoffeeUse ? reportCoffeeUse : []}
+            data={filteredReport}
             queryForm={queryForm}
             branchName={branchName}
           />

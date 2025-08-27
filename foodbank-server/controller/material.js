@@ -1006,3 +1006,46 @@ exports.deleteAllStockRequisitionByDate = async (req, res) => {
     return res.status(500).json({ message: `server erorr` });
   }
 };
+
+// calculate priceKip and sellPricekip by exchangeRate
+
+exports.updateMaterialVariantByExchangeRate = async (req, res) => {
+  try {
+    const { exchangeRate } = req.body;
+
+    if (!exchangeRate || isNaN(exchangeRate)) {
+      return res.status(400).json({ message: "Invalid exchange rate." });
+    }
+
+    // Fetch only materialVariants with costPriceBath not null
+    const materialVariants = await prisma.materialVariant.findMany({
+      where: {
+        costPriceBath: { gt: 0 }, // excludes null and 0
+        sellPriceBath: { gt: 0 }, // excludes null and 0
+      },
+      select: {
+        id: true,
+        costPriceBath: true,
+      },
+    });
+
+    // Prepare update promises
+    const updates = materialVariants.map((variant) =>
+      prisma.materialVariant.update({
+        where: { id: variant.id },
+        data: {
+          costPriceKip: Math.round(variant.costPriceBath * exchangeRate),
+          sellPriceKip: Math.round(variant.costPriceBath * exchangeRate),
+        },
+      })
+    );
+
+    // Execute all updates atomically
+    await prisma.$transaction(updates);
+
+    res.json({ message: "Update success." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error." });
+  }
+};

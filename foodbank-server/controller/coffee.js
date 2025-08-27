@@ -18,7 +18,7 @@ const s3 = new S3Client({
 
 exports.createCoffeeMenu = async (req, res) => {
   try {
-    const { name, description, image, size } = req.body;
+    const { name, description, image, size, type, sellPrice } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: `emty value.` });
@@ -29,6 +29,8 @@ exports.createCoffeeMenu = async (req, res) => {
         description,
         size,
         image,
+        type,
+        sellPrice: Number(sellPrice)
       },
     });
     res.send(ress);
@@ -51,7 +53,7 @@ exports.getAllCoffeeMenu = async (req, res) => {
 exports.updateCoffeeMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, image, contentType, size } = req.body;
+    const { name, description, image, contentType, size, type, sellPrice } = req.body;
 
     let imageUploadUrl = null;
 
@@ -103,6 +105,8 @@ exports.updateCoffeeMenu = async (req, res) => {
         description: description,
         size: size,
         ...(image ? { image } : {}),
+        type: type,
+        sellPrice: Number(sellPrice)
       },
     });
     res.status(201).json({
@@ -208,6 +212,7 @@ exports.getCoffeeMenuIngredientByCoffeeMenu = async (req, res) => {
     const result = ingredients.map((item) => ({
       id: item.id,
       quantity: item.quantity,
+      totalUseKip:item.quantity * item.materialVariant.sellPriceKip,
       image: item.materialVariant.rawMaterial.image,
       unit: item.unit,
       coffeeMenuId: item.coffeeMenuId,
@@ -650,14 +655,14 @@ exports.fetchCoffeeIngredientUseByMaterialId = async (req, res) => {
       // 3. build response row
       results.push({
         rawMaterialName:
-          stockItem?.rawMaterialName ||
-          usageItem?.rawMaterialName ||
-          "", // fallback
+          stockItem?.rawMaterialName || usageItem?.rawMaterialName || "", // fallback
         branchName: branch.branchname,
         branchId: branch.id,
         materialVariantId: Number(materialVariantId),
         materialVariantName:
-          stockItem?.materialVariantName || usageItem?.materialVariantName || "",
+          stockItem?.materialVariantName ||
+          usageItem?.materialVariantName ||
+          "",
         stockRequisition: stockItem?.quantityRequisition || 0,
         ingredientUsage: usageItem?.coffeeSellUsed || 0,
       });
@@ -669,6 +674,3 @@ exports.fetchCoffeeIngredientUseByMaterialId = async (req, res) => {
     return res.status(500).json({ message: `server error.` });
   }
 };
-
-
- 

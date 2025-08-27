@@ -57,6 +57,8 @@ const CoffeeMenu = () => {
 
   //function
 
+  console.log(coffeeMenu)
+
   const handleClickOpen = (row) => {
     fecthCoffeeMenuIngredientByMenuId(row.id);
     setParentData(row);
@@ -154,6 +156,31 @@ const CoffeeMenu = () => {
       ),
     },
     {
+      field: "type",
+      headerName: "ປະເພດເມນູ",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <Typography
+            sx={{
+              fontFamily: "Noto Sans Lao",
+            }}
+          >
+            {row.type ? row.type : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
       field: "size",
       headerName: "ຂະໜາດຈອກ",
       headerAlign: "center",
@@ -174,6 +201,33 @@ const CoffeeMenu = () => {
             }}
           >
             {row.size}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      field: "sellPrice",
+      headerName: "ລາຄາຂາຍ",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <Typography
+            sx={{
+              fontFamily: "Noto Sans Lao",
+            }}
+          >
+            {row.sellPrice
+              ? `${row.sellPrice.toLocaleString()} ກີບ`
+              : "ຍັງບໍ່ໄດ້ຕັ້ງລາຄາຂາຍ"}
           </Typography>
         </Box>
       ),
