@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import CalendarExp from "./component/CalendarExp";
@@ -29,6 +29,7 @@ import {
 } from "../../api/tracking";
 import DialogEditSend from "./component/DialogEditSend";
 import DialogEditExp from "./component/DialogEditExp";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -39,8 +40,6 @@ const Trackexp = () => {
   const token = useFoodBankStorage((state) => state.token);
   const products = useFoodBankStorage((state) => state.products);
   const [productDetail, setProductDetail] = useState([]);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState(null);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     expCount: "",
@@ -54,7 +53,11 @@ const Trackexp = () => {
     brachId: "",
   });
   const [expCounts, setSellCounts] = useState({});
+  const imageModalRef = useRef();
 
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
   {
     /** column for DataGrid  */
   }
@@ -297,18 +300,6 @@ const Trackexp = () => {
   };
 
   {
-    /** function open modal image  */
-  }
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
-  {
     /** fucntion fecth the tracking from the database */
   }
   const fetchDateBrachCheck = async () => {
@@ -459,38 +450,8 @@ const Trackexp = () => {
         </Box>
       </Box>
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
+
       {/* Snackbar for success message */}
     </Box>
   );

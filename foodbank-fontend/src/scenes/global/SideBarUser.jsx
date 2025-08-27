@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
 import { tokens } from "../../theme";
 import CloseIcon from "@mui/icons-material/Close";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Editprofile from "./component/Editprofile";
 import MapIcon from "@mui/icons-material/Map";
@@ -24,10 +24,12 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
-import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import EditCalendarIcon from "@mui/icons-material/EditCalendar";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import ImageModal from "../../component/ImageModal";
 
-const URL ="https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
+const URL =
+  "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -53,19 +55,12 @@ const SideBarUser = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const user = useFoodBankStorage((state) => state.user);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  // Function to close the image modal
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
+  const imageModalRef = useRef();
 
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
   return (
     <Box
       sx={{
@@ -98,11 +93,7 @@ const SideBarUser = () => {
             }}
           >
             {!isCollapsed && (
-              <Box
-                display="flex"
-                alignItems="center"
-                ml="15px"
-              >
+              <Box display="flex" alignItems="center" ml="15px">
                 <img
                   src="/TK.png"
                   alt="Logo"
@@ -122,17 +113,13 @@ const SideBarUser = () => {
                 <img
                   onClick={() =>
                     handleImageClick(
-                      `${URL}/${
-                        user?.image || "default-user.png"
-                      }`
+                      `${URL}/${user?.image || "default-user.png"}`
                     )
                   }
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`${URL}/${
-                    user?.image || `default-user.png`
-                  }`}
+                  src={`${URL}/${user?.image || `default-user.png`}`}
                   style={{
                     cursor: "pointer",
                     borderRadius: "50%",
@@ -259,38 +246,7 @@ const SideBarUser = () => {
       </ProSidebar>
 
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl || "nigler.png"}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

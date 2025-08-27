@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Button from "@mui/material/Button";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -23,6 +23,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { format } from "date-fns";
+import ImageModal from "../../../component/ImageModal";
 
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
@@ -44,9 +45,11 @@ const UploadImage = ({ selectFormtracksell, checkImage, setCheckImage }) => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const token = useFoodBankStorage((state) => state.token);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
-  const [openImageModal, setOpenImageModal] = useState(false);
+  const imageModalRef = useRef();
 
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
   const typeToExtension = {
     "image/jpeg": "jpg",
     "image/png": "png",
@@ -197,16 +200,6 @@ const UploadImage = ({ selectFormtracksell, checkImage, setCheckImage }) => {
     }
   };
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
   return (
     <Box
       sx={{
@@ -292,7 +285,7 @@ const UploadImage = ({ selectFormtracksell, checkImage, setCheckImage }) => {
                       height: "100%",
                       objectFit: "cover",
                       borderRadius: "4px",
-                      cursor:"pointer"
+                      cursor: "pointer",
                     }}
                   />
                 </Box>
@@ -411,40 +404,8 @@ const UploadImage = ({ selectFormtracksell, checkImage, setCheckImage }) => {
         </DialogActions>
       </Dialog>
 
-      {/** IMAGE MODAL */}
-
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={`${URL}/${selectedImageUrl}`}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

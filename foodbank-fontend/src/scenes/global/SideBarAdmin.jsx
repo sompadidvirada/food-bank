@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
@@ -26,7 +26,7 @@ import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ArticleIcon from "@mui/icons-material/Article";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import CoffeeIcon from '@mui/icons-material/Coffee';
+import CoffeeIcon from "@mui/icons-material/Coffee";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
@@ -36,6 +36,7 @@ import ShowChartIcon from "@mui/icons-material/ShowChart";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import GradeIcon from "@mui/icons-material/Grade";
+import ImageModal from "../../component/ImageModal";
 
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
@@ -64,17 +65,10 @@ const SideBarAdmin = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const user = useFoodBankStorage((state) => state.user);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const imageModalRef = useRef();
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  // Function to close the image modal
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
   };
   return (
     <Box
@@ -433,38 +427,7 @@ const SideBarAdmin = () => {
       </ProSidebar>
 
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl || "nigler.png"}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

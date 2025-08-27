@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { tokens } from "../../theme";
 import {
   Box,
@@ -14,6 +14,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import Calendar from "../../component/Calendar";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Header from "../component/Header";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -21,8 +22,11 @@ const ReportAll = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const totalData = useFoodBankStorage((state) => state.totalData);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
 
   useEffect(() => {
     if (!totalData || totalData.length === 0) return;
@@ -275,16 +279,6 @@ const ReportAll = () => {
     [colors]
   );
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
   const handlePrint = () => {
     const formatCell = (value) => {
       if (typeof value === "number") return value.toLocaleString();
@@ -444,39 +438,8 @@ const ReportAll = () => {
           />
         </Box>
       </Box>
-      {/* Image Modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

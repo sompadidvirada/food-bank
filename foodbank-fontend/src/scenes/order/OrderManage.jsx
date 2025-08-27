@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../component/Header";
-import { Button, Typography, useTheme } from "@mui/material";
+import { Button, Dialog, DialogContent, IconButton, Typography, useTheme } from "@mui/material";
 import { tokens } from "../../theme";
 import CheckIcon from "@mui/icons-material/Check";
 import SelectBranch from "../Tracking/component/SelectBranch";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
+import CloseIcon from "@mui/icons-material/Close";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import CalendarOrder from "./component/CalendarOrder";
 import {
@@ -22,6 +23,7 @@ import {
 import { toast } from "react-toastify";
 import DialogOrder from "./component/DialogOrder";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -61,6 +63,11 @@ const OrderManage = () => {
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
+   const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
   const columns = [
     { field: "id", headerName: "ໄອດີ", width: 90 },
     {
@@ -713,7 +720,6 @@ const OrderManage = () => {
     };
   }, []);
 
-
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
@@ -746,7 +752,8 @@ const OrderManage = () => {
             disabled={
               selectFormtracksell?.orderDate &&
               selectFormtracksell?.brachId &&
-              checkedOrder.length !== 0 && status.confirmStatus !== true
+              checkedOrder.length !== 0 &&
+              status.confirmStatus !== true
                 ? false
                 : true
             }
@@ -865,6 +872,8 @@ const OrderManage = () => {
           </Box>
         )}
       </Box>
+      {/** image modal */}
+       <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

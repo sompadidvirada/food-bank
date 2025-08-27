@@ -8,7 +8,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import { DataGrid } from "@mui/x-data-grid";
@@ -22,6 +22,7 @@ import AddProduct from "./component/AddProduct";
 import AddCategory from "./component/AddCategory";
 import DeleteCategory from "./component/DeleteCategory";
 import { toast } from "react-toastify";
+import ImageModal from "../../component/ImageModal";
 
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
@@ -38,10 +39,13 @@ const Product = () => {
     /** create normal state */
   }
 
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [openDetailDialog, setOpenDetailDialog] = useState(false);
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
 
   {
     /** import function or varible from zustand */
@@ -207,20 +211,6 @@ const Product = () => {
   }, []);
 
   {
-    /* image modal function*/
-  }
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
-  {
     /** open dialog detail product available status function */
   }
 
@@ -285,38 +275,7 @@ const Product = () => {
       {/** image modal dialog */}
 
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
 
       {/**Product detail dialog */}
 

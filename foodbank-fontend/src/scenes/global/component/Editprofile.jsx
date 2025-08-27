@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import {
@@ -20,6 +20,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { toast } from "react-toastify";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import ImageModal from "../../../component/ImageModal";
 
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
@@ -40,8 +41,6 @@ const Editprofile = () => {
     image: "",
   });
   const [imagePreview, setImagePreview] = useState(null);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const updateUser = useFoodBankStorage((state) => state.updateUser);
   const typeToExtension = {
@@ -58,6 +57,11 @@ const Editprofile = () => {
     return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
       ""
     );
+  };
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
   };
 
   {
@@ -99,16 +103,6 @@ const Editprofile = () => {
       image: "",
     });
     setImagePreview(null);
-  };
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
   };
 
   const handleImageChange = (e) => {
@@ -266,40 +260,9 @@ const Editprofile = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl || "nigler.png"}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
+
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={isUploading}

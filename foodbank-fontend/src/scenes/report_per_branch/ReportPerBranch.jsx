@@ -7,13 +7,21 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useState, useEffect, useMemo, Suspense, lazy } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  Suspense,
+  lazy,
+  useRef,
+} from "react";
 import { CircularProgress } from "@mui/material";
 import { tokens } from "../../theme";
 import CloseIcon from "@mui/icons-material/Close";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Header from "../component/Header";
 import Calendar from "../../component/Calendar";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -33,8 +41,12 @@ const ReportPerBranch = () => {
     };
   });
 
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
+
   const [filterData, setFilterData] = useState(true);
 
   // Preload unique images once
@@ -43,9 +55,7 @@ const ReportPerBranch = () => {
 
     const imageUrls = dataTrack
       .flatMap((branch) => branch.detail || []) // Fallback to empty array if `detail` is undefined
-      .map((item) =>
-        item.image ? `${URL}/${item?.image}` : null
-      )
+      .map((item) => (item.image ? `${URL}/${item?.image}` : null))
       .filter(Boolean);
 
     const uniqueUrls = [...new Set(imageUrls)];
@@ -138,9 +148,19 @@ const ReportPerBranch = () => {
           </Typography>
         ),
       },
-      { field: "totalSend", headerName: "ຈຳນວນຈັດສົ່ງ", type: "number", flex: 0.5 },
+      {
+        field: "totalSend",
+        headerName: "ຈຳນວນຈັດສົ່ງ",
+        type: "number",
+        flex: 0.5,
+      },
       { field: "totalSell", headerName: "ຈຳນວນຂາຍ", type: "number", flex: 0.5 },
-      { field: "totalExp", headerName: "ຈຳນວນໝົດອາຍຸ", type: "number", flex: 0.5 },
+      {
+        field: "totalExp",
+        headerName: "ຈຳນວນໝົດອາຍຸ",
+        type: "number",
+        flex: 0.5,
+      },
       { field: "price", headerName: "ລາຄາຕົ້ນທຶນ", type: "number", flex: 0.5 },
       {
         field: "sellPrice",
@@ -245,16 +265,6 @@ const ReportPerBranch = () => {
     [colors]
   );
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
   const handleFilter = () => {
     setFilterData((prev) => !prev);
   };
@@ -277,7 +287,12 @@ const ReportPerBranch = () => {
             gap="20px"
           >
             <Calendar />
-            <Button variant="contained" sx={{ fontFamily:"Noto Sans Lao"}} color="warning" onClick={handleFilter}>
+            <Button
+              variant="contained"
+              sx={{ fontFamily: "Noto Sans Lao" }}
+              color="warning"
+              onClick={handleFilter}
+            >
               ແຍກລາຍການທີ່ບໍ່ໄດ້ຈັດສົ່ງ
             </Button>
           </Box>
@@ -339,39 +354,8 @@ const ReportPerBranch = () => {
         </Box>
       </Box>
 
-      {/* Image Modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

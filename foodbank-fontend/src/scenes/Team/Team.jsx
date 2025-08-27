@@ -42,6 +42,7 @@ import KeyOffIcon from "@mui/icons-material/KeyOff";
 import axios from "axios";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -61,9 +62,7 @@ const Team = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [status, setStatus] = useState(null);
   const [searchText, setSearchText] = useState("");
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [allStaffs, setAllStaffs] = useState([]);
-  const [openImageModal, setOpenImageModal] = useState(false);
   const [openCreateStaff, setOpenCreateStaff] = useState(false);
   const fileInputRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null);
@@ -85,6 +84,12 @@ const Team = () => {
     return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
       ""
     );
+  };
+
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
   };
 
   const handleOpenClearPassword = (row) => {
@@ -177,16 +182,6 @@ const Team = () => {
     } finally {
       setIsUploading(false); // Hide backdrop
     }
-  };
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
   };
 
   const handleClickOpenEditBranch = (row) => {
@@ -880,41 +875,6 @@ const Team = () => {
         </DialogActions>
       </Dialog>
 
-      {/** DIALOG OPEN IMAGE */}
-
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-
       {/** DIALOG CREATE STAFF */}
 
       <Dialog
@@ -1176,6 +1136,9 @@ const Team = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
 
       {/**Toastify Part */}
 

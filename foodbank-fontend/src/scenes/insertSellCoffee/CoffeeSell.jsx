@@ -79,10 +79,23 @@ const CoffeeSell = () => {
 
   const handleSetSell = async (
     menuId,
-    count = null,
+    countOrForm = null,
     productOverride = null
   ) => {
-    const countToUse = count !== null ? count : sendCounts[menuId];
+    let countToUse = 0;
+
+    // Case 1: called from UploadPdf (count passed directly)
+    if (typeof countOrForm === "number") {
+      countToUse = countOrForm;
+    }
+    // Case 2: called from form submit (form element passed)
+    else if (countOrForm instanceof HTMLFormElement) {
+      const formData = new FormData(countOrForm);
+      const rawValue = formData.get(`sellCount-${menuId}`);
+      countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+    }
+
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
 
     if (
       selectFormtracksend.sellDate === "" ||
@@ -107,14 +120,12 @@ const CoffeeSell = () => {
     try {
       const ress = await insertCoffeeSell(updatedForm, token);
       setChecked((prev) => [...prev, ress.data]);
-      setSendCounts((prev) => ({ ...prev, [menuId]: "" }));
+      if (countOrForm instanceof HTMLFormElement) {
+        countOrForm.reset();
+      }
     } catch (err) {
       console.log(err);
     }
-  };
-
-  const handleChange = (menuId, value) => {
-    setSendCounts((prev) => ({ ...prev, [menuId]: value }));
   };
 
   useEffect(() => {
@@ -134,6 +145,8 @@ const CoffeeSell = () => {
       toast.error(`ລອງໃຫ່ມພາຍຫຼັງ.`);
     }
   };
+
+  
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", flex: 0.2 },
@@ -273,43 +286,45 @@ const CoffeeSell = () => {
                 height: "100%",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={sendCounts[menuId] || ""}
-                onChange={(e) =>
-                  handleChange(menuId, Math.max(0, e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetSell(menuId);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSetSell(menuId, e.currentTarget);
                 }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetSell(menuId)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
-                ✔
-              </button>
+                <input
+                  type="number"
+                  min="0"
+                  name={`sellCount-${menuId}`} // important for FormData
+                  defaultValue=""
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                      e.preventDefault();
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  style={{
+                    width: "60px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  ✔
+                </button>
+              </form>
             </div>
           );
         }

@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
@@ -21,6 +21,7 @@ import {
 } from "../../api/rawMaterial";
 import SelectMaterialVariantForStock from "./component/SelectMaterialVariantForStock";
 import PrintReportStockRequisition from "./component/PrintReportStockRequisition";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -28,10 +29,8 @@ const ReportStockReqiosition = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const token = useFoodBankStorage((state) => state.token);
-  const [openImageModal, setOpenImageModal] = useState(false);
   const [rawMaterialVariants, setRawMaterialVariants] = useState([]);
   const [rawMaterial, setRawMaterial] = useState([]);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [queryForm, setQueryFormState] = useState({
     startDate: "",
     endDate: "",
@@ -59,8 +58,6 @@ const ReportStockReqiosition = () => {
     },
     { totalKip: 0, totalBath: 0 }
   );
-
-
 
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
@@ -92,13 +89,10 @@ const ReportStockReqiosition = () => {
     fecthRawMaterial();
   }, [token]);
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
   };
 
   // coumn for datagrid
@@ -309,7 +303,7 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avarageReq)
-                  ? `${(avarageReq * 30)} (${selectedVariant?.variantName}) / ມື້`
+                  ? `${avarageReq * 30} (${selectedVariant?.variantName}) / ມື້`
                   : `${(avarageReq * 30).toFixed(3)} (${
                       selectedVariant?.variantName
                     }) / ເດືອນ`
@@ -648,38 +642,7 @@ const ReportStockReqiosition = () => {
         </Box>
       </Box>
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

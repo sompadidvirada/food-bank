@@ -9,7 +9,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useRef } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { useState } from "react";
 import { tokens } from "../../theme";
@@ -29,12 +29,11 @@ import AddCoffeeMenu from "./component/AddCoffeeMenu";
 import DeleteCoffeeMenu from "./component/DeleteCoffeeMenu";
 import UpdateCoffeeMenu from "./component/UpdateCoffeeMenu";
 import DialogDetailCoffeeMenu from "./component/DialogDetailCoffeeMenu";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-coffee-menu.s3.ap-southeast-2.amazonaws.com";
 
 const CoffeeMenu = () => {
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const token = useFoodBankStorage((state) => state.token);
@@ -45,6 +44,11 @@ const CoffeeMenu = () => {
   const [materialVariantChildOnly, setMaterialVariantChildOnly] = useState([]);
 
   const [search, setSearch] = useState("");
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
 
   // 🔎 filter rows by search term
   const filteredRows = coffeeMenu?.filter((row) =>
@@ -91,15 +95,6 @@ const CoffeeMenu = () => {
     fecthCoffeeMenu();
     fecthMaterialVarinatChild();
   }, [token]);
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
 
   // column for DataGrid
 
@@ -229,7 +224,6 @@ const CoffeeMenu = () => {
     },
   ];
 
-
   return (
     <Box>
       {/** image modal */}
@@ -305,39 +299,9 @@ const CoffeeMenu = () => {
           />
         </Box>
       </Box>
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-      
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
+
       <DialogDetailCoffeeMenu
         openDetail={openDetail}
         setOpenDetail={setOpenDetail}

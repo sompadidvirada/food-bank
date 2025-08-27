@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Typography,
   Box,
@@ -30,6 +30,7 @@ import DetailDialog from "./component/DetailDialog";
 import DialogEditRawMaterial from "./component/DialogEditRawMaterial";
 import DeleteRawMaterial from "./component/DeleteRawMaterial";
 import AddMaterialVariant from "./component/AddMaterialVariant";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -39,11 +40,14 @@ const ManageRawMaterial = () => {
   const token = useFoodBankStorage((state) => state.token);
   const [categoryRawMaterial, setCategoryRawMaterial] = useState([]);
   const [rawMaterials, setRawMaterials] = useState([]);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [openDetail, setOpenDetail] = useState(false);
   const [selectItem, setSelectitem] = useState(null);
   const [parentData, setParentData] = useState(null);
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
 
   const [search, setSearch] = useState("");
 
@@ -51,7 +55,6 @@ const ManageRawMaterial = () => {
   const filteredRows = rawMaterials?.filter((row) =>
     row.name?.toLowerCase().includes(search.toLowerCase())
   );
-
 
   const handleClickOpen = (row) => {
     fecthMaterialVariant(row.id);
@@ -324,15 +327,6 @@ const ManageRawMaterial = () => {
     fecthAllRawMaterial();
   }, [token]);
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
-  };
-
   return (
     <Box m="20px">
       <Header title="ຈັດການວັດຖຸດິບ" />
@@ -409,40 +403,9 @@ const ManageRawMaterial = () => {
           }}
         />
       </Box>
-      {/** DIALOG OPEN IMAGE */}
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
 
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "800px",
-                maxHeight: "90vh",
-                overflow: "hidden",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
       <DetailDialog
         openDetail={openDetail}
         selectItem={selectItem}
