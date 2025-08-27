@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useRef } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import { toast } from "react-toastify";
@@ -26,6 +26,7 @@ import {
 } from "../../api/coffeeSell";
 import EditCoffeeSell from "./component/EditCoffeeSell";
 import UploadFile from "./component/UploadFile";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-coffee-menu.s3.ap-southeast-2.amazonaws.com";
 
@@ -33,8 +34,6 @@ const CoffeeSell = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const token = useFoodBankStorage((state) => state.token);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [coffeeMenu, setCoffeeMenu] = useState([]);
   const [checked, setChecked] = useState([]);
   const [sendCounts, setSendCounts] = useState({});
@@ -48,14 +47,10 @@ const CoffeeSell = () => {
     sellDate: "",
     brachId: "",
   });
+  const imageModalRef = useRef();
 
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
   };
 
   const fecthCoffeeMenu = async () => {
@@ -145,8 +140,6 @@ const CoffeeSell = () => {
       toast.error(`ລອງໃຫ່ມພາຍຫຼັງ.`);
     }
   };
-
-  
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", flex: 0.2 },
@@ -449,38 +442,7 @@ const CoffeeSell = () => {
         </Box>
       </Box>
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

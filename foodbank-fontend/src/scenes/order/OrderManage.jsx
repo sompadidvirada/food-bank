@@ -3,7 +3,14 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import Header from "../component/Header";
-import { Button, Dialog, DialogContent, IconButton, Typography, useTheme } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  IconButton,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { tokens } from "../../theme";
 import CheckIcon from "@mui/icons-material/Check";
 import SelectBranch from "../Tracking/component/SelectBranch";
@@ -38,7 +45,6 @@ const OrderManage = () => {
   const token = useFoodBankStorage((state) => state.token);
   const [checked, setChecked] = useState(null);
   const [checkedOrder, setCheckedOrder] = useState([]);
-  const [orderCount, setOrderCount] = useState({});
   const [branchName, setBranchName] = useState("");
   const [status, setStatus] = useState(null);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
@@ -63,7 +69,7 @@ const OrderManage = () => {
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
-   const imageModalRef = useRef();
+  const imageModalRef = useRef();
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -169,43 +175,45 @@ const OrderManage = () => {
                 height: "100%",
               }}
             >
-              <input
-                type="number"
-                min="0"
-                value={orderCount[productId] || ""}
-                onChange={(e) =>
-                  handleChange(productId, Math.max(0, e.target.value))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleSetOrder(productId);
-                  if (e.key === "ArrowUp" || e.key === "ArrowDown")
-                    e.preventDefault(); // Prevent up/down arrows
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSetOrder(productId, e.currentTarget);
                 }}
-                onWheel={(e) => e.target.blur()} // Prevent scroll
-                style={{
-                  width: "60px",
-                  padding: "5px",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                  textAlign: "center",
-                  appearance: "textfield", // Hides arrows in most browsers
-                  MozAppearance: "textfield", // Hides arrows in Firefox
-                  WebkitAppearance: "none", // Hides arrows in WebKit browsers (Chrome, Safari)
-                }}
-              />
-              <button
-                onClick={() => handleSetOrder(productId)}
-                style={{
-                  background: "#4CAF50",
-                  color: "white",
-                  border: "none",
-                  padding: "5px 10px",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                }}
+                style={{ display: "flex", gap: "5px", alignItems: "center" }}
               >
-                ✔
-              </button>
+                <input
+                  type="number"
+                  min="0"
+                  name={`orderSet-${productId}`} // important for FormData
+                  defaultValue=""
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp" || e.key === "ArrowDown")
+                      e.preventDefault();
+                  }}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  style={{
+                    width: "60px",
+                    padding: "5px",
+                    borderRadius: "4px",
+                    border: "1px solid #ccc",
+                    textAlign: "center",
+                  }}
+                />
+                <button
+                  type="submit"
+                  style={{
+                    background: "#4CAF50",
+                    color: "white",
+                    border: "none",
+                    padding: "5px 10px",
+                    cursor: "pointer",
+                    borderRadius: "4px",
+                  }}
+                >
+                  ✔
+                </button>
+              </form>
             </div>
           );
         }
@@ -633,12 +641,14 @@ const OrderManage = () => {
     }
   }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate]);
 
-  const handleChange = (productId, value) => {
-    setOrderCount((prev) => ({ ...prev, [productId]: value }));
-  };
 
-  const handleSetOrder = async (productId) => {
-    if (!orderCount[productId]) return;
+  const handleSetOrder = async (productId, countOrForm) => {
+    const formData = new FormData(countOrForm);
+    const rawValue = formData.get(`orderSet-${productId}`);
+
+    const countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+
+    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
     if (
       selectFormtracksell.orderDate === "" ||
       selectFormtracksell.brachId === ""
@@ -650,13 +660,12 @@ const OrderManage = () => {
       const updatedForm = {
         ...selectFormtracksell,
         productId,
-        orderCount: orderCount[productId],
+        orderCount: countToUse,
       };
-      setSelectFormtracksell(updatedForm);
       const ress = await insertOrder(updatedForm, token);
 
       setCheckedOrder((prevCheckedOrder) => [...prevCheckedOrder, ress.data]);
-      setOrderCount((prev) => ({ ...prev, [productId]: "" }));
+      countOrForm.reset();
     } catch (err) {
       console.log(err);
     }
@@ -873,7 +882,7 @@ const OrderManage = () => {
         )}
       </Box>
       {/** image modal */}
-       <ImageModal ref={imageModalRef} />
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

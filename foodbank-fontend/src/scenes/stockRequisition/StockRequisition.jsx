@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useRef } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
@@ -28,6 +28,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import SelectMaterialVariantToInsert from "./component/SelectMaterialVariantToInsert";
 import DialogEdit from "./component/DialogEdit";
 import UploadFile from "./component/UploadFile";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -37,8 +38,6 @@ const StockRequisition = () => {
   const token = useFoodBankStorage((state) => state.token);
   const [rawMaterial, setRawMaterial] = useState([]);
   const [rawMaterialVariants, setRawMaterialVariants] = useState([]);
-  const [openImageModal, setOpenImageModal] = useState(false);
-  const [selectedImageUrl, setSelectedImageUrl] = useState(null);
   const [checked, setChecked] = useState([]);
   const [selectFormtracksend, setSelectFormtracksend] = useState({
     materialVariantId: "",
@@ -56,6 +55,11 @@ const StockRequisition = () => {
     requisitionDate: "",
     branchId: "",
   });
+  const imageModalRef = useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
 
   const fecthRawMaterial = async () => {
     try {
@@ -127,15 +131,6 @@ const StockRequisition = () => {
     } catch (err) {
       console.log(err);
     }
-  };
-
-  const handleImageClick = (imageUrl) => {
-    setSelectedImageUrl(imageUrl);
-    setOpenImageModal(true);
-  };
-  const handleCloseImageModal = () => {
-    setOpenImageModal(false);
-    setSelectedImageUrl(null);
   };
 
   const handleDeleteAllStockRequisitionByDate = async () => {
@@ -314,7 +309,10 @@ const StockRequisition = () => {
 
         if (tracked) {
           return (
-            <Box display="flex-row" sx={{ height: "100%", width:"100%", justifyItems:"center"}}>
+            <Box
+              display="flex-row"
+              sx={{ height: "100%", width: "100%", justifyItems: "center" }}
+            >
               <span
                 style={{
                   color: colors.greenAccent[200],
@@ -336,7 +334,13 @@ const StockRequisition = () => {
               e.preventDefault();
               handleSetSendCount(materialVariantId, e.currentTarget);
             }}
-            style={{ display: "flex", gap: "5px", alignItems: "center", height:"100%", width:"100%" }}
+            style={{
+              display: "flex",
+              gap: "5px",
+              alignItems: "center",
+              height: "100%",
+              width: "100%",
+            }}
           >
             <input
               type="number"
@@ -623,38 +627,7 @@ const StockRequisition = () => {
         </Box>
       </Box>
       {/** image modal */}
-      <Dialog
-        open={openImageModal}
-        onClose={handleCloseImageModal}
-        maxWidth="md"
-      >
-        <DialogContent sx={{ position: "relative", padding: "0" }}>
-          <IconButton
-            onClick={handleCloseImageModal}
-            sx={{
-              position: "absolute",
-              top: 10,
-              right: 10,
-              backgroundColor: "white",
-              "&:hover": { backgroundColor: "gray" },
-            }}
-          >
-            <CloseIcon sx={{ color: "black" }} />
-          </IconButton>
-          {selectedImageUrl && (
-            <img
-              src={selectedImageUrl}
-              alt="Large Preview"
-              style={{
-                width: "100%",
-                height: "auto",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };
