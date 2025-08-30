@@ -17,6 +17,7 @@ const {
   updateCoffeeSell,
   fetchCoffeeSellWithStockRequisition,
   fetchCoffeeIngredientUseByMaterialId,
+  getAllmaterialVariantIngredientUse,
 } = require("../controller/coffee");
 const router = express.Router();
 
@@ -68,5 +69,6 @@ router.post("/deletecoffeesellbydate", authCheck, deleteAllTheCoffeeSellByDate);
 
 router.post("/coffeeingredientusereport", authCheck, fetchCoffeeSellWithStockRequisition)
 router.post("/getingredientusecompare", authCheck, fetchCoffeeIngredientUseByMaterialId)
+router.get("/getallingredientuse",authCheck,adminCheck, getAllmaterialVariantIngredientUse)
 
 module.exports = router;

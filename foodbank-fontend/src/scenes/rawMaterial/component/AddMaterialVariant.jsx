@@ -108,7 +108,6 @@ const AddMaterialVariant = ({ row, handleCloseParent, selectItem,parentData }) =
       sellPriceBath: "",
       barcode: "",
       rawMaterialId: "",
-      quantityInParent: "",
     });
   };
 

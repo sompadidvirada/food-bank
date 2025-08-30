@@ -30,7 +30,7 @@ exports.createCoffeeMenu = async (req, res) => {
         size,
         image,
         type,
-        sellPrice: Number(sellPrice)
+        sellPrice: Number(sellPrice),
       },
     });
     res.send(ress);
@@ -53,7 +53,8 @@ exports.getAllCoffeeMenu = async (req, res) => {
 exports.updateCoffeeMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, image, contentType, size, type, sellPrice } = req.body;
+    const { name, description, image, contentType, size, type, sellPrice } =
+      req.body;
 
     let imageUploadUrl = null;
 
@@ -106,7 +107,7 @@ exports.updateCoffeeMenu = async (req, res) => {
         size: size,
         ...(image ? { image } : {}),
         type: type,
-        sellPrice: Number(sellPrice)
+        sellPrice: Number(sellPrice),
       },
     });
     res.status(201).json({
@@ -212,7 +213,7 @@ exports.getCoffeeMenuIngredientByCoffeeMenu = async (req, res) => {
     const result = ingredients.map((item) => ({
       id: item.id,
       quantity: item.quantity,
-      totalUseKip:item.quantity * item.materialVariant.sellPriceKip,
+      totalUseKip: item.quantity * item.materialVariant.sellPriceKip,
       image: item.materialVariant.rawMaterial.image,
       unit: item.unit,
       coffeeMenuId: item.coffeeMenuId,
@@ -674,3 +675,47 @@ exports.fetchCoffeeIngredientUseByMaterialId = async (req, res) => {
     return res.status(500).json({ message: `server error.` });
   }
 };
+
+exports.getAllmaterialVariantIngredientUse = async (req, res) => {
+  try {
+    const coffeeMenu = await prisma.coffeeMenu.findMany({
+      include: {
+        recipeItem: true,
+      },
+    });
+    const materialVariants = await prisma.materialVariant.findMany();
+
+    const result = coffeeMenu.map(menu => {
+      let totalIngredientUsePrice = 0;
+
+      for (const recipe of menu.recipeItem) {
+        const variant = materialVariants.find(
+          mv => mv.id === recipe.materialVariantId
+        );
+        if (variant) {
+          totalIngredientUsePrice += (variant.costPriceKip || 0) * recipe.quantity;
+        }
+      }
+
+      // calculate percentage
+      const percentage = menu.sellPrice
+        ? (totalIngredientUsePrice / menu.sellPrice) * 100
+        : 0;
+
+      return {
+        id: menu.id,
+        name: menu.name,
+        sellPrice: menu.sellPrice,
+        totalIngredientUsePrice,
+        percentage,
+      };
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
+  }
+};
+
+

@@ -19,6 +19,7 @@ import Header from "../component/Header";
 import {
   getCoffeeMenu,
   getCoffeeMenuIngredientByMenuId,
+  getIngredientUseAll,
   getMateriantVariantChildOnly,
 } from "../../api/coffeeMenu";
 import { useEffect } from "react";
@@ -38,6 +39,7 @@ const CoffeeMenu = () => {
   const colors = tokens(theme.palette.mode);
   const token = useFoodBankStorage((state) => state.token);
   const [coffeeMenu, setCoffeeMenu] = useState([]);
+  const [ingreDientUse, setIngredientUse] = useState([]);
   const [openDetail, setOpenDetail] = useState(false);
   const [parentData, setParentData] = useState(null);
   const [selectItem, setSelectitem] = useState(null);
@@ -57,7 +59,7 @@ const CoffeeMenu = () => {
 
   //function
 
-  console.log(coffeeMenu)
+  console.log(coffeeMenu);
 
   const handleClickOpen = (row) => {
     fecthCoffeeMenuIngredientByMenuId(row.id);
@@ -93,9 +95,19 @@ const CoffeeMenu = () => {
     }
   };
 
+  const fecthTotalIngredientUse = async () => {
+    try {
+      const ress = await getIngredientUseAll(token);
+      setIngredientUse(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     fecthCoffeeMenu();
     fecthMaterialVarinatChild();
+    fecthTotalIngredientUse();
   }, [token]);
 
   // column for DataGrid
@@ -136,7 +148,7 @@ const CoffeeMenu = () => {
       headerAlign: "center",
       align: "center",
       sortable: false,
-      flex: 1,
+      flex: 1.2,
       renderCell: ({ row }) => (
         <Box
           display="flex"
@@ -144,10 +156,16 @@ const CoffeeMenu = () => {
           alignItems="center"
           width="100%"
           height="100%"
+          sx={{
+            whiteSpace: "normal",
+            wordWrap: "break-word",
+            overflowWrap: "break-word",
+          }}
         >
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
+              fontSize:12
             }}
           >
             {row.name}
@@ -173,6 +191,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
+              fontSize:12
             }}
           >
             {row.type ? row.type : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
@@ -198,6 +217,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
+              fontSize:12
             }}
           >
             {row.size}
@@ -223,14 +243,73 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
+              fontSize:12
             }}
           >
             {row.sellPrice
               ? `${row.sellPrice.toLocaleString()} ກີບ`
-              : "ຍັງບໍ່ໄດ້ຕັ້ງລາຄາຂາຍ"}
+              : "."}
           </Typography>
         </Box>
       ),
+    },
+    {
+      field: "ingredinetUse",
+      headerName: "ຕົ້ນທຶນ",
+      headerAlign: "center",
+      align: "left",
+      sortable: false,
+      flex: 1,
+      renderCell: ({ row }) => {
+        const ingredient = ingreDientUse.find(
+          (ing) => ing.id === row.id // adjust key name if different
+        );
+
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            height="100%"
+          >
+            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize:12 }}>
+              {ingredient
+                ? `${ingredient.totalIngredientUsePrice.toLocaleString()} ກີບ`
+                : "."}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "percentageIngredient",
+      headerName: "ເປີເຊັນ",
+      headerAlign: "center",
+      align: "left",
+      sortable: false,
+      flex: 1,
+      renderCell: ({ row }) => {
+        const ingredient = ingreDientUse.find(
+          (ing) => ing.id === row.id // adjust key name if different
+        );
+
+        return (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            height="100%"
+          >
+            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize:12 }}>
+              {ingredient
+                ? `${ingredient.percentage.toFixed(2)} %`
+                : "ຍັງບໍ່ໄດ້ຕັ້ງວັດຖຸດິບ"}
+            </Typography>
+          </Box>
+        );
+      },
     },
     {
       field: "mangement",

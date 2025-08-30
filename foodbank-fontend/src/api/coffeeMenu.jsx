@@ -81,3 +81,10 @@ return axios.post(`${URL}/createcoffeemenuingredient`, form, {
 })
 }
 
+export const getIngredientUseAll = (token) =>{
+  return axios.get(`${URL}/getallingredientuse`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

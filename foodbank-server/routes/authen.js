@@ -6,9 +6,6 @@ const {
   deleteStaff,
   createNewPassword,
 } = require("../controller/authen");
-const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
 const { authCheck, adminCheck } = require("../middleware/authCheck");
 const router = express.Router();
 
