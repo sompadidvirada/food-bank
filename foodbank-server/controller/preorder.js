@@ -446,7 +446,7 @@ exports.getPreviuosPreOrder = async (req, res) => {
     const orderDay = dayjs(orderDate);
     const weekday = orderDay.day(); // 0 = Sunday, 3 = Wednesday, 6 = Saturday
 
-    let startDate, endDate;
+    let startDate
 
     if (weekday === 3) {
       // Wednesday → go back 4 days (Saturday)
@@ -459,6 +459,8 @@ exports.getPreviuosPreOrder = async (req, res) => {
         message: "Only Wednesday or Saturday are supported orderDate.",
       });
     }
+
+    console.log(startDate.toDate())
 
     const previousOrders = await prisma.orderTrack.findMany({
       where: {

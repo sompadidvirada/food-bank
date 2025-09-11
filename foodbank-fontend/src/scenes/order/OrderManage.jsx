@@ -82,7 +82,7 @@ const OrderManage = () => {
 
   const imageModalRef = useRef();
 
-  console.log(checked);
+  console.log(previousOrderTrack);
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
