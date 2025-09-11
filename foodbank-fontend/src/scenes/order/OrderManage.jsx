@@ -25,6 +25,7 @@ import {
   confirmOrderChange,
   deleteOrderTrack,
   getOrderTrack,
+  getPreviousOrderTrack,
   insertOrder,
 } from "../../api/preorder";
 import { toast } from "react-toastify";
@@ -47,6 +48,7 @@ const OrderManage = () => {
   const [checkedOrder, setCheckedOrder] = useState([]);
   const [branchName, setBranchName] = useState("");
   const [status, setStatus] = useState(null);
+  const [previousOrderTrack, setPreviousOrderTrack] = useState([]);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     orderCount: "",
     orderDate: "",
@@ -66,10 +68,21 @@ const OrderManage = () => {
     totalExp: item.week1Exp + item.week2Exp + item.week3Exp,
   }));
 
+  const fecthPreviousOrderTrack = async () => {
+    try {
+      const ress = await getPreviousOrderTrack(selectDateBrachCheck, token);
+      setPreviousOrderTrack(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
   const imageModalRef = useRef();
+
+  console.log(checked);
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -249,6 +262,31 @@ const OrderManage = () => {
       },
     },
     {
+      field: "previousOrder",
+      headerName: "ຍອດທີ່ສັ່ງກ່ອນໜ້າ",
+      sortable: false,
+      width: 100,
+      renderCell: (params) => {
+        const productId = params.row.id;
+        const trackedProduct = previousOrderTrack?.find(
+          (item) => item?.productsId === productId
+        );
+        if (trackedProduct) {
+          return (
+            <Typography
+              fontFamily={"Noto Sans Lao"}
+              color={colors.blueAccent[200]}
+              textAlign={"center"}
+            >
+              {trackedProduct?.orderCount}
+            </Typography>
+          );
+        } else {
+          return <Box textAlign={"center"}>.</Box>;
+        }
+      },
+    },
+    {
       field: "orderwant12",
       sortable: false,
       renderHeader: () => (
@@ -281,8 +319,8 @@ const OrderManage = () => {
         }
 
         // Add 3 if totalSell >= totalSend
-        if (trackedProduct.totalSell >= trackedProduct.totalSend) {
-          value += 3;
+        if (trackedProduct.totalSell > trackedProduct.totalSend) {
+          value += 2;
           highlight = true; // Mark this case
         }
 
@@ -291,7 +329,7 @@ const OrderManage = () => {
             fontFamily={"Noto Sans Lao"}
             color={highlight ? colors.redAccent[400] : colors.greenAccent[400]} // change color if +3
           >
-            {highlight ? `${value.toFixed(2)} (+3)` : value.toFixed(2)}
+            {highlight ? `${value.toFixed(2)} (+2)` : value.toFixed(2)}
           </Typography>
         );
       },
@@ -638,9 +676,9 @@ const OrderManage = () => {
     if (selectDateBrachCheck.brachId && selectDateBrachCheck.orderDate) {
       fetchDateBrachCheck();
       fecthconfirmOrder();
+      fecthPreviousOrderTrack();
     }
   }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate]);
-
 
   const handleSetOrder = async (productId, countOrForm) => {
     const formData = new FormData(countOrForm);

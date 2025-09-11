@@ -3,6 +3,7 @@ const { parseISO, format, startOfDay, subDays, endOfDay } = require("date-fns");
 const { utcToZonedTime, zonedTimeToUtc } = require("date-fns-tz");
 const { io } = require("../server");
 const timeZone = "Asia/Vientiane";
+const dayjs = require("dayjs");
 
 exports.createPreorder = async (req, res) => {
   try {
@@ -434,6 +435,47 @@ exports.changeStatusConfirmOrder = async (req, res) => {
   }
 };
 
+exports.getPreviuosPreOrder = async (req, res) => {
+  try {
+    const { orderDate, brachId } = req.body;
+
+    if (!orderDate || !brachId) {
+      return res.status(400).json({ message: "orderDate is required" });
+    }
+
+    const orderDay = dayjs(orderDate);
+    const weekday = orderDay.day(); // 0 = Sunday, 3 = Wednesday, 6 = Saturday
+
+    let startDate, endDate;
+
+    if (weekday === 3) {
+      // Wednesday → go back 4 days (Saturday)
+      startDate = orderDay.subtract(4, "day").startOf("day");
+    } else if (weekday === 6) {
+      // Saturday → go back 3 days (Wednesday)
+      startDate = orderDay.subtract(3, "day").startOf("day");
+    } else {
+      return res.status(400).json({
+        message: "Only Wednesday or Saturday are supported orderDate.",
+      });
+    }
+
+    const previousOrders = await prisma.orderTrack.findMany({
+      where: {
+        orderDate: startDate.toDate(),
+        branchId: Number(brachId),
+      },
+      orderBy: {
+        orderDate: "asc",
+      },
+    });
+
+    return res.status(200).json(previousOrders);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
+  }
+};
 //  SOCKET IO
 
 io.on("connect", (socket) => {

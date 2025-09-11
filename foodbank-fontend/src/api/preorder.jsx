@@ -78,3 +78,11 @@ export const confirmOrderChange = (id,form, token) => {
     }
   })
 } 
+
+export const getPreviousOrderTrack = (form, token) => {
+  return axios.post(`${URL}/getpevoiusordertrack`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

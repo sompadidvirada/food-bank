@@ -14,6 +14,7 @@ const {
   checkConfirmOrderAll,
   changeStatusConfirmOrder,
   confirmOrderChange,
+  getPreviuosPreOrder,
 } = require("../controller/preorder");
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.post("/confirmorder", confirmOrder)
 router.post("/checkconfirmperbranch", checkConfirmOrderPerBranch)
 router.post("/checkconfirmall", checkConfirmOrderAll)
 router.put("/changestatusconfirm/:id",authCheck, changeStatusConfirmOrder)
+router.post("/getpevoiusordertrack", authCheck, getPreviuosPreOrder)
 
 module.exports = router;
