@@ -71,6 +71,7 @@ const OrderManage = () => {
   const fecthPreviousOrderTrack = async () => {
     try {
       const ress = await getPreviousOrderTrack(selectDateBrachCheck, token);
+      console.log(ress)
       setPreviousOrderTrack(ress.data);
     } catch (err) {
       console.log(err);
