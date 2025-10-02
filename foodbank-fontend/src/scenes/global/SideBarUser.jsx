@@ -241,6 +241,36 @@ const SideBarUser = () => {
               selected={selected}
               setSelected={setSelected}
             />
+
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              ຈັດການເບີກວັດຖຸດິບ
+            </Typography>
+            <Item
+              title="ຈັດການວັດຖຸດິບ"
+              to="/user/rawmaterial"
+              icon={<ChecklistIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຄີຍອດເບີກວັດຖຸດິບ"
+              to="/user/insertstockrequisition"
+              icon={<ChecklistIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ລາຍງານຍອດເບີກວັດຖຸດິບ"
+              to="/user/stockrequisitionreport"
+              icon={<ChecklistIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
           </Box>
         </Menu>
       </ProSidebar>

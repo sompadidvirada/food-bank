@@ -88,6 +88,9 @@ const router = createBrowserRouter([
       { path: "reportall", element: <ReportAll /> },
       { path: "calendar", element: <Calendar /> },
       { path: "allorder", element: <OrderUser /> },
+      { path: "rawmaterial", element: <ManageRawMaterial /> },
+      { path: "insertstockrequisition", element: <StockRequisition /> },
+      { path: "stockrequisitionreport", element: <ReportStockReqiosition /> },
     ],
   },
 ]);
