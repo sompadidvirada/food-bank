@@ -57,6 +57,8 @@ const StockRequisition = () => {
     branchId: "",
   });
 
+  console.log(rawMaterialVariants);
+
   const totals = checked?.reduce(
     (acc, item) => {
       acc.totalKip += item.totalPriceKip;
@@ -80,7 +82,6 @@ const StockRequisition = () => {
     }
   };
 
-
   const fecthStockRequisition = async () => {
     try {
       const ress = await getStockRequisitionByDate(selectDateBrachCheck, token);
@@ -89,6 +90,7 @@ const StockRequisition = () => {
       console.log(err);
     }
   };
+
   const handleSetSendCount = async (materialVariantId, countOrForm = null) => {
     let countToUse = 0;
 
@@ -112,10 +114,21 @@ const StockRequisition = () => {
       return;
     }
 
-    const materialVarint = rawMaterialVariants?.find(
-      (v) => v.materialVariantId === materialVariantId
-    );
-    if (!materialVarint) {
+    // 🔎 Find material variant inside rawMaterial
+    let materialVariant = null;
+    let parentMaterial = null;
+
+    for (const rm of rawMaterial) {
+      materialVariant = rm.materialVariant.find(
+        (v) => v.id === materialVariantId
+      );
+      if (materialVariant) {
+        parentMaterial = rm;
+        break;
+      }
+    }
+
+    if (!materialVariant) {
       console.warn(`⚠️ Material variant ${materialVariantId} not found`);
       return;
     }
@@ -123,14 +136,20 @@ const StockRequisition = () => {
     const updatedForm = {
       ...selectFormtracksend,
       materialVariantId,
-      unitPriceKip: materialVarint.costPriceKip,
-      unitSellPriceKip: materialVarint.costPriceBath,
-      totalPriceKip: materialVarint.sellPriceKip * countToUse,
-      unitPriceBath: materialVarint.costPriceBath,
-      unitSellPriceBath: materialVarint.sellPriceBath,
-      totalPriceBath: materialVarint.sellPriceBath * countToUse,
+      // pricing info comes from the found variant
+      unitPriceKip: materialVariant.costPriceKip,
+      unitSellPriceKip: materialVariant.sellPriceKip,
+      totalPriceKip: materialVariant.sellPriceKip * countToUse,
+      unitPriceBath: materialVariant.costPriceBath,
+      unitSellPriceBath: materialVariant.sellPriceBath,
+      totalPriceBath: materialVariant.sellPriceBath * countToUse,
       quantityRequisition: countToUse,
+
+      // optional: include parent raw material info if needed later
+      rawMaterialId: parentMaterial?.id,
+      rawMaterialName: parentMaterial?.name,
     };
+
     try {
       const ress = await insertStockRequisition(updatedForm, token);
       setChecked((prevChecked) => [...prevChecked, ress.data]);
