@@ -24,6 +24,7 @@ import { useSearchParams } from "react-router-dom";
 import CheckIcon from "@mui/icons-material/Check";
 import DialogEditCustomerOrder from "./component/DialogEditCustomerOrder";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
+import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -50,6 +51,11 @@ const CustomerOrder = () => {
   const [cheked, setChecked] = React.useState([]);
   const [orderCount, setOrderCount] = React.useState({});
   const [status, setStatus] = React.useState([]);
+  const imageModalRef = React.useRef();
+
+  const handleImageClick = (url) => {
+    imageModalRef.current.openModal(url);
+  };
   const socket = useSocket();
 
   function formatDate(date) {
@@ -284,6 +290,7 @@ const CustomerOrder = () => {
                               borderRadius: "4px",
                               cursor: "pointer",
                             }}
+                            onClick={() => handleImageClick(`${URL}/${row?.image}`)}
                           />
                         }
                       </TableCell>
@@ -396,6 +403,8 @@ const CustomerOrder = () => {
           </Box>
         </Box>
       )}
+      {/** image modal */}
+      <ImageModal ref={imageModalRef} />
     </Box>
   );
 };

@@ -46,6 +46,7 @@ const SelectBranch = ({ setSelectFormtracksend, setSelectDateBrachCheck }) => {
           setSelectFormtracksend((prev) => ({
             ...prev,
             branchId: value ? value.id : null,
+            branchName: value ? value.branchname : null
           }));
           setSelectDateBrachCheck((prev) => ({
             ...prev,

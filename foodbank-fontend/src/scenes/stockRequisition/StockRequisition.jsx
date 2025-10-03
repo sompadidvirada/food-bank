@@ -29,6 +29,7 @@ import SelectMaterialVariantToInsert from "./component/SelectMaterialVariantToIn
 import DialogEdit from "./component/DialogEdit";
 import UploadFile from "./component/UploadFile";
 import ImageModal from "../../component/ImageModal";
+import PrintStockRequisition from "./component/PrintStockRequisition";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -55,6 +56,15 @@ const StockRequisition = () => {
     requisitionDate: "",
     branchId: "",
   });
+
+  const totals = checked?.reduce(
+    (acc, item) => {
+      acc.totalKip += item.totalPriceKip;
+      acc.totalBath += item.totalPriceBath;
+      return acc;
+    },
+    { totalKip: 0, totalBath: 0 }
+  );
   const imageModalRef = useRef();
 
   const handleImageClick = (url) => {
@@ -69,6 +79,7 @@ const StockRequisition = () => {
       console.log(err);
     }
   };
+
 
   const fecthStockRequisition = async () => {
     try {
@@ -115,7 +126,7 @@ const StockRequisition = () => {
       unitPriceKip: materialVarint.costPriceKip,
       unitSellPriceKip: materialVarint.costPriceBath,
       totalPriceKip: materialVarint.sellPriceKip * countToUse,
-      unitPriceBath: materialVarint.sellPriceKip,
+      unitPriceBath: materialVarint.costPriceBath,
       unitSellPriceBath: materialVarint.sellPriceBath,
       totalPriceBath: materialVarint.sellPriceBath * countToUse,
       quantityRequisition: countToUse,
@@ -559,6 +570,16 @@ const StockRequisition = () => {
                 handleSetSendCount={handleSetSendCount}
                 selectDateBrachCheck={selectDateBrachCheck}
                 rawMaterial={rawMaterial}
+              />
+            </Box>
+            <Box>
+              <PrintStockRequisition
+                branchName={selectFormtracksend?.branchName}
+                queryForm={selectDateBrachCheck}
+                totals={totals}
+                rawMaterialVariants={rawMaterialVariants}
+                rawMaterial={rawMaterial}
+                stockRequisitionData={checked}
               />
             </Box>
           </Box>

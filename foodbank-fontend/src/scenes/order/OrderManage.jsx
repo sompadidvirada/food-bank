@@ -71,7 +71,6 @@ const OrderManage = () => {
   const fecthPreviousOrderTrack = async () => {
     try {
       const ress = await getPreviousOrderTrack(selectDateBrachCheck, token);
-      console.log(ress)
       setPreviousOrderTrack(ress.data);
     } catch (err) {
       console.log(err);
@@ -82,8 +81,6 @@ const OrderManage = () => {
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
   const imageModalRef = useRef();
-
-  console.log(previousOrderTrack);
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -739,7 +736,7 @@ const OrderManage = () => {
   const handleConfirmOrderChange = async (statuss) => {
     try {
       socket.emit("confirmOrderByAdmin", {
-        id: status.id,
+        id: status?.id,
         status: statuss,
       });
       //const ress = await confirmOrderChange(
@@ -752,21 +749,24 @@ const OrderManage = () => {
       console.log(err);
     }
   };
+
+  console.log(selectDateBrachCheck?.brachId);
+
   useEffect(() => {
     const updateHandler = (data) => {
-      setStatus(data);
+      console.log(data);
+      console.log(selectDateBrachCheck?.brachId);
+      if (data.branchId === selectDateBrachCheck?.brachId) {
+        setStatus(data);
+      }
     };
-
-    socket.on("updateConfirmStatusOrder", (data) => {
-      setStatus(data);
-    });
+    socket.on("updateConfirmStatusOrder", updateHandler);
     socket.on("responeConfirmOrderCustomer", updateHandler);
 
     return () => {
-      socket.off("updateConfirmStatusOrder");
       socket.off("updateConfirmStatusOrder", updateHandler);
     };
-  }, []);
+  }, [selectDateBrachCheck]);
 
   return (
     <Box m="20px">
