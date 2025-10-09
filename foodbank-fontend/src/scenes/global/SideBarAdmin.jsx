@@ -172,6 +172,20 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="ຈັດການໃບສັ່ງຊຶ້"
+              to="/admin/order"
+              icon={<AssignmentIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການອໍເດີສາຂາ"
+              to="/admin/allorder"
+              icon={<AssignmentIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}
@@ -275,20 +289,7 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Item
-              title="ຈັດການໃບສັ່ງຊຶ້"
-              to="/admin/order"
-              icon={<AssignmentIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="ຈັດການອໍເດີສາຂາ"
-              to="/admin/allorder"
-              icon={<AssignmentIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
+
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}
