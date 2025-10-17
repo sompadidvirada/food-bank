@@ -28,6 +28,8 @@ const ReportAll = () => {
     imageModalRef.current.openModal(url);
   };
 
+  console.log(totalData)
+
   useEffect(() => {
     if (!totalData || totalData.length === 0) return;
 

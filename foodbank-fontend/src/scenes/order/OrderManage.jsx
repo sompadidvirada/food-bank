@@ -61,12 +61,48 @@ const OrderManage = () => {
     orderDate: "",
     brachId: "",
   });
-  const result = checked?.map((item) => ({
+  const date = new Date(selectDateBrachCheck?.orderDate);
+  const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
+  const result = checked?.map((item) => {
+  const product = products.find((p) => p.id === item.productId); // 👈 find product detail
+
+  const totalSell = item.week1Sell + item.week2Sell + item.week3Sell;
+  const totalSend = item.week1Send + item.week2Send + item.week3Send;
+  const totalExp = item.week1Exp + item.week2Exp + item.week3Exp;
+
+  let orderWant = 0;
+  let highlight = false;
+  let valueadd = 0;
+
+  if (dayName === "Saturday") {
+    orderWant = (totalSell / 10) * 3;
+  } else if (dayName === "Wednesday") {
+    orderWant = (totalSell / 11) * 4;
+  }
+
+  // ✅ now product.category is available
+  if (totalSell >= totalSend) {
+    if (product?.category?.name === "ເຄັກ") {
+      orderWant += 1;
+      valueadd = 1;
+    } else {
+      orderWant += 2;
+      valueadd = 2;
+    }
+    highlight = true;
+  }
+
+  // ✅ return merged result with product info
+  return {
     ...item,
-    totalSend: item.week1Send + item.week2Send + item.week3Send,
-    totalSell: item.week1Sell + item.week2Sell + item.week3Sell,
-    totalExp: item.week1Exp + item.week2Exp + item.week3Exp,
-  }));
+    orderWant,
+    highlight,
+    valueadd,
+    category: product?.category, 
+    name: product?.name
+  };
+});
+
 
   const fecthPreviousOrderTrack = async () => {
     try {
@@ -77,8 +113,6 @@ const OrderManage = () => {
     }
   };
 
-  const date = new Date(selectDateBrachCheck?.orderDate);
-  const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
   const imageModalRef = useRef();
 
@@ -298,36 +332,28 @@ const OrderManage = () => {
       ),
       width: 100,
       renderCell: (params) => {
-        const productId = params.row.id;
         const trackedProduct = result?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === params.row.id
         );
+
+        console.log(params.row)
 
         if (!trackedProduct) return <Box>No Data</Box>;
 
-        let value;
-        let highlight = false; // Track if +3 was applied
-
-        if (dayName === "Saturday") {
-          value = (trackedProduct.totalSell / 10) * 3;
-        } else if (dayName === "Wednesday") {
-          value = (trackedProduct.totalSell / 11) * 4;
-        } else {
-          return <Box>No Data</Box>;
-        }
-
-        // Add 3 if totalSell >= totalSend
-        if (trackedProduct.totalSell > trackedProduct.totalSend) {
-          value += 2;
-          highlight = true; // Mark this case
-        }
-
         return (
           <Typography
-            fontFamily={"Noto Sans Lao"}
-            color={highlight ? colors.redAccent[400] : colors.greenAccent[400]} // change color if +3
+            fontFamily="Noto Sans Lao"
+            color={
+              trackedProduct.highlight
+                ? colors.redAccent[400]
+                : colors.greenAccent[400]
+            }
           >
-            {highlight ? `${value.toFixed(2)} (+2)` : value.toFixed(2)}
+            {trackedProduct.highlight
+              ? `${trackedProduct.orderWant.toFixed(2)} (+${
+                  trackedProduct.valueadd
+                })`
+              : trackedProduct.orderWant.toFixed(2)}
           </Typography>
         );
       },
@@ -678,34 +704,68 @@ const OrderManage = () => {
     }
   }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate]);
 
-  const handleSetOrder = async (productId, countOrForm) => {
+const handleSetOrder = async (productId, countOrForm) => {
+  let countToUse = 0;
+
+  if (typeof countOrForm === "number") {
+    // round and ensure at least 1
+    countToUse = Math.max(1, Math.round(countOrForm));
+  } else if (countOrForm instanceof HTMLFormElement) {
     const formData = new FormData(countOrForm);
     const rawValue = formData.get(`orderSet-${productId}`);
+    const parsed = rawValue ? parseInt(rawValue, 10) : 0;
+    countToUse = isNaN(parsed) ? 0 : parsed;
+    // if you want to auto-fix small values from form to 1, uncomment next line:
+    // countToUse = Math.max(1, countToUse);
+  } else {
+    // fallback: try to coerce strings or other types
+    const parsed = parseInt(countOrForm, 10);
+    countToUse = isNaN(parsed) ? 0 : Math.max(1, parsed);
+  }
 
-    const countToUse = rawValue ? parseInt(rawValue, 10) : 0;
+  if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`); // optional: with auto-fix you may remove this line
 
-    if (!countToUse) return toast.error(`ກະລຸນາເພີ່ມຈຳນວນກ່ອນ.`);
-    if (
-      selectFormtracksell.orderDate === "" ||
-      selectFormtracksell.brachId === ""
-    ) {
-      toast.error("ລອງໃຫ່ມພາຍຫຼັງ");
-      return;
-    }
-    try {
-      const updatedForm = {
-        ...selectFormtracksell,
-        productId,
-        orderCount: countToUse,
-      };
-      const ress = await insertOrder(updatedForm, token);
+  if (
+    selectFormtracksell.orderDate === "" ||
+    selectFormtracksell.brachId === ""
+  ) {
+    toast.error("ລອງໃຫ່ມພາຍຫຼັງ");
+    return;
+  }
 
-      setCheckedOrder((prevCheckedOrder) => [...prevCheckedOrder, ress.data]);
-      countOrForm.reset();
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  try {
+    const updatedForm = {
+      ...selectFormtracksell,
+      productId,
+      orderCount: countToUse,
+    };
+
+    const ress = await insertOrder(updatedForm, token);
+
+    setCheckedOrder((prevCheckedOrder) => [...prevCheckedOrder, ress.data]);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
+const handleUseAllRecomOrder = async () => {
+  if (!result || result.length === 0) {
+    toast.error("ບໍ່ມີຂໍ້ມູນແນະນຳ");
+    return;
+  }
+
+  try {
+    await Promise.all(
+      result.map((item) => handleSetOrder(item.productId, item.orderWant))
+    );
+    toast.success("ນຳໃຊ້ຈຳນວນແນະນຳສຳເລັດ");
+  } catch (error) {
+    console.error(error);
+    toast.error("ການນຳໃຊ້ຈຳນວນແນະນຳລົ້ມເຫຼວ");
+  }
+};
+
 
   function generateOrderUrl(baseUrl, orderDate, branchId, branchName) {
     const params = new URLSearchParams({
@@ -749,8 +809,6 @@ const OrderManage = () => {
       console.log(err);
     }
   };
-
-  console.log(selectDateBrachCheck?.brachId);
 
   useEffect(() => {
     const updateHandler = (data) => {
@@ -847,6 +905,21 @@ const OrderManage = () => {
             sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
           >
             ກ໋ອປປີ້ລີ້ງຍອດສັ່ງສາຂາ
+          </Button>
+        </Box>
+        <Box>
+          <Button
+            variant="contained"
+            color="inherit"
+            disabled={
+              selectFormtracksell?.orderDate && selectFormtracksell?.brachId
+                ? false
+                : true
+            }
+            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
+            onClick={handleUseAllRecomOrder} // ✅ Add this line
+          >
+            ນຳໃຊ້ຈຳນວນແນະນຳ
           </Button>
         </Box>
       </Box>
