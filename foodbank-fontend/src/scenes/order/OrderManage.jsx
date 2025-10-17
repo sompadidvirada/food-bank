@@ -81,7 +81,7 @@ const OrderManage = () => {
   }
 
   // ✅ now product.category is available
-  if (totalSell >= totalSend) {
+  if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
     if (product?.category?.name === "ເຄັກ") {
       orderWant += 1;
       valueadd = 1;
