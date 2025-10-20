@@ -290,7 +290,9 @@ const EditProduct = ({ productRow }) => {
                 <MenuItem value={"A"}>A</MenuItem>
                 <MenuItem value={"B"}>B</MenuItem>
                 <MenuItem value={"F"}>F</MenuItem>
-                <MenuItem value={"LPB"}>LPB</MenuItem>
+                <MenuItem value={"LPB"}>LPB A</MenuItem>
+                <MenuItem value={"LPB"}>LPB B</MenuItem>
+                <MenuItem value={"LPF"}>LPB F</MenuItem>
               </Select>
             </FormControl>
           </Box>
