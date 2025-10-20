@@ -70,6 +70,7 @@ const EditProduct = ({ productRow }) => {
     sellprice: "",
     categoryId: "",
     lifetime: "",
+    status:""
   });
 
   const handleOpen = (productRow) => {
@@ -217,11 +218,11 @@ const EditProduct = ({ productRow }) => {
             name="sellprice"
           />
 
-          <Box display="flex" gap="10px">
+          <Box display="flex" gap="10px" sx={{width:"100%"}}>
             {/* Select LifeTime */}
 
-            <FormControl sx={{ mt: "10px" }}>
-              <InputLabel id="category-label">LIFE TIME</InputLabel>
+            <FormControl sx={{ mt: "10px", width:"30%" }}>
+              <InputLabel id="category-label" sx={{fontFamily:"Noto Sans Lao"}}>ອາຍຸສິນຄ້າ</InputLabel>
               <Select
                 labelId="lifetime-label"
                 id="lifetime-select"
@@ -247,11 +248,12 @@ const EditProduct = ({ productRow }) => {
             </FormControl>
             {/* Select Category */}
 
-            <FormControl sx={{ mt: "10px" }}>
-              <InputLabel id="category-label">CATEGORY</InputLabel>
+            <FormControl sx={{ mt: "10px", width:"30%" }}>
+              <InputLabel id="category-label" sx={{fontFamily:"Noto Sans Lao"}}>CATEGORY</InputLabel>
               <Select
                 labelId="category-label"
                 id="category-select"
+                sx={{fontFamily:"Noto Sans Lao"}}
                 value={editProduct.categoryId} // ✅ This will now default to the selected category ID
                 onChange={(event) => {
                   // Update the categoryId in editProduct state
@@ -262,10 +264,32 @@ const EditProduct = ({ productRow }) => {
                 }}
               >
                 {categorys?.map((cate) => (
-                  <MenuItem key={cate.id} value={cate.id}>
+                  <MenuItem key={cate.id} value={cate.id} sx={{fontFamily:"Noto Sans Lao"}}>
                     {cate.name}
                   </MenuItem>
                 ))}
+              </Select>
+            </FormControl>
+
+
+            {/** SELECT STATUS */}
+
+            <FormControl sx={{ mt: "10px", width:"30%" }}>
+              <InputLabel id="status-label" sx={{fontFamily:"Noto Sans Lao"}}>ສະຖານະສິນຄ້າ</InputLabel>
+              <Select
+                labelId="status-select"
+                id="status-select"
+                value={editProduct.status} // ✅ This will now default to "" instead of []
+                onChange={(event) => {
+                  setEditProduct({
+                    ...editProduct,
+                    status: event.target.value,
+                  }); // ✅ Convert to number
+                }}
+              >
+                <MenuItem value={"A"}>A</MenuItem>
+                <MenuItem value={"B"}>B</MenuItem>
+                <MenuItem value={"F"}>F</MenuItem>
               </Select>
             </FormControl>
           </Box>

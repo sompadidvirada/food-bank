@@ -64,6 +64,8 @@ const OrderManage = () => {
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
+  console.log(products);
+
   const result = checked?.map((item) => {
     const product = products.find((p) => p.id === item.productId);
 
@@ -81,14 +83,14 @@ const OrderManage = () => {
     orderWant = (totalSell / baseDivisor) * baseMultiplier;
 
     // 🧭 Highlight & Extra amount logic
-    const isCake = product?.category?.name === "ເຄັກ";
+    const isAStatus = product?.status === "A";
     const isWednesday = dayName === "Wednesday";
 
     if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
-      if (isCake) {
-        valueadd = isWednesday ? 2 : 1;
-      } else {
+      if (isAStatus) {
         valueadd = isWednesday ? 3 : 2;
+      } else {
+        valueadd = isWednesday ? 2 : 1;
       }
 
       orderWant += valueadd;
@@ -806,29 +808,28 @@ const OrderManage = () => {
     }
   };
 
-  console.log(selectDateBrachCheck.brachId)
+  console.log(selectDateBrachCheck.brachId);
 
-useEffect(() => {
-  const updateHandler = (data) => {
-    console.log("data:", data);
-    console.log("branch:", selectDateBrachCheck?.brachId);
-    if (data.branchId === selectDateBrachCheck?.brachId) {
-      setStatus(data);
-    }
-  };
+  useEffect(() => {
+    const updateHandler = (data) => {
+      console.log("data:", data);
+      console.log("branch:", selectDateBrachCheck?.brachId);
+      if (data.branchId === selectDateBrachCheck?.brachId) {
+        setStatus(data);
+      }
+    };
 
-  socket.off("updateConfirmStatusOrder");
-  socket.off("responeConfirmOrderCustomer");
+    socket.off("updateConfirmStatusOrder");
+    socket.off("responeConfirmOrderCustomer");
 
-  socket.on("updateConfirmStatusOrder", updateHandler);
-  socket.on("responeConfirmOrderCustomer", updateHandler);
+    socket.on("updateConfirmStatusOrder", updateHandler);
+    socket.on("responeConfirmOrderCustomer", updateHandler);
 
-  return () => {
-    socket.off("updateConfirmStatusOrder", updateHandler);
-    socket.off("responeConfirmOrderCustomer", updateHandler);
-  };
-}, [selectDateBrachCheck]);
-
+    return () => {
+      socket.off("updateConfirmStatusOrder", updateHandler);
+      socket.off("responeConfirmOrderCustomer", updateHandler);
+    };
+  }, [selectDateBrachCheck]);
 
   return (
     <Box m="20px">
