@@ -336,8 +336,6 @@ const OrderManage = () => {
           (item) => item?.productId === params.row.id
         );
 
-        console.log(params.row);
-
         if (!trackedProduct) return <Box>No Data</Box>;
 
         return (
@@ -808,21 +806,29 @@ const OrderManage = () => {
     }
   };
 
-  useEffect(() => {
-    const updateHandler = (data) => {
-      console.log(data);
-      console.log(selectDateBrachCheck?.brachId);
-      if (data.branchId === selectDateBrachCheck?.brachId) {
-        setStatus(data);
-      }
-    };
-    socket.on("updateConfirmStatusOrder", updateHandler);
-    socket.on("responeConfirmOrderCustomer", updateHandler);
+  console.log(selectDateBrachCheck.brachId)
 
-    return () => {
-      socket.off("updateConfirmStatusOrder", updateHandler);
-    };
-  }, [selectDateBrachCheck]);
+useEffect(() => {
+  const updateHandler = (data) => {
+    console.log("data:", data);
+    console.log("branch:", selectDateBrachCheck?.brachId);
+    if (data.branchId === selectDateBrachCheck?.brachId) {
+      setStatus(data);
+    }
+  };
+
+  socket.off("updateConfirmStatusOrder");
+  socket.off("responeConfirmOrderCustomer");
+
+  socket.on("updateConfirmStatusOrder", updateHandler);
+  socket.on("responeConfirmOrderCustomer", updateHandler);
+
+  return () => {
+    socket.off("updateConfirmStatusOrder", updateHandler);
+    socket.off("responeConfirmOrderCustomer", updateHandler);
+  };
+}, [selectDateBrachCheck]);
+
 
   return (
     <Box m="20px">

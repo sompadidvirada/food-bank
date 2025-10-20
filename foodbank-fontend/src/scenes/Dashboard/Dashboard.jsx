@@ -74,6 +74,7 @@ const Dashboard = () => {
     return increase;
   };
 
+
   const incress1 = getPercentFromPreviose(
     totalSell?.current?.totalSellPrice || 0,
     totalSell?.lastMonth?.totalSellPriceLast || 1
