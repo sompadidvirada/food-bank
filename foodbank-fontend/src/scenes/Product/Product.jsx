@@ -221,7 +221,7 @@ const Product = () => {
 
   return (
     <Box ml="20px">
-      <Header title="ລາຍການສິນຄ້າ" subtitle="ຈັດການລາຍການສິນຄ້າ" />
+      <Header title="ລາຍການສິນຄ້າ"/>
       <Box display={"flex"} gap={5} justifyContent={"center"}>
         <AddProduct />
         <AddCategory />
