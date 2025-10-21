@@ -3,9 +3,15 @@ import { tokens } from "../../theme";
 import {
   Box,
   Button,
+  Chip,
   Dialog,
   DialogContent,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -18,17 +24,23 @@ import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
+const allStatuses = ["A", "B", "F", "LPB A", "LPB B", "LPB F"];
+
 const ReportAll = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const totalData = useFoodBankStorage((state) => state.totalData);
   const imageModalRef = useRef();
+  const queryForm = useFoodBankStorage((s) => s.queryForm);
+
+  console.log(queryForm);
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
   };
 
-  console.log(totalData)
+  // ✅ Multiple select: statuses to exclude
+  const [excludedStatuses, setExcludedStatuses] = useState([]);
 
   useEffect(() => {
     if (!totalData || totalData.length === 0) return;
@@ -62,6 +74,14 @@ const ReportAll = () => {
       }) || []
     );
   }, [totalData]);
+
+  // ✅ Filter rows based on excluded statuses
+  const filteredRows = useMemo(() => {
+    if (!excludedStatuses.length) return rowsWithPercent;
+    return rowsWithPercent.filter(
+      (item) => !excludedStatuses.includes(item.status)
+    );
+  }, [rowsWithPercent, excludedStatuses]);
 
   const columns = useMemo(
     () => [
@@ -99,14 +119,54 @@ const ReportAll = () => {
         headerName: "ຊື່ສິນຄ້າ",
         headerAlign: "center",
         flex: 0.5,
-        renderCell: (params) => (
-          <Typography
-            variant="laoText"
-            fontWeight="bold"
-            color={colors.grey[100]}
+        renderCell: ({ row }) => (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
           >
-            {params?.value}
-          </Typography>
+            <Typography
+              fontSize={12}
+              fontFamily="Noto Sans Lao"
+              color={colors.grey[100]}
+              sx={{
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {row.name}
+            </Typography>
+          </Box>
+        ),
+      },
+      {
+        field: "status",
+        headerName: "ສະຖານະ",
+        headerAlign: "center",
+        flex: 0.5,
+        renderCell: ({ row }) => (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            justifyContent="center"
+          >
+            <Typography
+              fontSize={12}
+              fontFamily="Noto Sans Lao"
+              color={colors.grey[100]}
+              
+            >
+              {row.status}
+            </Typography>
+          </Box>
         ),
       },
       {
@@ -136,7 +196,7 @@ const ReportAll = () => {
       },
       {
         field: "totalSell",
-        headerAlign: "center", // This centers the column title
+        headerAlign: "center",
         headerName: "ຈຳນວນຂາຍ",
         type: "number",
         flex: 0.5,
@@ -281,6 +341,7 @@ const ReportAll = () => {
     [colors]
   );
 
+  // ✅ Updated print to reflect excluded statuses
   const handlePrint = () => {
     const formatCell = (value) => {
       if (typeof value === "number") return value.toLocaleString();
@@ -294,29 +355,34 @@ const ReportAll = () => {
       .map((col) => `<th>${col.headerName}</th>`)
       .join("");
 
-    const sortedRows = [...rowsWithPercent].sort(
+    const sortedRows = [...filteredRows].sort(
       (a, b) => b.totalSend - a.totalSend
     );
 
     const tableRows = sortedRows
-      .map((row) => {
+      .map((row, index) => {
         return `<tr>${printableColumns
-          .map((col) => `<td>${formatCell(row[col.field])}</td>`)
+          .map((col, i) => {
+            // ✅ Replace 'id' column with row number
+            if (col.field === "id") {
+              return `<td>${index + 1}</td>`;
+            }
+            return `<td>${formatCell(row[col.field])}</td>`;
+          })
           .join("")}</tr>`;
       })
       .join("");
 
-    // Aggregate totals
-    // Aggregate total prices
-    const totalPriceSend = totalData.reduce(
+    // ✅ Aggregate total from filtered data only
+    const totalPriceSend = filteredRows.reduce(
       (sum, b) => sum + b.totalPriceSend,
       0
     );
-    const totalPriceSell = totalData.reduce(
+    const totalPriceSell = filteredRows.reduce(
       (sum, b) => sum + b.totalPriceSell,
       0
     );
-    const totalPriceEXP = totalData.reduce(
+    const totalPriceEXP = filteredRows.reduce(
       (sum, b) => sum + b.totalPriceEXP,
       0
     );
@@ -324,45 +390,50 @@ const ReportAll = () => {
       totalPriceSend > 0
         ? ((totalPriceEXP / totalPriceSend) * 100).toFixed(1)
         : 0;
+    // ✅ Format date range (based on queryform)
+    const start = new Date(queryForm.startDate).toLocaleDateString("lo-LA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const end = new Date(queryForm.endDate).toLocaleDateString("lo-LA", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const excludedText =
+      excludedStatuses.length > 0
+        ? `ບໍ່ລວມສະຖານະ: ${excludedStatuses.join(", ")}`
+        : "ທັງໝົດ";
 
     const html = `
-    <html>
-      <head>
-        <title>Branch Tracking Report</title>
-        <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao&display=swap" rel="stylesheet">
-        <style>
-          body {
-            font-family: 'Noto Sans Lao', Arial, sans-serif;
-          }
-          table {
-            width: 100%;
-            border-collapse: collapse;
-          }
-          th, td {
-            border: 1px solid #000;
-            padding: 8px;
-            text-align: left;
-          }
-          h2 {
-            text-align: center;
-          }
-        </style>
-      </head>
-      <body>
-        <h2>ລາຍງານສະຫຼຸບຂໍ້ມູນທັງໝົດ</h2>
-        <p>ລາຄາສົ່ງລວມ: ${totalPriceSend.toLocaleString()} ກີບ</p>
-<p>ລາຄາຂາຍລວມ: ${totalPriceSell.toLocaleString()} ກີບ</p>
-<p>ລາຄາໝົດອາຍຸລວມ: ${totalPriceEXP.toLocaleString()} ກີບ</p>
-<p>ເປີເຊັນໝົດອາຍຸ %: ${branchPercent}%</p>
-
-        <table>
-          <thead><tr>${tableHeaders}</tr></thead>
-          <tbody>${tableRows}</tbody>
-        </table>
-        <script>window.onload = () => { window.print(); }</script>
-      </body>
-    </html>
-  `;
+      <html>
+        <head>
+          <title>Branch Tracking Report</title>
+          <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao&display=swap" rel="stylesheet">
+          <style>
+            body { font-family: 'Noto Sans Lao', Arial, sans-serif; }
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #000; padding: 8px; text-align: left; }
+            h2 { text-align: center; }
+            h3 { text-align: center; }
+          </style>
+        </head>
+        <body>
+          <h2>ລາຍງານສະຫຼຸບຂໍ້ມູນທັງໝົດ (${excludedText})</h2>
+           <h3>ວັນທີ: ${start} ຫາ ${end}</h3>
+          <p>ລາຄາສົ່ງລວມ: ${totalPriceSend.toLocaleString()} ກີບ</p>
+          <p>ລາຄາຂາຍລວມ: ${totalPriceSell.toLocaleString()} ກີບ</p>
+          <p>ລາຄາໝົດອາຍຸລວມ: ${totalPriceEXP.toLocaleString()} ກີບ</p>
+          <p>ເປີເຊັນໝົດອາຍຸ %: ${branchPercent}%</p>
+          <table>
+            <thead><tr>${tableHeaders}</tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+          <script>window.onload = () => { window.print(); }</script>
+        </body>
+      </html>
+    `;
 
     printWindow.document.open();
     printWindow.document.write(html);
@@ -387,6 +458,41 @@ const ReportAll = () => {
             gap="20px"
           >
             <Calendar />
+
+            {/* ✅ Multi-select with chips for excluded statuses */}
+            <FormControl sx={{ minWidth: 200 }}>
+              <InputLabel sx={{ fontFamily: "Noto Sans Lao" }}>
+                ບໍ່ລວມສະຖານະ
+              </InputLabel>
+              <Select
+                multiple
+                value={excludedStatuses}
+                onChange={(e) => setExcludedStatuses(e.target.value)}
+                input={<OutlinedInput label="ບໍ່ລວມສະຖານະ" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        key={value}
+                        label={value}
+                        sx={{ fontFamily: "Noto Sans Lao" }}
+                      />
+                    ))}
+                  </Box>
+                )}
+              >
+                {allStatuses.map((status) => (
+                  <MenuItem
+                    key={status}
+                    value={status}
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    {status}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
             <Button
               variant="contained"
               color="info"
@@ -397,11 +503,12 @@ const ReportAll = () => {
             </Button>
           </Box>
         </Box>
+
+        {/* DataGrid */}
         <Box
           sx={{
             "& .MuiDataGrid-root": { border: "none" },
             "& .MuiDataGrid-cell": { borderBottom: "none" },
-            "& .name-column--cell": { color: colors.greenAccent[300] },
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: colors.blueAccent[700],
               borderBottom: "none",
@@ -410,37 +517,32 @@ const ReportAll = () => {
               backgroundColor: colors.primary[400],
             },
             "& .MuiDataGrid-virtualScrollerContent": {
-              paddingBottom: "60px", // ✅ adds visible space AFTER the last row
+              paddingBottom: "60px",
             },
             "& .MuiDataGrid-footerContainer": {
               borderTop: "none",
               backgroundColor: colors.blueAccent[700],
             },
-            "& .MuiCheckbox-root": {
-              color: `${colors.greenAccent[200]} !important`,
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${colors.grey[100]} !important`,
-            },
           }}
         >
           <DataGrid
-            autoHeight // ✅ let the grid expand to fit all rows
-            rows={rowsWithPercent}
+            autoHeight
+            rows={filteredRows}
             columns={columns}
             disableRowSelectionOnClick
             hideFooter
             sx={{
               "& .MuiDataGrid-columnHeaders": {
                 fontFamily: "Noto Sans Lao",
-                fontWeight: "bold", // optional
-                fontSize: "15px", // optional
+                fontWeight: "bold",
+                fontSize: "15px",
               },
             }}
           />
         </Box>
       </Box>
-      {/** image modal */}
+
+      {/* Image Modal */}
       <ImageModal ref={imageModalRef} />
     </Box>
   );
