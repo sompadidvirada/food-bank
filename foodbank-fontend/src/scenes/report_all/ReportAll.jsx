@@ -33,8 +33,6 @@ const ReportAll = () => {
   const imageModalRef = useRef();
   const queryForm = useFoodBankStorage((s) => s.queryForm);
 
-  console.log(queryForm);
-
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
   };
@@ -162,7 +160,6 @@ const ReportAll = () => {
               fontSize={12}
               fontFamily="Noto Sans Lao"
               color={colors.grey[100]}
-              
             >
               {row.status}
             </Typography>
@@ -374,15 +371,20 @@ const ReportAll = () => {
       .join("");
 
     // ✅ Aggregate total from filtered data only
-    const totalPriceSend = filteredRows.reduce(
+
+    const rowsForTotal = filteredRows.filter(
+      (row) => !excludedStatuses.includes(row.status)
+    );
+
+    const totalPriceSend = rowsForTotal.reduce(
       (sum, b) => sum + b.totalPriceSend,
       0
     );
-    const totalPriceSell = filteredRows.reduce(
+    const totalPriceSell = rowsForTotal.reduce(
       (sum, b) => sum + b.totalPriceSell,
       0
     );
-    const totalPriceEXP = filteredRows.reduce(
+    const totalPriceEXP = rowsForTotal.reduce(
       (sum, b) => sum + b.totalPriceEXP,
       0
     );
@@ -405,6 +407,9 @@ const ReportAll = () => {
       excludedStatuses.length > 0
         ? `ບໍ່ລວມສະຖານະ: ${excludedStatuses.join(", ")}`
         : "ທັງໝົດ";
+
+    console.log(excludedStatuses);
+    console.log(totalData);
 
     const html = `
       <html>
