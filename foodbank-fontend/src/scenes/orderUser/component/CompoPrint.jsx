@@ -22,6 +22,8 @@ const CompoPrint = ({ componentRef, orders, products }) => {
     return hasValidCategory && isAvailable;
   });
 
+  console.log(filterProducts);
+
   // 2. Pivot data: Map productId -> { productName, price, branchQuantities, total }
   const pivotData = filterProducts.map((product) => {
     const row = {
@@ -62,7 +64,7 @@ const CompoPrint = ({ componentRef, orders, products }) => {
   const getRowColor = (name) => {
     if (name.toLowerCase().includes("red velvet")) return "#53c8ffff"; // red
     if (name.toLowerCase().includes("croissant")) return "#eeb919ff"; // light yellow
-    if (name.toLowerCase().includes("croffle")) return "#f2ecdbff"; // light orange
+    if (name.toLowerCase().includes("croffle")) return "#F2E9FF"; // light orange
     if (name.toLowerCase().includes("egg")) return "#efd893ff"; // light orange
     if (name.toLowerCase().includes("choux")) return "#ff8f2cff"; // light orange
     if (name.toLowerCase().includes("timber")) return "#b9a43eff"; // light orange
@@ -71,6 +73,29 @@ const CompoPrint = ({ componentRef, orders, products }) => {
     if (name.toLowerCase().includes("chocolate top")) return "#53c8ffff"; // light blue
     return "white";
   };
+
+  // === Sort pivotData by color groups ===
+  const colorOrder = [
+    "#53c8ffff", // blue
+    "#eeb919ff", // light yellow
+    "#F2E9FF", // light orange
+    "#efd893ff", // light orange
+    "#ff8f2cff", // light orange
+    "#b9a43eff", // brownish
+    "white", // default
+  ];
+
+  const sortedPivotData = [...pivotData].sort((a, b) => {
+    const colorA = getRowColor(a.name);
+    const colorB = getRowColor(b.name);
+    const indexA = colorOrder.indexOf(colorA);
+    const indexB = colorOrder.indexOf(colorB);
+    // If color not found, push to the end
+    return (
+      (indexA === -1 ? colorOrder.length : indexA) -
+      (indexB === -1 ? colorOrder.length : indexB)
+    );
+  });
 
   return (
     <div ref={componentRef} style={{ padding: 20, color: "black" }}>
@@ -118,7 +143,7 @@ const CompoPrint = ({ componentRef, orders, products }) => {
           </tr>
         </thead>
         <tbody>
-          {pivotData.map((row) => (
+          {sortedPivotData.map((row) => (
             <tr
               key={row.id}
               style={{
