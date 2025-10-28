@@ -91,6 +91,7 @@ const router = createBrowserRouter([
       { path: "rawmaterial", element: <ManageRawMaterial /> },
       { path: "insertstockrequisition", element: <StockRequisition /> },
       { path: "stockrequisitionreport", element: <ReportStockReqiosition /> },
+      { path: "coffeemenu", element: <CoffeeMenu /> },
     ],
   },
 ]);

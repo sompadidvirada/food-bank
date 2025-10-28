@@ -27,6 +27,8 @@ import ChecklistIcon from "@mui/icons-material/Checklist";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ImageModal from "../../component/ImageModal";
+import CoffeeIcon from '@mui/icons-material/Coffee';
+import WarehouseIcon from '@mui/icons-material/Warehouse';
 
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
@@ -253,21 +255,36 @@ const SideBarUser = () => {
             <Item
               title="ຈັດການວັດຖຸດິບ"
               to="/user/rawmaterial"
-              icon={<ChecklistIcon />}
+              icon={<WarehouseIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ຄີຍອດເບີກວັດຖຸດິບ"
               to="/user/insertstockrequisition"
-              icon={<ChecklistIcon />}
+              icon={<WarehouseIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
               title="ລາຍງານຍອດເບີກວັດຖຸດິບ"
               to="/user/stockrequisitionreport"
-              icon={<ChecklistIcon />}
+              icon={<WarehouseIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Typography
+              variant="h6"
+              display={isCollapsed ? "none" : "block"}
+              color={colors.grey[300]}
+              sx={{ m: "15px 0 5px 20px", fontFamily: "Noto Sans Lao" }}
+            >
+              TREEKOFF
+            </Typography>
+            <Item
+              title="ຈັດການເມນູທຮີຄອຟ"
+              to="/user/coffeemenu"
+              icon={<CoffeeIcon />}
               selected={selected}
               setSelected={setSelected}
             />

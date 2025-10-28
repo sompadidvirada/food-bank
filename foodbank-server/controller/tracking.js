@@ -464,7 +464,7 @@ exports.updateTrackSend = async (req, res) => {
     sevenDaysAgo.setDate(today.getDate() - 7);
 
     // Prevent deletion if sellDate is older than 7 days
-    if (dateToDelete < sevenDaysAgo) {
+    if (dateToDelete < sevenDaysAgo && req.user.role !== "admin") {
       return res
         .status(403)
         .json({ message: "ບໍ່ສາມາດແກ້ໄຂລາຍການທີ່ກາຍ 7 ວັນໄດ້." });
