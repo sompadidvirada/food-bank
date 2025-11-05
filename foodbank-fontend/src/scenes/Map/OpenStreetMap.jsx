@@ -82,8 +82,8 @@ const OpenStreetMap = () => {
   const user = useFoodBankStorage((state) => state.user);
 
   useEffect(() => {
-    getBrnachs();
-  }, []);
+    getBrnachs(true);
+  }, [token]);
 
   {
     /** create tempolary marker function */
