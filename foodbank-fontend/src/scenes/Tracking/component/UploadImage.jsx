@@ -279,7 +279,7 @@ const UploadImage = ({ selectFormtracksell, checkImage, setCheckImage }) => {
                   <img
                     src={`${URL}/${img.imageName}`}
                     alt={`Uploaded ${index}`}
-                    onClick={() => handleImageClick(img.imageName)}
+                    onClick={() => handleImageClick(`${URL}/${img.imageName}`)}
                     style={{
                       width: "100%",
                       height: "100%",
