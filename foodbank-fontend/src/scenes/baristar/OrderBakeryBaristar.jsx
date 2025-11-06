@@ -41,7 +41,6 @@ dayjs.tz.setDefault("Asia/Bangkok");
 const OrderBakeryBaristar = () => {
   const user = useFoodBankStorage((s) => s.user);
   const token = useFoodBankStorage((s) => s.token);
-  const [cheked, setChecked] = useState([]);
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [order, setOrder] = useState([]);
@@ -235,7 +234,7 @@ const OrderBakeryBaristar = () => {
               />
             </Box>
             <Box sx={{ my: 2 }}>
-              <CalendarOrderBaristar setDateToGet={setDateToGet} />
+              <CalendarOrderBaristar setDateToGet={setDateToGet} dateToGet={dateToGet} />
             </Box>
             <Box>
               <Button
