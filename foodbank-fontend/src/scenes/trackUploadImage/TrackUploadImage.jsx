@@ -279,7 +279,7 @@ const TrackUploadImage = () => {
                       </TableCell>
                       <TableCell align="right">
                         {(() => {
-                          if (branch?.phonenumber || branchImages.length < 0) {
+                          if (branch?.phonenumber) {
                             return (
                               <Box>
                                 <Button

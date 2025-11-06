@@ -49,26 +49,26 @@ const BaristarProfile = () => {
   const [year, setYear] = useState(dayjs().year());
 
   useEffect(() => {
-      const handleTouchMove = (event) => {
-        if (event.scale !== 1) {
-          event.preventDefault();
-        }
-      };
-  
-      const handleWheel = (event) => {
-        if (event.ctrlKey) {
-          event.preventDefault();
-        }
-      };
-  
-      document.addEventListener("touchmove", handleTouchMove, { passive: false });
-      document.addEventListener("wheel", handleWheel, { passive: false });
-  
-      return () => {
-        document.removeEventListener("touchmove", handleTouchMove);
-        document.removeEventListener("wheel", handleWheel);
-      };
-    }, []);
+    const handleTouchMove = (event) => {
+      if (event.scale !== 1) {
+        event.preventDefault();
+      }
+    };
+
+    const handleWheel = (event) => {
+      if (event.ctrlKey) {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   const handleSearch = async () => {
     const selectedDate = dayjs(new Date(year, month, 1));
@@ -88,6 +88,10 @@ const BaristarProfile = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    handleSearch();
+  }, [token]);
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -166,7 +170,7 @@ const BaristarProfile = () => {
                   >
                     {`${user?.firstname} ${user?.lastname}`}
                   </Typography>
-                  <Box sx={{display:"flex"}}>
+                  <Box sx={{ display: "flex" }}>
                     <Typography
                       sx={{
                         fontFamily: "Noto Sans Lao",
@@ -194,7 +198,9 @@ const BaristarProfile = () => {
                   <Typography
                     fontFamily={"Noto Sans Lao"}
                     sx={{ fontSize: 14 }}
-                  >{`ປະຈຳສາຂາ: ${user.branchName ? user?.branchName : "ບໍ່ມິສາຂາ"}`}</Typography>
+                  >{`ປະຈຳສາຂາ: ${
+                    user.branchName ? user?.branchName : "ບໍ່ມິສາຂາ"
+                  }`}</Typography>
                 </Box>
               </Box>
             </Box>
