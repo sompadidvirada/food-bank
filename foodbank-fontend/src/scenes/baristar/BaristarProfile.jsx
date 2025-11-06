@@ -70,15 +70,22 @@ const BaristarProfile = () => {
     };
   }, []);
 
-  const handleSearch = async () => {
-    const selectedDate = dayjs(new Date(year, month, 1));
-    const startDate = selectedDate.startOf("month").format("YYYY-MM-DD");
-    const endDate = selectedDate.endOf("month").format("YYYY-MM-DD");
+  console.log(`month`, month, `year`, year);
 
+  const handleSearch = async (monthArg, yearArg) => {
+    const m = monthArg !== undefined ? monthArg : month;
+    const y = yearArg !== undefined ? yearArg : year;
+
+    const startDate = dayjs(new Date(y, m, 1)).startOf("day");
+    const endDate = dayjs(new Date(y, m + 1, 0)).endOf("day");
     setLoading(true);
     try {
       const ress = await getBaristarProfile(
-        { startDate, endDate, branchId: user.userBranch },
+        {
+          startDate: startDate.format("YYYY-MM-DD"),
+          endDate: endDate.format("YYYY-MM-DD"),
+          branchId: user.userBranch,
+        },
         token
       );
       setData(ress.data);
@@ -214,6 +221,17 @@ const BaristarProfile = () => {
                 onSearch={handleSearch}
               />
             </Box>
+            <Box sx={{ textAlign: "center", my: 2 }}>
+              <Typography
+                sx={{
+                  fontFamily: "Noto Sans Lao",
+                  fontSize: 20,
+                  fontWeight: "bold",
+                }}
+              >
+                ລາຍລະອຽດເດືອນ {month ? month : "-"} ປີ {year ? year : "-"}
+              </Typography>
+            </Box>
             <Box width={"100%"} display={"flex"}>
               <Box
                 sx={{
@@ -309,7 +327,18 @@ const BaristarProfile = () => {
                   flexDirection: "column",
                 }}
               >
-                <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize: 30 }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Noto Sans Lao",
+                    fontSize: 30,
+                    color:
+                      data?.percent > 20
+                        ? "red"
+                        : data?.percent >= 15
+                        ? "yellow"
+                        : "green", // 👈 color condition
+                  }}
+                >
                   {`${
                     data?.percent
                       ? `${data?.percent.toLocaleString()} %`

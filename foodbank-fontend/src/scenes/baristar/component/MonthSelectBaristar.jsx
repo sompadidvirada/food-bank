@@ -1,14 +1,24 @@
 import React from "react";
-import { Box, Select, MenuItem, Button } from "@mui/material";
+import { Box, Select, MenuItem } from "@mui/material";
 import dayjs from "dayjs";
 
 const MonthSelectBaristar = ({ month, year, onMonthChange, onYearChange, onSearch }) => {
+const handleMonthChange = (newMonth) => {
+  onMonthChange(newMonth);
+  onSearch(newMonth, year); // pass updated month
+};
+
+const handleYearChange = (newYear) => {
+  onYearChange(newYear);
+  onSearch(month, newYear); // pass updated year
+};
+
   return (
     <Box display="flex" gap={2} width="100%" justifyContent="center" my={2}>
       {/* Month Dropdown */}
       <Select
         value={month}
-        onChange={(e) => onMonthChange(e.target.value)}
+        onChange={(e) => handleMonthChange(e.target.value)}
         sx={{ fontFamily: "Noto Sans Lao", minWidth: 120 }}
       >
         {Array.from({ length: 12 }, (_, i) => (
@@ -21,7 +31,7 @@ const MonthSelectBaristar = ({ month, year, onMonthChange, onYearChange, onSearc
       {/* Year Dropdown */}
       <Select
         value={year}
-        onChange={(e) => onYearChange(e.target.value)}
+        onChange={(e) => handleYearChange(e.target.value)}
         sx={{ fontFamily: "Noto Sans Lao", minWidth: 100 }}
       >
         {Array.from({ length: 5 }, (_, i) => {
@@ -34,15 +44,6 @@ const MonthSelectBaristar = ({ month, year, onMonthChange, onYearChange, onSearc
           );
         })}
       </Select>
-
-      <Button
-        variant="contained"
-        color="info"
-        onClick={onSearch}
-        sx={{ fontFamily: "Noto Sans Lao" }}
-      >
-        ຄົ້ນຫາ
-      </Button>
     </Box>
   );
 };
