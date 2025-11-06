@@ -279,7 +279,7 @@ const TrackUploadImage = () => {
                       </TableCell>
                       <TableCell align="right">
                         {(() => {
-                          if (branch?.phonenumber) {
+                          if (branch?.phonenumber || branchImages.length < 0) {
                             return (
                               <Box>
                                 <Button
@@ -292,7 +292,7 @@ const TrackUploadImage = () => {
                                   sx={{ fontFamily: "Noto Sans Lao" }}
                                   startIcon={<AddLinkIcon />}
                                 >
-                                  ສົ່ງລິ້ງ
+                                  ແຈ້ງຫາສາຂາ
                                 </Button>
                               </Box>
                             );
