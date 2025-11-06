@@ -34,6 +34,9 @@ import { useSocket } from "../../../socket-io-provider/SocketProvider";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
+const URLSTAFF =
+  "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
+
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Asia/Bangkok");
@@ -193,7 +196,49 @@ const OrderBakeryBaristar = () => {
 
   return (
     <>
-      {" "}
+      {/* User Avatar */}
+      <Box
+        sx={{
+          top: 20,
+          left: 20,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          zIndex: 1000,
+        }}
+      >
+        <img
+          src={`${URLSTAFF}/${user?.image}`}
+          alt="User Avatar"
+          style={{
+            width: 60,
+            height: 60,
+            borderRadius: "50%",
+            objectFit: "cover",
+          }}
+        />
+        <Box sx={{ display: "flex", flexDirection: "column", ml: 1 }}>
+          <Typography
+            sx={{
+              fontFamily: "Noto Sans Lao",
+              fontSize: 18,
+              color: "#ffffffaf",
+              fontWeight: 500,
+            }}
+          >
+            {user?.branchName}
+          </Typography>
+          <Typography
+            sx={{
+              fontFamily: "Noto Sans Lao",
+              fontSize: 12,
+              color: "#f7f7f7a1",
+            }}
+          >
+            {user?.firstname} {user?.lastname}
+          </Typography>
+        </Box>
+      </Box>{" "}
       {loading ? (
         <Box
           sx={{
@@ -222,19 +267,11 @@ const OrderBakeryBaristar = () => {
               alignItems: "center",
             }}
           >
-            <Box>
-              <img
-                src="/TK.png"
-                alt="Logo"
-                style={{
-                  height: 120,
-                  display: "block",
-                  margin: "2px auto",
-                }}
-              />
-            </Box>
             <Box sx={{ my: 2 }}>
-              <CalendarOrderBaristar setDateToGet={setDateToGet} dateToGet={dateToGet} />
+              <CalendarOrderBaristar
+                setDateToGet={setDateToGet}
+                dateToGet={dateToGet}
+              />
             </Box>
             <Box>
               <Button
