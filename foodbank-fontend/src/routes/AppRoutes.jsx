@@ -21,7 +21,7 @@ import PieSell from "../scenes/Pie/PieSell";
 import PieSend from "../scenes/Pie/PieSend";
 import PieExp from "../scenes/Pie/PieExp";
 import LineMain from "../scenes/Line/LineMain";
-import Calendar from "../scenes/calendar/Calendar"
+import Calendar from "../scenes/calendar/Calendar";
 import CalendarAdmin from "../scenes/calendar/CalendarAdmin";
 import UploadS3 from "../scenes/upload/UploadS3";
 import OrderManage from "../scenes/order/OrderManage";
@@ -33,6 +33,12 @@ import ReportStockReqiosition from "../scenes/reportStockRequisition/ReportStock
 import CoffeeMenu from "../scenes/coffeeMenu/CoffeeMenu";
 import CoffeeSell from "../scenes/insertSellCoffee/CoffeeSell";
 import ReportTreekoffUse from "../scenes/reportTreekoffUse/ReportTreekoffUse";
+import ProtectBaristar from "./ProtectBaristar";
+import LayourBaristar from "../scenes/layout/LayourBaristar";
+import BaristarProfile from "../scenes/baristar/BaristarProfile";
+import BaristarImage from "../scenes/baristar/BaristarImage";
+import OrderBakeryBaristar from "../scenes/baristar/OrderBakeryBaristar";
+import TrackUploadImage from "../scenes/trackUploadImage/TrackUploadImage";
 
 const router = createBrowserRouter([
   {
@@ -73,6 +79,7 @@ const router = createBrowserRouter([
       { path: "coffeemenu", element: <CoffeeMenu /> },
       { path: "insertcoffeesell", element: <CoffeeSell /> },
       { path: "reporttreekoffuse", element: <ReportTreekoffUse /> },
+      { path: "trackimageallbranch", element: <TrackUploadImage /> },
     ],
   },
   {
@@ -92,8 +99,20 @@ const router = createBrowserRouter([
       { path: "insertstockrequisition", element: <StockRequisition /> },
       { path: "stockrequisitionreport", element: <ReportStockReqiosition /> },
       { path: "coffeemenu", element: <CoffeeMenu /> },
+      { path: "team", element: <Team /> },
+      { path: "trackimageallbranch", element: <TrackUploadImage /> },
     ],
   },
+  {
+  path: "/baristar",
+  element: <ProtectBaristar element={<LayourBaristar />} />,
+  children: [
+    { index: true, element: <BaristarProfile /> },
+    { path: "profile", element: <BaristarProfile /> },
+    { path: "image", element: <BaristarImage /> },
+    { path: "order", element: <OrderBakeryBaristar /> },
+  ],
+}
 ]);
 
 const AppRoutes = () => {

@@ -27,6 +27,7 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import ArticleIcon from "@mui/icons-material/Article";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CoffeeIcon from "@mui/icons-material/Coffee";
+import BurstModeIcon from '@mui/icons-material/BurstMode';
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AnalyticsIcon from "@mui/icons-material/Analytics";
@@ -183,6 +184,13 @@ const SideBarAdmin = () => {
               title="ຈັດການອໍເດີສາຂາ"
               to="/admin/allorder"
               icon={<AssignmentIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຕິດຕາມຮູບຕູ້ເບເກີລີ້ແຕ່ລະສາຂາ"
+              to="/admin/trackimageallbranch"
+              icon={<BurstModeIcon />}
               selected={selected}
               setSelected={setSelected}
             />

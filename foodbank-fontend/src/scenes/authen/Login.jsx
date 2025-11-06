@@ -23,7 +23,6 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import { createNewpassword } from "../../api/authen";
 import { jwtDecode } from "jwt-decode";
 
-
 const Login = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -99,6 +98,8 @@ const Login = () => {
       navigate("/admin");
     } else if (role === "staff") {
       navigate("/user");
+    } else if (role === "baristar") {
+      navigate("/baristar");
     } else {
       return;
     }
@@ -116,6 +117,8 @@ const Login = () => {
             navigate("/admin", { replace: true });
           } else if (user?.role === "staff") {
             navigate("/user", { replace: true });
+          } else if (user?.role === "baristar") {
+            navigate("/baristar", { replace: true });
           }
         } else {
           useFoodBankStorage.persist.clearStorage();

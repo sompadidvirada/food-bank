@@ -2,11 +2,11 @@ import { useState } from "react";
 import useFoodBankStorage from "../zustand/foodbank-storage";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { currectAdmin } from "../api/authen";
+import { currentBaristar } from "../api/authen";
 import Backdrop from "@mui/material/Backdrop";
 import CircularProgress from "@mui/material/CircularProgress";
 
-const ProtectAdmin = ({ element }) => {
+const ProtectBaristar = ({ element }) => {
   const [ok, setOk] = useState(null);
   const user = useFoodBankStorage((state) => state.user);
   const token = useFoodBankStorage((state) => state.token);
@@ -14,7 +14,7 @@ const ProtectAdmin = ({ element }) => {
 
   useEffect(() => {
     if (user && token) {
-      currectAdmin(token)
+      currentBaristar(token)
         .then(() => setOk(true))
         .catch((err) => {
           console.log(err);
@@ -24,8 +24,6 @@ const ProtectAdmin = ({ element }) => {
       setOk(false);
     }
   }, [user, token]);
-
-  //Redirect if not Allow
 
   useEffect(() => {
     if (ok === false) {
@@ -45,4 +43,4 @@ const ProtectAdmin = ({ element }) => {
   ) : null; // don't render anything for false
 };
 
-export default ProtectAdmin;
+export default ProtectBaristar;

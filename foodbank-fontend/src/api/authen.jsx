@@ -29,6 +29,14 @@ export const currentUser = (token) => {
   );
 };
 
+export const currentBaristar = (token) => {
+  return axios.post(`${URL}/current-baristar`,{}, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
 export const createStaff = (form, token) => {
   return axios.post(`${URL}/createstaff`, form, {
     headers: {

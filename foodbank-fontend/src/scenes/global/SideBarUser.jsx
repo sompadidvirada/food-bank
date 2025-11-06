@@ -24,11 +24,12 @@ import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SpeakerNotesIcon from "@mui/icons-material/SpeakerNotes";
 import ChecklistIcon from "@mui/icons-material/Checklist";
+import BurstModeIcon from "@mui/icons-material/BurstMode";
 import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ImageModal from "../../component/ImageModal";
-import CoffeeIcon from '@mui/icons-material/Coffee';
-import WarehouseIcon from '@mui/icons-material/Warehouse';
+import CoffeeIcon from "@mui/icons-material/Coffee";
+import WarehouseIcon from "@mui/icons-material/Warehouse";
 
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
@@ -167,6 +168,20 @@ const SideBarUser = () => {
               title="ແຜນທີສາຂາ"
               to="/user"
               icon={<MapIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຕິດຕາມຮູບຕູ້ເບເກີລີ້"
+              to="/user/trackimageallbranch"
+              icon={<BurstModeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການພະນັກງານ"
+              to="/user/team"
+              icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
             />

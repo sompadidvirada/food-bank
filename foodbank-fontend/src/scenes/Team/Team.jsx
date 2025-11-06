@@ -444,18 +444,20 @@ const Team = () => {
             >
               {role}
             </Typography>
-            <AddCircleIcon
-              onClick={() => handleOpenEditRole(row?.row)}
-              sx={{
-                cursor: "pointer",
-                borderRadius: "50%", // optional: make it a circle
-                transition: "background-color 0.3s ease",
-                "&:hover": {
-                  backgroundColor: "#e0e0e0", // or any color you like
-                  color: colors.grey[800],
-                },
-              }}
-            />
+            {user.role === "admin" && (
+              <AddCircleIcon
+                onClick={() => handleOpenEditRole(row?.row)}
+                sx={{
+                  cursor: "pointer",
+                  borderRadius: "50%", // optional: make it a circle
+                  transition: "background-color 0.3s ease",
+                  "&:hover": {
+                    backgroundColor: "#e0e0e0", // or any color you like
+                    color: colors.grey[800],
+                  },
+                }}
+              />
+            )}
           </Box>
         );
       },
@@ -496,94 +498,100 @@ const Team = () => {
         );
       },
     },
-    {
-      field: "aviable",
-      headerName: "ສະຖານະ ຢູເຊີ",
-      headerAlign: "center",
-      flex: 0.6,
-      renderCell: (row) => {
-        const aviable = row?.row?.aviable;
-        const staffId = row?.row?.id;
-        return (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            height="100%"
-          >
-            <Button
-              variant="contained"
-              color={aviable ? "success" : "error"}
-              onClick={() => handleClickOpenEditStatus(staffId, aviable)}
-            >
-              {aviable ? (
-                <CheckIcon sx={{ color: "black" }} />
-              ) : (
-                <ClearIcon sx={{ color: "black" }} />
-              )}
-            </Button>
-          </Box>
-        );
-      },
-    },
-    {
-      field: "manage",
-      headerName: "ຈັດການ",
-      headerAlign: "center",
-      flex: 0.6,
-      renderCell: (row) => {
-        return (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            width="100%"
-            height="100%"
-          >
-            <Tooltip
-              title="ລົບຢູເຊີພະນັກງານ"
-              arrow
-              placement="top"
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    fontSize: "14px",
-                    fontFamily: "Noto Sans Lao", // or any font you prefer
-                    color: "#fff",
-                    backgroundColor: "#333", // optional
-                  },
-                },
-              }}
-            >
-              <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
-                <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
-              </IconButton>
-            </Tooltip>
+    ...(user.role === "admin"
+      ? [
+          {
+            field: "aviable",
+            headerName: "ສະຖານະ ຢູເຊີ",
+            headerAlign: "center",
+            flex: 0.6,
+            renderCell: (row) => {
+              const aviable = row?.row?.aviable;
+              const staffId = row?.row?.id;
+              return (
+                <Box
+                  display="flex"
+                  justifyContent="center"
+                  alignItems="center"
+                  width="100%"
+                  height="100%"
+                >
+                  <Button
+                    variant="contained"
+                    color={aviable ? "success" : "error"}
+                    onClick={() => handleClickOpenEditStatus(staffId, aviable)}
+                  >
+                    {aviable ? (
+                      <CheckIcon sx={{ color: "black" }} />
+                    ) : (
+                      <ClearIcon sx={{ color: "black" }} />
+                    )}
+                  </Button>
+                </Box>
+              );
+            },
+          },
+        ]
+      : []),
+    ...(user.role === "admin"
+      ? [
+          {
+            field: "manage",
+            headerName: "ຈັດການ",
+            headerAlign: "center",
+            flex: 0.6,
+            renderCell: (row) => (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                width="100%"
+                height="100%"
+              >
+                <Tooltip
+                  title="ລົບຢູເຊີພະນັກງານ"
+                  arrow
+                  placement="top"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: "14px",
+                        fontFamily: "Noto Sans Lao",
+                        color: "#fff",
+                        backgroundColor: "#333",
+                      },
+                    },
+                  }}
+                >
+                  <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
+                    <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
+                  </IconButton>
+                </Tooltip>
 
-            <Tooltip
-              title="ລ້າງລະຫັດຜ່ານ"
-              arrow
-              placement="top"
-              componentsProps={{
-                tooltip: {
-                  sx: {
-                    fontSize: "14px",
-                    fontFamily: "Noto Sans Lao", // or any font you prefer
-                    color: "#fff",
-                    backgroundColor: "#333", // optional
-                  },
-                },
-              }}
-            >
-              <IconButton onClick={() => handleOpenClearPassword(row.row)}>
-                <KeyOffIcon />
-              </IconButton>
-            </Tooltip>
-          </Box>
-        );
-      },
-    },
+                <Tooltip
+                  title="ລ້າງລະຫັດຜ່ານ"
+                  arrow
+                  placement="top"
+                  componentsProps={{
+                    tooltip: {
+                      sx: {
+                        fontSize: "14px",
+                        fontFamily: "Noto Sans Lao",
+                        color: "#fff",
+                        backgroundColor: "#333",
+                      },
+                    },
+                  }}
+                >
+                  <IconButton onClick={() => handleOpenClearPassword(row.row)}>
+                    <KeyOffIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -843,11 +851,8 @@ const Team = () => {
                 admin
               </MenuItem>
 
-              <MenuItem
-                value={"supervisor"}
-                sx={{ fontFamily: "Noto Sans Lao" }}
-              >
-                supervisor
+              <MenuItem value={"baristar"} sx={{ fontFamily: "Noto Sans Lao" }}>
+                baristar
               </MenuItem>
             </Select>
           </FormControl>

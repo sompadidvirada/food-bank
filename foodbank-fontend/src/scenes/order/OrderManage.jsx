@@ -64,8 +64,6 @@ const OrderManage = () => {
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
-  console.log(products);
-
   const result = checked?.map((item) => {
     const product = products.find((p) => p.id === item.productId);
 
@@ -76,6 +74,7 @@ const OrderManage = () => {
     let orderWant = 0;
     let highlight = false;
     let valueadd = 0;
+
 
     // 🧮 Base calculation
     const baseDivisor = dayName === "Saturday" ? 10 : 11;
@@ -808,7 +807,6 @@ const OrderManage = () => {
     }
   };
 
-  console.log(selectDateBrachCheck.brachId);
 
   useEffect(() => {
     const updateHandler = (data) => {

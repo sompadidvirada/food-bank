@@ -175,7 +175,7 @@ const Editprofile = () => {
       </Tooltip>
       {/* Modal Edit Product Dialog */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Edit Profile</DialogTitle>
+        <DialogTitle sx={{fontFamily:"Noto Sans Lao"}}>ແກ້ໄຂໂປຮຟາຍ</DialogTitle>
         <DialogContent>
           <TextField
             label={<Typography variant="laoText">ຊື່</Typography>}
