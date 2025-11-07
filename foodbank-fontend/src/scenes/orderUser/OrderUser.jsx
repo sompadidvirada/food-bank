@@ -293,9 +293,6 @@ const OrderUser = () => {
                   <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
                     ຈັດການ
                   </TableCell>
-                  <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ເບີຕີດຕໍ່ສາຂາ
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -441,58 +438,6 @@ const OrderUser = () => {
                                   />
                                 </IconButton>
                               </Tooltip>
-                            </Box>
-                          );
-                        }
-                      })()}
-                    </TableCell>
-                    <TableCell align="right">
-                      {" "}
-                      {(() => {
-                        if (row?.phonenumber) {
-                          return (
-                            <Box
-                              sx={{
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "end",
-                              }}
-                            >
-                              <Typography>{row?.phonenumber}</Typography>
-                              <Tooltip
-                                title="ແກ້ໄຂເບີໂທ"
-                                arrow
-                                placement="top"
-                                componentsProps={{
-                                  tooltip: {
-                                    sx: {
-                                      fontSize: "14px",
-                                      fontFamily: "Noto Sans Lao", // or any font you prefer
-                                      color: "#fff",
-                                      backgroundColor: "#333", // optional
-                                    },
-                                  },
-                                }}
-                              >
-                                <IconButton
-                                  onClick={() => handleClickOpen(row)}
-                                >
-                                  <MoreVertIcon />
-                                </IconButton>
-                              </Tooltip>
-                            </Box>
-                          );
-                        } else {
-                          return (
-                            <Box>
-                              <Button
-                                variant="contained"
-                                color="info"
-                                sx={{ fontFamily: "Noto Sans Lao" }}
-                                onClick={() => handleClickOpen(row)}
-                              >
-                                ເພີ່ມເບີຕິດຕໍ່
-                              </Button>
                             </Box>
                           );
                         }
