@@ -19,7 +19,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React from "react";
+import React, { useMemo } from "react";
 import { tokens } from "../../theme";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import CalendarOrderUser from "../orderUser/component/CalendarOrderUser";
@@ -130,6 +130,15 @@ const TrackUploadImage = () => {
     window.open(whatsappUrl, "_blank");
   };
 
+  const imageByBranch = useMemo(() => {
+  const map = {};
+  imageAllBranch.forEach((img) => {
+    if (!map[img.branchId]) map[img.branchId] = [];
+    map[img.branchId].push(img);
+  });
+  return map;
+}, [imageAllBranch]);
+
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
@@ -181,9 +190,8 @@ const TrackUploadImage = () => {
               <TableBody>
                 {branchs.map((branch) => {
                   // find all images for this branch
-                  const branchImages = imageAllBranch.filter(
-                    (img) => img.branchId === branch.id
-                  );
+                 const branchImages = imageByBranch[branch.id] || [];
+
 
                   return (
                     <TableRow
