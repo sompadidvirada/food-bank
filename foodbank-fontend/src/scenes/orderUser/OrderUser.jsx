@@ -296,9 +296,6 @@ const OrderUser = () => {
                   <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
                     ເບີຕີດຕໍ່ສາຂາ
                   </TableCell>
-                  <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ລີ້ງແກ້ໄຂອໍເດີ
-                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -498,32 +495,6 @@ const OrderUser = () => {
                               </Button>
                             </Box>
                           );
-                        }
-                      })()}
-                    </TableCell>
-                    <TableCell align="right">
-                      {(() => {
-                        if (row?.phonenumber) {
-                          return (
-                            <Box>
-                              <Button
-                                onClick={() =>
-                                  handleCreateLink(
-                                    row.branchname,
-                                    row.id,
-                                    row.phonenumber
-                                  )
-                                }
-                                variant="contained"
-                                sx={{ fontFamily: "Noto Sans Lao" }}
-                                startIcon={<AddLinkIcon />}
-                              >
-                                ສົ່ງລິ້ງ
-                              </Button>
-                            </Box>
-                          );
-                        } else {
-                          return <Typography>-</Typography>;
                         }
                       })()}
                     </TableCell>
