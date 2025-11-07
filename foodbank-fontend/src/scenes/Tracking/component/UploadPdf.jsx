@@ -39,37 +39,24 @@ const UploadPdf = ({ handleSetSellCount, selectDateBrachCheck }) => {
       const cells = row.querySelectorAll("td");
       if (cells.length >= 8) {
         const type = cells[7].textContent.trim();
-
         if (type === "BAKERY/CAKE" || type === "BEVERAGES") {
           const menu = cells[2].textContent.trim();
           const sellCount = parseInt(cells[3].textContent.trim());
-
           const product = products.find(
             (p) => p.name.trim().toLowerCase() === menu.toLowerCase()
           );
-
-          if (!product) {
-            console.warn(`⚠️ Menu "${menu}" not found in products`);
-            return;
-          }
-
-          if (menu && !isNaN(sellCount)) {
-            extracted.push({
-              product,
-              sellCount,
-              productId: product.id,
-            });
+          if (product && menu && !isNaN(sellCount)) {
+            extracted.push({ productId: product.id, sellCount, product });
           }
         }
       }
     });
 
-    // ✅ Just call handleSetSellCount directly
-    extracted.forEach((entry, index) => {
-      setTimeout(() => {
-        handleSetSellCount(entry.productId, entry.sellCount, entry.product);
-      }, 150 * index);
-    });
+    // 🔁 Process one by one to ensure reliability
+    for (const entry of extracted) {
+      handleSetSellCount(entry.productId, entry.sellCount, entry.product);
+      await new Promise((r) => setTimeout(r, 100)); // slight delay for stability
+    }
 
     event.target.value = "";
     toast.success("ອັປໂຫລດຟາຍຍອດຂາຍສຳເລັດ.");
