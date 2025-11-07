@@ -39,8 +39,7 @@ import ImageModal from "../../component/ImageModal";
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
 
-
-  const URLCUSTOMER = "https://treekoff.store"
+const URLCUSTOMER = "https://treekoff.store";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -116,9 +115,7 @@ const TrackUploadImage = () => {
     }
   };
 
-
-    const handleCreateLink = (phone) => {
-
+  const handleCreateLink = (phone) => {
     const phoneNumber = `85620${phone}`;
 
     // Keep URL as-is (encoded), no decodeURIComponent here
@@ -131,13 +128,13 @@ const TrackUploadImage = () => {
   };
 
   const imageByBranch = useMemo(() => {
-  const map = {};
-  imageAllBranch.forEach((img) => {
-    if (!map[img.branchId]) map[img.branchId] = [];
-    map[img.branchId].push(img);
-  });
-  return map;
-}, [imageAllBranch]);
+    const map = {};
+    imageAllBranch.forEach((img) => {
+      if (!map[img.branchId]) map[img.branchId] = [];
+      map[img.branchId].push(img);
+    });
+    return map;
+  }, [imageAllBranch]);
 
   return (
     <Box m="20px">
@@ -190,8 +187,7 @@ const TrackUploadImage = () => {
               <TableBody>
                 {branchs.map((branch) => {
                   // find all images for this branch
-                 const branchImages = imageByBranch[branch.id] || [];
-
+                  const branchImages = imageByBranch[branch.id] || [];
 
                   return (
                     <TableRow
@@ -213,6 +209,7 @@ const TrackUploadImage = () => {
                                 key={img.id}
                                 src={`${URL}/${img.imageName}`}
                                 alt={branch.branchname}
+                                loading="lazy"
                                 onClick={() =>
                                   handleImageClick(`${URL}/${img.imageName}`)
                                 }
@@ -292,9 +289,7 @@ const TrackUploadImage = () => {
                               <Box>
                                 <Button
                                   onClick={() =>
-                                    handleCreateLink(
-                                      branch.phonenumber
-                                    )
+                                    handleCreateLink(branch.phonenumber)
                                   }
                                   variant="contained"
                                   sx={{ fontFamily: "Noto Sans Lao" }}
