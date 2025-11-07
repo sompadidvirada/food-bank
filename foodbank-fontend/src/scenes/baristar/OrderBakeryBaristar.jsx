@@ -294,7 +294,7 @@ const OrderBakeryBaristar = () => {
                 ຢືນຢັນຈຳນວນ
               </Button>
             </Box>
-            {order.length <= 0 ? (
+            {filteredOrders?.length <= 0 ? (
               <Box sx={{ my: 8, display: "flex", flexDirection: "column" }}>
                 <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize: 25 }}>
                   ຍັງບໍ່ມີອໍເດີເບເກີລີ..
@@ -344,7 +344,7 @@ const OrderBakeryBaristar = () => {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {order.map((row) => (
+                        {filteredOrders?.map((row) => (
                           <TableRow
                             key={row.id}
                             sx={{
