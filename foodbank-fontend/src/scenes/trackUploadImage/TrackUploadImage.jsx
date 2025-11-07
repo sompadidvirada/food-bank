@@ -136,6 +136,69 @@ const TrackUploadImage = () => {
     return map;
   }, [imageAllBranch]);
 
+  const renderPhoneCell = (branch) => {
+    if (branch.phonenumber)
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "end",
+          }}
+        >
+          <Typography>{branch?.phonenumber}</Typography>
+          <Tooltip
+            title="ແກ້ໄຂເບີໂທ"
+            arrow
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "14px",
+                  fontFamily: "Noto Sans Lao", // or any font you prefer
+                  color: "#fff",
+                  backgroundColor: "#333", // optional
+                },
+              },
+            }}
+          >
+            <IconButton onClick={() => handleClickOpen(branch)}>
+              <MoreVertIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      );
+    return (
+      <Box>
+        <Button
+          variant="contained"
+          color="info"
+          sx={{ fontFamily: "Noto Sans Lao" }}
+          onClick={() => handleClickOpen(branch)}
+        >
+          ເພີ່ມເບີຕິດຕໍ່
+        </Button>
+      </Box>
+    );
+  };
+
+  const renderConteck = (branch) => {
+    if (branch.phonenumber)
+      return (
+        <Box>
+          <Button
+            onClick={() => handleCreateLink(branch.phonenumber)}
+            variant="contained"
+            sx={{ fontFamily: "Noto Sans Lao" }}
+            startIcon={<AddLinkIcon />}
+          >
+            ແຈ້ງຫາສາຂາ
+          </Button>
+        </Box>
+      );
+    return <Typography>-</Typography>;
+  };
+
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
@@ -231,78 +294,11 @@ const TrackUploadImage = () => {
                       </TableCell>
 
                       <TableCell align="right">
-                        {" "}
-                        {(() => {
-                          if (branch?.phonenumber) {
-                            return (
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  justifyContent: "end",
-                                }}
-                              >
-                                <Typography>{branch?.phonenumber}</Typography>
-                                <Tooltip
-                                  title="ແກ້ໄຂເບີໂທ"
-                                  arrow
-                                  placement="top"
-                                  componentsProps={{
-                                    tooltip: {
-                                      sx: {
-                                        fontSize: "14px",
-                                        fontFamily: "Noto Sans Lao", // or any font you prefer
-                                        color: "#fff",
-                                        backgroundColor: "#333", // optional
-                                      },
-                                    },
-                                  }}
-                                >
-                                  <IconButton
-                                    onClick={() => handleClickOpen(branch)}
-                                  >
-                                    <MoreVertIcon />
-                                  </IconButton>
-                                </Tooltip>
-                              </Box>
-                            );
-                          } else {
-                            return (
-                              <Box>
-                                <Button
-                                  variant="contained"
-                                  color="info"
-                                  sx={{ fontFamily: "Noto Sans Lao" }}
-                                  onClick={() => handleClickOpen(branch)}
-                                >
-                                  ເພີ່ມເບີຕິດຕໍ່
-                                </Button>
-                              </Box>
-                            );
-                          }
-                        })()}
+                        {renderPhoneCell(branch)}
                       </TableCell>
+
                       <TableCell align="right">
-                        {(() => {
-                          if (branch?.phonenumber) {
-                            return (
-                              <Box>
-                                <Button
-                                  onClick={() =>
-                                    handleCreateLink(branch.phonenumber)
-                                  }
-                                  variant="contained"
-                                  sx={{ fontFamily: "Noto Sans Lao" }}
-                                  startIcon={<AddLinkIcon />}
-                                >
-                                  ແຈ້ງຫາສາຂາ
-                                </Button>
-                              </Box>
-                            );
-                          } else {
-                            return <Typography>-</Typography>;
-                          }
-                        })()}
+                       {renderConteck(branch)}
                       </TableCell>
                     </TableRow>
                   );
