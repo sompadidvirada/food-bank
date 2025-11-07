@@ -70,7 +70,6 @@ const BaristarProfile = () => {
     };
   }, []);
 
-  console.log(`month`, month, `year`, year);
 
   const handleSearch = async (monthArg, yearArg) => {
     const m = monthArg !== undefined ? monthArg : month;
@@ -420,7 +419,7 @@ const BaristarProfile = () => {
               </DialogContent>
               <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
                 <Button
-                  onClick={handleClose}
+                  onClick={handleLogout}
                   sx={{ fontFamily: "Noto Sans Lao" }}
                   color="success"
                   variant="contained"
