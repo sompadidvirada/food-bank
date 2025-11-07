@@ -64,47 +64,60 @@ const OrderManage = () => {
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
 
-  const result = checked?.map((item) => {
-    const product = products.find((p) => p.id === item.productId);
+  const result = checked
+    ?.map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) return null; // skip if product not found
 
-    const totalSell = item.week1Sell + item.week2Sell + item.week3Sell;
-    const totalSend = item.week1Send + item.week2Send + item.week3Send;
-    const totalExp = item.week1Exp + item.week2Exp + item.week3Exp;
+      // 🔍 find the matching branch availability
+      const branchAvail = product.available?.find(
+        (a) => a.branchId === selectDateBrachCheck.brachId
+      );
 
-    let orderWant = 0;
-    let highlight = false;
-    let valueadd = 0;
+      // ❌ skip this product if availability is false (or not found)
+      if (!branchAvail || !branchAvail.aviableStatus) return null;
 
+      const totalSell = item.week1Sell + item.week2Sell + item.week3Sell;
+      const totalSend = item.week1Send + item.week2Send + item.week3Send;
+      const totalExp = item.week1Exp + item.week2Exp + item.week3Exp;
 
-    // 🧮 Base calculation
-    const baseDivisor = dayName === "Saturday" ? 10 : 11;
-    const baseMultiplier = dayName === "Saturday" ? 3 : 4;
-    orderWant = (totalSell / baseDivisor) * baseMultiplier;
+      let orderWant = 0;
+      let highlight = false;
+      let valueadd = 0;
 
-    // 🧭 Highlight & Extra amount logic
-    const isAStatus = product?.status === "A";
-    const isWednesday = dayName === "Wednesday";
+      // 🧮 Base calculation
+      const baseDivisor = dayName === "Saturday" ? 10 : 11;
+      const baseMultiplier = dayName === "Saturday" ? 3 : 4;
+      orderWant = (totalSell / baseDivisor) * baseMultiplier;
 
-    if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
-      if (isAStatus) {
-        valueadd = isWednesday ? 3 : 2;
-      } else {
-        valueadd = isWednesday ? 2 : 1;
+      // 🧭 Highlight & Extra amount logic
+      const isAStatus = product?.status === "A";
+      const isWednesday = dayName === "Wednesday";
+
+      if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
+        if (isAStatus) {
+          valueadd = isWednesday ? 3 : 2;
+        } else {
+          valueadd = isWednesday ? 2 : 1;
+        }
+
+        orderWant += valueadd;
+        highlight = true;
       }
 
-      orderWant += valueadd;
-      highlight = true;
-    }
+      return {
+        ...item,
+        orderWant,
+        highlight,
+        valueadd,
+        category: product?.category,
+        name: product?.name,
+      };
+    })
+    // 🧹 remove null entries from skipped products
+    .filter(Boolean);
 
-    return {
-      ...item,
-      orderWant,
-      highlight,
-      valueadd,
-      category: product?.category,
-      name: product?.name,
-    };
-  });
+  console.log(products);
 
   const fecthPreviousOrderTrack = async () => {
     try {
@@ -806,7 +819,6 @@ const OrderManage = () => {
       console.log(err);
     }
   };
-
 
   useEffect(() => {
     const updateHandler = (data) => {

@@ -47,12 +47,18 @@ const OrderBakeryBaristar = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [order, setOrder] = useState([]);
+  const filteredOrders = order.filter((product) => {
+    // Find the matching availability record for this user's branch
+    const branchAvail = product.products.available?.find(
+      (a) => a.branchId === user.userBranch
+    );
+
+    // Only keep if available and true
+    return branchAvail?.aviableStatus === true;
+  });
   const [orderCount, setOrderCount] = useState({});
   const [status, setStatus] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  console.log(status);
-
   const socket = useSocket();
   const [dateToGet, setDateToGet] = useState(
     dayjs().tz().startOf("day").toDate()
@@ -100,6 +106,8 @@ const OrderBakeryBaristar = () => {
       setLoading(false);
     }
   };
+
+  console.log(filteredOrders);
 
   useEffect(() => {
     const handleTouchMove = (event) => {
