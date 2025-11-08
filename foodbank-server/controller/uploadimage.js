@@ -30,11 +30,36 @@ exports.uploadProductImage = async (req, res) => {
 
     const url = await getSignedUrl(s3, command, { expiresIn: 300 }); // 5 minutes
     if (!url) {
-        return res.status(500).json({ message: `Soemthing went wrong.`})
+      return res.status(500).json({ message: `Soemthing went wrong.` });
     }
     res.json({ uploadUrl: url });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.checkUploadImageAllBranch = async (req, res) => {
+  try {
+    const { checkDate } = req.body;
+
+    console.log(checkDate)
+    const startofDay = new Date(checkDate);
+    const endofDay = new Date(checkDate);
+    startofDay.setUTCHours(0, 0, 0, 0);
+    endofDay.setUTCHours(23, 59, 59, 999);
+
+    const images = await prisma.imageTrack.findMany({
+      where: {
+        date: {
+          gte: startofDay,
+          lte: endofDay,
+        },
+      },
+    });
+    res.send(images);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
   }
 };

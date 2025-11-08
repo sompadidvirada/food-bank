@@ -158,6 +158,7 @@ exports.TotalData = async (req, res) => {
       return {
         id: product.id,
         name: product.name,
+        status:product.status,
         price: product.price,
         sellPrice: product.sellprice,
         image: product.image,

@@ -156,11 +156,12 @@ exports.updateProduct = async (req, res) => {
       sellprice,
       categoryId,
       lifetime,
+      status,
       imageName,
       contentType,
     } = req.body;
 
-    if (!name || !price || !sellprice || !categoryId || !lifetime) {
+    if (!name || !price || !sellprice || !categoryId || !lifetime || !status) {
       return res.status(400).json({ message: `Can't update with emty value.` });
     }
 
@@ -214,6 +215,7 @@ exports.updateProduct = async (req, res) => {
         price: Number(price),
         sellprice: Number(sellprice),
         lifetime: Number(lifetime),
+        status: status,
         categoryId: Number(categoryId),
         image: imageName,
       },

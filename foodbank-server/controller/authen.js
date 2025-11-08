@@ -27,6 +27,9 @@ exports.login = async (req, res) => {
       where: {
         phonenumber: phonenumber,
       },
+      include: {
+        branch: true,
+      },
     });
     if (!checkUser) {
       return res
@@ -46,14 +49,21 @@ exports.login = async (req, res) => {
       phonenumber: checkUser.phonenumber,
       role: checkUser.role,
       image: checkUser.image,
+      userBranch: checkUser.branchId,
+      branchName: checkUser.branch?.branchname,
     };
 
-    jwt.sign(payload, process.env.SECRET, { expiresIn: "20h" }, (err, token) => {
-      if (err) {
-        return res.status(500).json({ message: `Token error` });
+    jwt.sign(
+      payload,
+      process.env.SECRET,
+      { expiresIn: "20h" },
+      (err, token) => {
+        if (err) {
+          return res.status(500).json({ message: `Token error` });
+        }
+        res.send({ payload, token });
       }
-      res.send({ payload, token });
-    });
+    );
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: `server error.` });
@@ -75,6 +85,16 @@ exports.createStaff = async (req, res) => {
       return res
         .status(400)
         .json({ message: `Can't create with empty value.` });
+    }
+
+    console.log(req.user)
+
+    let role = "";
+
+    if (req.user.role === "staff") {
+      role = "baristar";
+    } else if (req.user.role === "admin") {
+      role = "user"
     }
 
     // Use uploaded image filename or fallback to 'default.png'
@@ -115,6 +135,7 @@ exports.createStaff = async (req, res) => {
         phonenumber: phonenumber,
         birdDate: new Date(birthDate),
         image: imageStaff,
+        role: role,
       },
     });
 

@@ -19,7 +19,7 @@ exports.authCheck = async (req, res, next) => {
       },
     });
 
-    if (!user.aviable) {
+    if (!user?.aviable) {
       return res.status(400).json({ message: `This account can't access` });
     }
     next();
@@ -34,6 +34,46 @@ exports.authCheck = async (req, res, next) => {
     return res.status(500).json({ message: "Server error." });
   }
 };
+
+{
+  exports.baristarCheck = async (req, res, next) => {
+    try {
+      const headerToken = req.headers.authorization;
+      if (!headerToken) {
+        return res.status(401).json({ meesage: `No Token Authorization.` });
+      }
+
+      const token = headerToken.split(" ")[1];
+      const decode = jwt.verify(token, process.env.SECRET);
+
+      req.user = decode;
+
+      const user = await prisma.staff.findFirst({
+        where: {
+          phonenumber: req.user.phonenumber,
+        },
+      });
+
+      if (!user?.aviable) {
+        return res.status(400).json({ message: `This account can't access` });
+      } else if (user.role !== "admin" && user.role !== "baristar") {
+        return res
+          .status(403)
+          .json({ message: `Your user doesn't have permission.` });
+      }
+      next();
+    } catch (err) {
+      if (err.name === "TokenExpiredError") {
+        return res.status(401).json({ message: "Token expired." });
+      }
+      if (err.name === "JsonWebTokenError") {
+        return res.status(401).json({ message: "Invalid token." });
+      }
+      console.log(err);
+      return res.status(500).json({ message: "Server error." });
+    }
+  };
+}
 
 exports.adminCheck = async (req, res, next) => {
   try {

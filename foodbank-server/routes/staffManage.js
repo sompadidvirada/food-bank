@@ -17,8 +17,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-router.get('/getstaffsinfo', authCheck, adminCheck, getStaffInfos)
-router.put('/updatestaff/:id', authCheck, adminCheck, updateBranchStaff)
+router.get('/getstaffsinfo', authCheck, getStaffInfos)
+router.put('/updatestaff/:id', authCheck, updateBranchStaff)
 router.put('/updatestatusstaff/:id', authCheck, adminCheck, updateStatusStaff)
 router.put('/updaterolestaff/:id', authCheck, adminCheck, updateRoleStaff)
 router.put('/updateuser/:id', updateMainStaff)

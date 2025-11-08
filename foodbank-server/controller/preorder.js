@@ -4,6 +4,11 @@ const { utcToZonedTime, zonedTimeToUtc } = require("date-fns-tz");
 const { io } = require("../server");
 const timeZone = "Asia/Vientiane";
 const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const timezone = require("dayjs/plugin/timezone");
+dayjs.extend(utc);
+dayjs.extend(timezone);
+const TIME_ZONE = "Asia/Vientiane";
 
 exports.createPreorder = async (req, res) => {
   try {
@@ -87,14 +92,17 @@ exports.updateOrderWant = async (req, res) => {
     const laosMinute = now.getUTCMinutes();
 
     // Block if Laos time is 11:30 or later
-    if (laosHour > 11 || (laosHour === 11 && laosMinute >= 50)) {
-      return res
-        .status(403)
-        .json({ message: "Updates are not allowed after 11:30 AM Laos time" });
-    }
+    // if (laosHour > 11 || (laosHour === 11 && laosMinute >= 50)) {
+    //   return res
+    //     .status(403)
+    //     .json({ message: "Updates are not allowed after 11:30 AM Laos time" });
+    // }
 
     const { id } = req.params;
     const { orderWant } = req.body;
+
+    console.log(id)
+    console.log(orderWant)
     const chaneg = await prisma.orderTrack.update({
       where: {
         id: Number(id),
@@ -440,31 +448,33 @@ exports.getPreviuosPreOrder = async (req, res) => {
     const { orderDate, brachId } = req.body;
 
     if (!orderDate || !brachId) {
-      return res.status(400).json({ message: "orderDate is required" });
+      return res.status(400).json({ message: "orderDate and brachId are required" });
     }
 
-    const orderDay = dayjs(orderDate);
-    const weekday = orderDay.day(); // 0 = Sunday, 3 = Wednesday, 6 = Saturday
+    // Convert request date into Lao timezone
+    const localDate = dayjs(orderDate).tz(TIME_ZONE);
+    const weekday = localDate.day(); // now correct in Lao time
 
-    let startDate
+    let startDate;
 
     if (weekday === 3) {
       // Wednesday → go back 4 days (Saturday)
-      startDate = orderDay.subtract(4, "day").startOf("day");
+      startDate = localDate.subtract(4, "day").startOf("day");
     } else if (weekday === 6) {
       // Saturday → go back 3 days (Wednesday)
-      startDate = orderDay.subtract(3, "day").startOf("day");
+      startDate = localDate.subtract(3, "day").startOf("day");
     } else {
       return res.status(400).json({
         message: "Only Wednesday or Saturday are supported orderDate.",
       });
     }
 
-    console.log(startDate.toDate())
+    // Convert back to UTC for DB query
+    const startUtc = startDate.utc().toDate();
 
     const previousOrders = await prisma.orderTrack.findMany({
       where: {
-        orderDate: startDate.toDate(),
+        orderDate: startUtc, // ⚠️ this matches exact timestamp
         branchId: Number(brachId),
       },
       orderBy: {
@@ -474,7 +484,7 @@ exports.getPreviuosPreOrder = async (req, res) => {
 
     return res.status(200).json(previousOrders);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return res.status(500).json({ message: `server error.` });
   }
 };

@@ -25,7 +25,6 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import CalendarOrderUser from "../orderUser/component/CalendarOrderUser";
 import { useState } from "react";
 import Header from "../component/Header";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { format, isValid, parseISO } from "date-fns";
 import AddLinkIcon from "@mui/icons-material/AddLink";
 import Slide from "@mui/material/Slide";
@@ -35,9 +34,136 @@ import { getImageAllBranch } from "../../api/trackingImage";
 import { useEffect } from "react";
 import { useRef } from "react";
 import ImageModal from "../../component/ImageModal";
+import { DataGrid } from "@mui/x-data-grid";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
+
+// 🧩 Memoized Image Cell Component
+const BranchImages = React.memo(({ images, branchname, onClick }) => (
+  <Box display="flex" gap={1} mt={1}>
+    {images.length > 0 ? (
+      images.map((img) => (
+        <img
+          key={img.id}
+          src={`${URL}/${img.imageName}`}
+          alt={branchname}
+          loading="lazy"
+          decoding="async"
+          onClick={() => onClick(`${URL}/${img.imageName}`)}
+          style={{
+            width: 60,
+            height: 60,
+            objectFit: "cover",
+            borderRadius: 8,
+            cursor: "pointer",
+          }}
+        />
+      ))
+    ) : (
+      <Typography variant="body2" color="text.secondary">
+        No images
+      </Typography>
+    )}
+  </Box>
+));
+
+// 🧩 Columns for DataGrid
+const createColumns = (handleClickOpen, handleCreateLink, handleImageClick) => [
+  {
+    field: "branchname",
+    headerName: "ສາຂາ",
+    flex: 1,
+    minWidth: 120,
+    renderCell: (params) => (
+      <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+        {params.row.branchname}
+      </Typography>
+    ),
+  },
+  {
+    field: "images",
+    headerName: "ຮູບເບເກີລີ້",
+    flex: 2,
+    minWidth: 150,
+    sortable: false,
+    renderCell: (params) => (
+      <BranchImages
+        images={params.row.images}
+        branchname={params.row.branchname}
+        onClick={handleImageClick}
+      />
+    ),
+  },
+  {
+    field: "phonenumber",
+    headerName: "ເບີຕິດຕໍ່ສາຂາ",
+    flex: 1,
+    minWidth: 100,
+    sortable: false,
+    renderCell: (params) => {
+      const branch = params.row;
+      return branch.phonenumber ? (
+        <Box
+          sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+        >
+          <Typography>{branch.phonenumber}</Typography>
+          <Tooltip
+            title="ແກ້ໄຂເບີໂທ"
+            arrow
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "14px",
+                  fontFamily: "Noto Sans Lao",
+                  color: "#fff",
+                  backgroundColor: "#333",
+                },
+              },
+            }}
+          >
+            <IconButton onClick={() => handleClickOpen(branch)}>
+              <MoreVertIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ) : (
+        <Button
+          variant="contained"
+          color="info"
+          sx={{ fontFamily: "Noto Sans Lao" }}
+          onClick={() => handleClickOpen(branch)}
+        >
+          ເພີ່ມເບີຕິດຕໍ່
+        </Button>
+      );
+    },
+  },
+  {
+    field: "contact",
+    headerName: "ຕິດຕໍ່ຫາສາຂາ",
+    flex: 1,
+    minWidth: 100,
+    sortable: false,
+    renderCell: (params) => {
+      const branch = params.row;
+      return branch.phonenumber ? (
+        <Button
+          onClick={() => handleCreateLink(branch.phonenumber)}
+          variant="contained"
+          sx={{ fontFamily: "Noto Sans Lao" }}
+          startIcon={<AddLinkIcon />}
+        >
+          ແຈ້ງຫາສາຂາ
+        </Button>
+      ) : (
+        <Typography>-</Typography>
+      );
+    },
+  },
+];
 
 const URLCUSTOMER = "https://treekoff.store";
 
@@ -136,69 +262,6 @@ const TrackUploadImage = () => {
     return map;
   }, [imageAllBranch]);
 
-  const renderPhoneCell = (branch) => {
-    if (branch.phonenumber)
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "end",
-          }}
-        >
-          <Typography>{branch?.phonenumber}</Typography>
-          <Tooltip
-            title="ແກ້ໄຂເບີໂທ"
-            arrow
-            placement="top"
-            componentsProps={{
-              tooltip: {
-                sx: {
-                  fontSize: "14px",
-                  fontFamily: "Noto Sans Lao", // or any font you prefer
-                  color: "#fff",
-                  backgroundColor: "#333", // optional
-                },
-              },
-            }}
-          >
-            <IconButton onClick={() => handleClickOpen(branch)}>
-              <MoreVertIcon />
-            </IconButton>
-          </Tooltip>
-        </Box>
-      );
-    return (
-      <Box>
-        <Button
-          variant="contained"
-          color="info"
-          sx={{ fontFamily: "Noto Sans Lao" }}
-          onClick={() => handleClickOpen(branch)}
-        >
-          ເພີ່ມເບີຕິດຕໍ່
-        </Button>
-      </Box>
-    );
-  };
-
-  const renderConteck = (branch) => {
-    if (branch.phonenumber)
-      return (
-        <Box>
-          <Button
-            onClick={() => handleCreateLink(branch.phonenumber)}
-            variant="contained"
-            sx={{ fontFamily: "Noto Sans Lao" }}
-            startIcon={<AddLinkIcon />}
-          >
-            ແຈ້ງຫາສາຂາ
-          </Button>
-        </Box>
-      );
-    return <Typography>-</Typography>;
-  };
-
   return (
     <Box m="20px">
       <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
@@ -229,83 +292,50 @@ const TrackUploadImage = () => {
       </Box>
       {dateConfirmOrder?.orderDate ? (
         <Box m={2}>
-          <TableContainer component={Paper}>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
-              <TableHead>
-                <TableRow>
-                  <TableCell sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ສາຂາ{" "}
-                  </TableCell>
-                  <TableCell align="left" sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ຮູບເບເກີລີ້
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ເບີຕີດຕໍ່ສາຂາ
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontFamily: "Noto Sans Lao" }}>
-                    ຕິດຕໍ່ຫາສາຂາ
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {branchs.map((branch) => {
-                  // find all images for this branch
-                  const branchImages = imageByBranch[branch.id] || [];
-
-                  return (
-                    <TableRow
-                      key={branch.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell
-                        component="th"
-                        scope="row"
-                        sx={{ fontFamily: "Noto Sans Lao" }}
-                      >
-                        {branch.branchname}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box display="flex" gap={1}>
-                          {branchImages.length > 0 ? (
-                            branchImages.map((img) => (
-                              <img
-                                key={img.id}
-                                src={`${URL}/${img.imageName}`}
-                                alt={branch.branchname}
-                                loading="lazy"
-                                onClick={() =>
-                                  handleImageClick(`${URL}/${img.imageName}`)
-                                }
-                                style={{
-                                  width: 60,
-                                  height: 60,
-                                  objectFit: "cover",
-                                  borderRadius: 8,
-                                  cursor: "pointer",
-                                }}
-                              />
-                            ))
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              No images
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        {renderPhoneCell(branch)}
-                      </TableCell>
-
-                      <TableCell align="right">
-                       {renderConteck(branch)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <Paper
+            sx={{
+              width: "100%",
+              height: "auto", // allow full content height
+              boxShadow: 2,
+              p: 1,
+              
+            }}
+          >
+            <DataGrid
+              autoHeight // 👈 key property: makes DataGrid expand with content
+              rows={branchs.map((branch) => ({
+                id: branch.id,
+                branchname: branch.branchname,
+                phonenumber: branch.phonenumber,
+                images: imageByBranch[branch.id] || [],
+              }))}
+              columns={createColumns(
+                handleClickOpen,
+                handleCreateLink,
+                handleImageClick
+              )}
+              disableRowSelectionOnClick
+              pageSizeOptions={[]} // hides pagination
+              hideFooter // 👈 optional, hides footer pagination bar
+              rowHeight={90} // taller rows for images
+              sx={{
+                "& .MuiDataGrid-columnHeaders": {
+                  fontFamily: "Noto Sans Lao",
+                  backgroundColor: "#f5f5f5",
+                  fontWeight: "bold",
+                  border:"none"
+                },
+                
+                "& .MuiDataGrid-cell": {
+                  fontFamily: "Noto Sans Lao",
+                  alignItems: "center",
+                  py: 1,
+                },
+                
+                border: "none",
+              }}
+            />
+          </Paper>
         </Box>
       ) : (
         <Box sx={{ textAlign: "center", p: 3 }}>

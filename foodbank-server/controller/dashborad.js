@@ -1,12 +1,14 @@
 const prisma = require("../config/prisma");
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+dayjs.extend(utc);
 
 exports.dashboradData = async (req, res) => {
   try {
     const { startDate, endDate, branchs } = req.body;
-
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    end.setHours(23, 59, 59, 999);
+    // === Normalize start & end in UTC ===
+    const start = dayjs(startDate).utc().startOf("day").toDate();
+    const end = dayjs(endDate).utc().endOf("day").toDate();
 
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
       return res.status(400).send("Invalid startDate or endDate");
@@ -37,12 +39,31 @@ exports.dashboradData = async (req, res) => {
       }),
     ]);
 
-    // === 2. Shift dates to last month ===
-    const lastStart = new Date(start);
-    const lastEnd = new Date(end);
-    lastStart.setMonth(lastStart.getMonth() - 1);
-    lastEnd.setMonth(lastEnd.getMonth() - 1);
+    // === 2. Calculate last month start and end correctly ===
+    function getLastMonth(date, isEnd = false) {
+      let d = dayjs(date).utc().subtract(1, "month");
 
+      // If the original date is the last day of its month,
+      // move the last month date to the end of its month as well.
+      const originalIsLastDay = dayjs(date).utc().isSame(
+        dayjs(date).utc().endOf("month"),
+        "day"
+      );
+      if (originalIsLastDay) {
+        d = d.endOf("month");
+      }
+
+      if (isEnd) {
+        return d.endOf("day").toDate();
+      } else {
+        return d.startOf("day").toDate();
+      }
+    }
+
+    const lastStart = getLastMonth(start);
+    const lastEnd = getLastMonth(end, true);
+
+    // === 3. Query last month ===
     const [sendTrackLast, expTrackLast, sellTrackLast] = await Promise.all([
       prisma.tracksend.findMany({
         where: {
@@ -67,7 +88,7 @@ exports.dashboradData = async (req, res) => {
       }),
     ]);
 
-    // === 3. Calculate totals ===
+    // === 4. Calculate totals ===
     const totalSendPrice = sendTrack.reduce(
       (sum, r) => sum + r.sendCount * (r.price || r.sellPrice || 0),
       0
@@ -110,7 +131,7 @@ exports.dashboradData = async (req, res) => {
           )
         : 0;
 
-    // === 4. Return both current & last month ===
+    // === 5. Return both current & last month ===
     res.json({
       current: {
         totalSendPrice,
@@ -127,6 +148,6 @@ exports.dashboradData = async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ message: `server error` });
+    return res.status(500).json({ message: "server error" });
   }
 };

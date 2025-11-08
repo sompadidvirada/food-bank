@@ -134,7 +134,6 @@ exports.updateMainStaff = async (req, res) => {
       contentType,
     } = req.body;
 
-
     if (!id || !firstname || !lastname || !phonenumber) {
       return res.status(400).json({ message: `Invalid input data.` });
     }
@@ -151,6 +150,9 @@ exports.updateMainStaff = async (req, res) => {
       where: {
         phonenumber: phonenumber,
         id: { not: Number(id) },
+      },
+      include: {
+        branch: true,
       },
     });
 
@@ -178,7 +180,7 @@ exports.updateMainStaff = async (req, res) => {
             Key: exitingUser.image,
           };
 
-          const command = new DeleteObjectCommand(params); 
+          const command = new DeleteObjectCommand(params);
           await s3.send(command);
 
           console.log("Deleted old image:", exitingUser.image);
@@ -206,6 +208,9 @@ exports.updateMainStaff = async (req, res) => {
     const updatedStaff = await prisma.staff.update({
       where: { id: Number(id) },
       data: updateData,
+      include: {
+        branch: true,
+      },
     });
 
     const payload = {
@@ -216,19 +221,26 @@ exports.updateMainStaff = async (req, res) => {
       role: updatedStaff.role,
       status: updatedStaff.aviable,
       image: updatedStaff.image,
+      userBranch: updatedStaff.branchId ?? null,
+      branchName: updatedStaff.branch?.branchname ?? null, // safe access
     };
 
-    jwt.sign(payload, process.env.SECRET, { expiresIn: "20h" }, (err, token) => {
-      if (err) {
-        return res.status(500).json({ message: "Token error." });
-      }
+    jwt.sign(
+      payload,
+      process.env.SECRET,
+      { expiresIn: "20h" },
+      (err, token) => {
+        if (err) {
+          return res.status(500).json({ message: "Token error." });
+        }
 
-      res.send({
-        payload,
-        token,
-        imageUploadUrl, // <- signed URL for frontend to PUT image
-      });
-    });
+        res.send({
+          payload,
+          token,
+          imageUploadUrl, // <- signed URL for frontend to PUT image
+        });
+      }
+    );
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: `Server error.` });
