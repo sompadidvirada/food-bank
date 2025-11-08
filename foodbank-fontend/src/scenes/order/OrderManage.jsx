@@ -117,8 +117,6 @@ const OrderManage = () => {
     // 🧹 remove null entries from skipped products
     .filter(Boolean);
 
-  console.log(products);
-
   const fecthPreviousOrderTrack = async () => {
     try {
       const ress = await getPreviousOrderTrack(selectDateBrachCheck, token);
@@ -768,8 +766,11 @@ const OrderManage = () => {
 
     try {
       await Promise.all(
-        result.map((item) => handleSetOrder(item.productId, item.orderWant))
+        result.map(
+          (item) => handleSetOrder(item.productId, Math.floor(item.orderWant)) // 👈 floor only when setting
+        )
       );
+
       toast.success("ນຳໃຊ້ຈຳນວນແນະນຳສຳເລັດ");
     } catch (error) {
       console.error(error);
