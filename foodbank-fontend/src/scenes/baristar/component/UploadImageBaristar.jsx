@@ -44,6 +44,7 @@ const UploadImageBaristar = ({
   selectFormtracksell,
   checkImage,
   setCheckImage,
+  user
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -221,7 +222,14 @@ const UploadImageBaristar = ({
         alignItems={"center"}
       >
         {selectedImages.length > 0 ? (
-          <Box sx={{ width: "100%", alignItems: "center", gap:2, display:"flex" }}>
+          <Box
+            sx={{
+              width: "100%",
+              alignItems: "center",
+              gap: 2,
+              display: "flex",
+            }}
+          >
             <Button
               component="label"
               variant="contained"
@@ -276,19 +284,21 @@ const UploadImageBaristar = ({
                 multiple
               />
             </Button>
-            <Button
-              component="label"
-              role={undefined}
-              variant="contained"
-              color="error"
-              disabled={checkImage?.length > 0 ? false : true}
-              tabIndex={-1}
-              onClick={handleClickOpen}
-              startIcon={<DeleteForeverIcon />}
-              sx={{ fontFamily: "Noto Sans Lao" }}
-            >
-              ລົບຮູບທັງໝົດ
-            </Button>
+            {user.role !== "baristar" && (
+              <Button
+                component="label"
+                role={undefined}
+                variant="contained"
+                color="error"
+                disabled={checkImage?.length > 0 ? false : true}
+                tabIndex={-1}
+                onClick={handleClickOpen}
+                startIcon={<DeleteForeverIcon />}
+                sx={{ fontFamily: "Noto Sans Lao" }}
+              >
+                ລົບຮູບທັງໝົດ
+              </Button>
+            )}
           </Box>
         )}
       </Box>

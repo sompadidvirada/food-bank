@@ -107,6 +107,7 @@ const BaristarImage = () => {
                 selectFormtracksell={selectFormtracksell}
                 checkImage={checkImage}
                 setCheckImage={setCheckImage}
+                user={user}
               />
             </Paper>
           </Box>
