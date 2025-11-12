@@ -18,7 +18,11 @@ const {
   deleteImages,
   fecthImageTrack,
 } = require("../controller/tracking");
+const multer = require("multer");
 const router = express.Router();
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
+
 
 router.post("/checktracksell", authCheck, checkTrackSell);
 router.post("/checktracksend", authCheck, checkTrackSend);
@@ -36,7 +40,16 @@ router.post("/deleteimagestrack", authCheck, deleteImages)
 
 // upload image track
 
-router.post("/uploadimagetrack", authCheck, uploadImageTrack)
+// multer setup
+
+// Express route
+router.post(
+  "/uploadimagetrack",
+  authCheck,
+  upload.array("images"), // "images" must match the FormData key
+  uploadImageTrack
+);
+
 router.post("/getimagetrack", authCheck, checkImageTrack)
 router.post("/getimagetracking", authCheck, fecthImageTrack)
 

@@ -543,61 +543,55 @@ exports.updateTrackExp = async (req, res) => {
 
 exports.uploadImageTrack = async (req, res) => {
   try {
-    const { branchId, Datetime, images } = req.body;
-    if (
-      !branchId ||
-      !Array.isArray(images) ||
-      images.length === 0 ||
-      !Datetime
-    ) {
-      return res.status(400).json({ message: `Invalid or missing values.` });
+    const { branchId, Datetime } = req.body;
+    const files = req.files;
+
+    if (!branchId || !Datetime || !files || files.length === 0) {
+      return res.status(400).json({ message: "Invalid or missing values." });
     }
 
-    const uploadPromises = images.map(async (img) => {
-      const { imagesName, contentType } = img;
+    // Upload each file to S3
+    const uploadedImages = [];
 
-      if (!imagesName || !contentType) {
-        throw new Error("Missing image name or content type.");
-      }
+    for (const file of files) {
+      const filename = `${Date.now()}-${file.originalname.replace(/\s/g, "_")}`;
 
       const command = new PutObjectCommand({
         Bucket: process.env.SECREY_AWS_BUCKET_IMAGE_TRACK,
-        Key: imagesName,
-        ContentType: contentType,
+        Key: filename,
+        Body: file.buffer,
+        ContentType: file.mimetype,
         CacheControl: "public, max-age=31536000, immutable",
       });
 
-      const signedUrl = await getSignedUrl(s3, command, { expiresIn: 900 });
+      await s3.send(command);
 
-      return {
-        uploadUrl: signedUrl,
-        filename: imagesName,
-        publicUrl: `https://${process.env.SECREY_AWS_BUCKET_IMAGE_TRACK}.s3.${process.env.BUCKET_REGION}.amazonaws.com/${imagesName}`,
-      };
-    });
+      uploadedImages.push({
+        imageName: filename,
+        publicUrl: `https://${process.env.SECREY_AWS_BUCKET_IMAGE_TRACK}.s3.${process.env.BUCKET_REGION}.amazonaws.com/${filename}`,
+      });
+    }
 
-    const result = await Promise.all(uploadPromises);
-
-    // ✅ Insert to imageTrack table (use only filename and request data)
-    const insertData = result.map((r) => ({
-      branchId: Number(branchId),
-      date: new Date(Datetime), // <- from request
-      imageName: r.filename, // <- from S3 object
-    }));
-
+    // Save to DB
     await prisma.imageTrack.createMany({
-      data: insertData,
+      data: uploadedImages.map((img) => ({
+        branchId: Number(branchId),
+        date: new Date(Datetime),
+        imageName: img.imageName,
+      })),
     });
 
     return res.status(200).json({
-      message: "Signed URLs generated and data saved.",
-      data: result,
+      message: "Images uploaded successfully",
+      data: uploadedImages,
     });
   } catch (err) {
     console.error("Upload error:", err);
-    return res.status(500).json({ message: `Server error.` });
+    res.status(500).json({ message: "Server error" });
   }
 };
+
+
 exports.checkImageTrack = async (req, res) => {
   try {
     const { sellDate, brachId } = req.body;

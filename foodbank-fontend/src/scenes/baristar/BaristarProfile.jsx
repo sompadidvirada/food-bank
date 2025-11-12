@@ -184,7 +184,7 @@ const BaristarProfile = () => {
                         opacity: 0.4,
                       }}
                     >
-                      {user?.role === `admin` && `ຕຳແໜ່ງ: ບາລີສຕ້າ`}
+                      {user?.role === `admin` ? `ຕຳແຫນ່ງ: ແອດມິນ` : `ຕຳແໜ່ງ: ບາລີສຕ້າ`}
                     </Typography>
                     {<Editprofile />}
                   </Box>
