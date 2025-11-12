@@ -28,6 +28,8 @@ import ImageModal from "../../../component/ImageModal";
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
 
+const URLAPI = import.meta.env.VITE_API_URL;
+
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
   clipPath: "inset(50%)",
@@ -107,57 +109,59 @@ const UploadImageBaristar = ({
     });
   };
 
-  const preparePayload = () => {
-    return {
-      branchId: selectFormtracksell?.brachId,
-      Datetime: selectFormtracksell?.sellAt,
-      images: selectedImages.map((img) => ({
-        imagesName: img.name,
-        contentType: img.file.type,
-      })),
-    };
-  };
 
   const handleUpload = async () => {
-    const data = preparePayload(); // includes branchId and image metadata
+    if (selectedImages.length === 0) return;
+
     setIsUploading(true);
 
     try {
-      // 1. Request signed upload URLs from backend
-      const response = await uploadImageTrack(data, token); // should return { data: [...] }
-      const uploadUrls = response?.data?.data;
+      const formData = new FormData();
+      formData.append("branchId", selectFormtracksell?.brachId);
+      formData.append("Datetime", selectFormtracksell?.sellAt);
 
-      if (!uploadUrls || !Array.isArray(uploadUrls)) {
-        throw new Error("Invalid upload URL response");
-      }
+      // Random filename generator
+      const randomImage = (length = 32) => {
+        const array = new Uint8Array(length);
+        window.crypto.getRandomValues(array);
+        return Array.from(array, (byte) =>
+          byte.toString(16).padStart(2, "0")
+        ).join("");
+      };
 
-      // 2. Upload each image to its corresponding signed URL
-      for (const uploadItem of uploadUrls) {
-        const { uploadUrl, filename } = uploadItem;
-        const matchedImage = selectedImages.find(
-          (img) => img.name === filename
-        );
+      // Rename before sending
+      const renamedFiles = selectedImages.map((img) => {
+        const file = img.file;
+        const extension = file.name.split(".").pop();
+        const randomName = `${randomImage()}.${extension}`;
+        return new File([file], randomName, { type: file.type });
+      });
 
-        if (!matchedImage) {
-          console.warn(`No matching image found for ${filename}`);
-          continue;
-        }
-        await axios.put(uploadUrl, matchedImage.file, {
-          headers: {
-            "Content-Type": matchedImage.file.type,
-          },
-        });
-      }
-      toast.success("ອັປໂຫລດຮູບພາບສຳເລັດ");
+      renamedFiles.forEach((file) => formData.append("images", file));
+
+      // Upload to backend
+      const res = await axios.post(`${URLAPI}/uploadimagetrack`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Response contains uploadedImages
+      const uploaded = res.data.data; // [{ imageName, publicUrl }, ...]
+
+      // Update your state to show them immediately
       setCheckImage((prev) => [
         ...prev,
-        ...selectedImages.map((img) => ({
-          imageName: img.name,
-          date: selectFormtracksell?.sellAt,
+        ...uploaded.map((img) => ({
+          imageName: img.imageName,
+          url: img.publicUrl,
           branchId: selectFormtracksell?.brachId,
+          date: selectFormtracksell?.sellAt,
         })),
       ]);
-      // 3. Reset
+
+      toast.success("ອັບໂຫລດຮູບພາບສຳເລັດ");
       setSelectedImages([]);
       setImagePreviews([]);
     } catch (err) {
