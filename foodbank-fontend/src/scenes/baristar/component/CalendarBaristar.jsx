@@ -5,14 +5,14 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
 const CalendarBaristar = ({ setSelectFormtracksell }) => {
-  // set default to previous day
-  const [value, setValue] = React.useState(dayjs().subtract(1, "day"));
+  // ✅ Set default to current day
+  const [value, setValue] = React.useState(dayjs());
 
   React.useEffect(() => {
-    // set default sellAt as previous day on mount
+    // ✅ Set default sellAt as current day on mount
     setSelectFormtracksell((prevState) => ({
       ...prevState,
-      sellAt: dayjs().subtract(1, "day").startOf("day").toISOString(),
+      sellAt: dayjs().startOf("day").toISOString(),
     }));
   }, [setSelectFormtracksell]);
 

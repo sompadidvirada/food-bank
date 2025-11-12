@@ -671,7 +671,9 @@ const Team = () => {
               fontWeight: "bold", // optional
               fontSize: "16px", // optional
             },
+            
           }}
+          hideFooter
         />
       </Box>
 

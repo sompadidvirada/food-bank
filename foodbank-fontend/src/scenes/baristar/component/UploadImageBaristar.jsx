@@ -44,7 +44,7 @@ const UploadImageBaristar = ({
   selectFormtracksell,
   checkImage,
   setCheckImage,
-  user
+  user,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [selectedImages, setSelectedImages] = useState([]);
@@ -280,6 +280,7 @@ const UploadImageBaristar = ({
               ອັປໂຫລດຮູບ
               <VisuallyHiddenInput
                 type="file"
+                accept="image/*" // ✅ allow only image files
                 onChange={handleImageChange}
                 multiple
               />
