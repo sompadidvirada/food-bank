@@ -84,31 +84,50 @@ const UploadImageBaristar = ({
   );
 
   const handleImageChange = async (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = [];
-    const newImages = [];
+  const files = Array.from(e.target.files);
+  const newPreviews = [];
+  const newImages = [];
 
-    for (const file of files) {
-      // Compress the image
-      const compressedFile = await imageCompression(file, {
-        maxSizeMB: 1, // compress to ~1MB
-        maxWidthOrHeight: 1920, // resize to max 1920px
-        useWebWorker: true,
-      });
-
+  // Helper to convert File to Base64 using promise
+  const fileToDataUrl = (file) =>
+    new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        newPreviews.push(reader.result);
-        newImages.push({ file: compressedFile, name: compressedFile.name });
+      reader.onloadend = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
 
-        if (newPreviews.length === files.length) {
-          setImagePreviews((prev) => [...prev, ...newPreviews]);
-          setSelectedImages((prev) => [...prev, ...newImages]);
-        }
-      };
-      reader.readAsDataURL(compressedFile);
+  for (const file of files) {
+    // Show file name, size in toast
+    toast.info(
+      `Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`,
+      { autoClose: 3000 }
+    );
+
+    // Compress image before upload
+    const compressedFile = await imageCompression(file, {
+      maxSizeMB: 1, // ~1MB
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    });
+
+    const extension = typeToExtension[compressedFile.type];
+    if (!extension) {
+      toast.error(`Unsupported file type: ${compressedFile.type}`);
+      continue;
     }
-  };
+
+    const imageName = `${randomImage()}.${extension}`;
+    const dataUrl = await fileToDataUrl(compressedFile);
+
+    newPreviews.push(dataUrl);
+    newImages.push({ file: compressedFile, name: imageName });
+  }
+
+  // Update state once after all files processed
+  setImagePreviews((prev) => [...prev, ...newPreviews]);
+  setSelectedImages((prev) => [...prev, ...newImages]);
+};
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;
