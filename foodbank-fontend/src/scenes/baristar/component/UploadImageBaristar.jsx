@@ -169,7 +169,7 @@ const UploadImageBaristar = ({
       setImagePreviews([]);
     } catch (err) {
       console.error("Upload failed", err);
-      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.");
+      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.",err);
     } finally {
       setIsUploading(false);
     }
