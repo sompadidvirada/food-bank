@@ -32,6 +32,7 @@
     "@nivo/line": "^0.88.0",
     "@nivo/pie": "^0.88.0",
     "axios": "^1.8.4",
+    "browser-image-compression": "^2.0.2",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",

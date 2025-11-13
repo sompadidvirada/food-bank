@@ -83,37 +83,31 @@ const UploadImageBaristar = ({
     }
   );
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
     const newPreviews = [];
     const newImages = [];
 
-    files.forEach((file) => {
-      // Show file type and name in console and toast
-      toast.info(
-        `Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`,
-        { autoClose: 3000 }
-      );
-
-      const extension = typeToExtension[file.type];
-      if (!extension) {
-        alert(`Unsupported file type: ${file.type}`);
-        return;
-      }
-      const imageName = `${randomImage()}.${extension}`;
-      newImages.push({ file, name: imageName });
+    for (const file of files) {
+      // Compress the image
+      const compressedFile = await imageCompression(file, {
+        maxSizeMB: 1, // compress to ~1MB
+        maxWidthOrHeight: 1920, // resize to max 1920px
+        useWebWorker: true,
+      });
 
       const reader = new FileReader();
       reader.onloadend = () => {
         newPreviews.push(reader.result);
-        // Once all previews are read, update state
+        newImages.push({ file: compressedFile, name: compressedFile.name });
+
         if (newPreviews.length === files.length) {
           setImagePreviews((prev) => [...prev, ...newPreviews]);
           setSelectedImages((prev) => [...prev, ...newImages]);
         }
       };
-      reader.readAsDataURL(file);
-    });
+      reader.readAsDataURL(compressedFile);
+    }
   };
 
   const handleUpload = async () => {
