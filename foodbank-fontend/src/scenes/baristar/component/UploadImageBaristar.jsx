@@ -53,7 +53,7 @@ const UploadImageBaristar = ({
   const [imagePreviews, setImagePreviews] = useState([]);
   const token = useFoodBankStorage((state) => state.token);
   const imageModalRef = useRef();
-  const [errorMessage, setErrorMessage] = useState("");
+  
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -83,57 +83,41 @@ const UploadImageBaristar = ({
     }
   );
 
-  const handleImageChange = async (e) => {
-  const files = Array.from(e.target.files);
-  const newPreviews = [];
-  const newImages = [];
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newPreviews = [];
+    const newImages = [];
 
-  // Helper to convert File to Base64 using promise
-  const fileToDataUrl = (file) =>
-    new Promise((resolve, reject) => {
+    files.forEach((file) => {
+      // Show file type and name in console and toast
+      toast.info(`Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`, { autoClose: 3000 });
+
+      const extension = typeToExtension[file.type];
+      if (!extension) {
+        alert(`Unsupported file type: ${file.type}`);
+        return;
+      }
+      const imageName = `${randomImage()}.${extension}`;
+      newImages.push({ file, name: imageName });
+
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result);
-      reader.onerror = reject;
+      reader.onloadend = () => {
+        newPreviews.push(reader.result);
+        // Once all previews are read, update state
+        if (newPreviews.length === files.length) {
+          setImagePreviews((prev) => [...prev, ...newPreviews]);
+          setSelectedImages((prev) => [...prev, ...newImages]);
+        }
+      };
       reader.readAsDataURL(file);
     });
-
-  for (const file of files) {
-    // Show file name, size in toast
-    toast.info(
-      `Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`,
-      { autoClose: 3000 }
-    );
-
-    // Compress image before upload
-    const compressedFile = await imageCompression(file, {
-      maxSizeMB: 1, // ~1MB
-      maxWidthOrHeight: 1920,
-      useWebWorker: true,
-    });
-
-    const extension = typeToExtension[compressedFile.type];
-    if (!extension) {
-      toast.error(`Unsupported file type: ${compressedFile.type}`);
-      continue;
-    }
-
-    const imageName = `${randomImage()}.${extension}`;
-    const dataUrl = await fileToDataUrl(compressedFile);
-
-    newPreviews.push(dataUrl);
-    newImages.push({ file: compressedFile, name: imageName });
-  }
-
-  // Update state once after all files processed
-  setImagePreviews((prev) => [...prev, ...newPreviews]);
-  setSelectedImages((prev) => [...prev, ...newImages]);
-};
+  };
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;
 
     setIsUploading(true);
-    setErrorMessage(""); // Reset previous error
+
     try {
       const formData = new FormData();
       formData.append("branchId", selectFormtracksell?.brachId);
@@ -185,10 +169,7 @@ const UploadImageBaristar = ({
       setImagePreviews([]);
     } catch (err) {
       console.error("Upload failed", err);
-      const message =
-        err?.response?.data?.message || err.message || "Unknown error";
-      setErrorMessage(message); // <-- show on page
-      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.", err);
+      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.",err);
     } finally {
       setIsUploading(false);
     }
@@ -284,20 +265,6 @@ const UploadImageBaristar = ({
             >
               ອັປໂຫລດຮູບ
             </Button>
-            {errorMessage && (
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  backgroundColor: "#fdecea",
-                  color: "#611a15",
-                  borderRadius: 1,
-                  fontFamily: "Noto Sans Lao",
-                }}
-              >
-                ❌ {errorMessage}
-              </Box>
-            )}
           </Box>
         ) : (
           <Box
