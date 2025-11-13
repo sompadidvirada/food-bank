@@ -82,37 +82,36 @@ const UploadImageBaristar = ({
     }
   );
 
-const handleImageChange = (e) => {
-  const files = Array.from(e.target.files);
-  const newPreviews = [];
-  const newImages = [];
+  const handleImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const newPreviews = [];
+    const newImages = [];
 
-  files.forEach((file) => {
-    // Show file type and name in console and toast
-    console.log("Selected file:", file.name, "Type:", file.type);
-    toast.info(`Name: ${file.name}, Type: ${file.type}`, { autoClose: 3000 });
+    files.forEach((file) => {
+      // Show file type and name in console and toast
+      toast.info(`Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`, { autoClose: 3000 });
+      toast.info(`Name: ${file.name}, Type: ${file.type}`, { autoClose: 3000 });
 
-    const extension = typeToExtension[file.type];
-    if (!extension) {
-      alert(`Unsupported file type: ${file.type}`);
-      return;
-    }
-    const imageName = `${randomImage()}.${extension}`;
-    newImages.push({ file, name: imageName });
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      newPreviews.push(reader.result);
-      // Once all previews are read, update state
-      if (newPreviews.length === files.length) {
-        setImagePreviews((prev) => [...prev, ...newPreviews]);
-        setSelectedImages((prev) => [...prev, ...newImages]);
+      const extension = typeToExtension[file.type];
+      if (!extension) {
+        alert(`Unsupported file type: ${file.type}`);
+        return;
       }
-    };
-    reader.readAsDataURL(file);
-  });
-};
+      const imageName = `${randomImage()}.${extension}`;
+      newImages.push({ file, name: imageName });
 
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        newPreviews.push(reader.result);
+        // Once all previews are read, update state
+        if (newPreviews.length === files.length) {
+          setImagePreviews((prev) => [...prev, ...newPreviews]);
+          setSelectedImages((prev) => [...prev, ...newImages]);
+        }
+      };
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;
