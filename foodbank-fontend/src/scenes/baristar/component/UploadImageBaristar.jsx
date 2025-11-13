@@ -243,9 +243,9 @@ const UploadImageBaristar = ({
               ເພີ່ມຮູບພາບ
               <VisuallyHiddenInput
                 type="file"
-                onChange={handleImageChange}
                 accept="image/*"
                 capture="environment"
+                onChange={handleImageChange}
               />
             </Button>
 
@@ -283,9 +283,9 @@ const UploadImageBaristar = ({
               ອັປໂຫລດຮູບ
               <VisuallyHiddenInput
                 type="file"
-                accept="image/*" // ✅ allow only image files
+                accept="image/*"
+                capture="environment"
                 onChange={handleImageChange}
-                multiple
               />
             </Button>
             {user.role !== "baristar" && (
