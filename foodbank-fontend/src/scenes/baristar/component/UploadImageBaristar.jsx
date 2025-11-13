@@ -133,14 +133,7 @@ const UploadImageBaristar = ({
         const file = img.file;
         const extension = file.name.split(".").pop();
         const randomName = `${randomImage()}.${extension}`;
-
-        try {
-          return new File([file], randomName, { type: file.type });
-        } catch {
-          // fallback for old mobile browsers
-          file.name = randomName;
-          return file;
-        }
+        return new File([file], randomName, { type: file.type });
       });
 
       renamedFiles.forEach((file) => formData.append("images", file));
@@ -148,6 +141,7 @@ const UploadImageBaristar = ({
       // Upload to backend
       const res = await axios.post(`${URLAPI}/uploadimagetrack`, formData, {
         headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
