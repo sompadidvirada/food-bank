@@ -82,32 +82,36 @@ const UploadImageBaristar = ({
     }
   );
 
-  const handleImageChange = (e) => {
-    const files = Array.from(e.target.files);
-    const newPreviews = [];
-    const newImages = [];
+const handleImageChange = (e) => {
+  const files = Array.from(e.target.files);
+  const newPreviews = [];
+  const newImages = [];
 
-    files.forEach((file) => {
-      const extension = typeToExtension[file.type];
-      if (!extension) {
-        alert(`Unsupported file type: ${file.type}`);
-        return;
+  files.forEach((file) => {
+    // Show file type and name in console and toast
+    console.log("Selected file:", file.name, "Type:", file.type);
+    toast.info(`Name: ${file.name}, Type: ${file.type}`, { autoClose: 3000 });
+
+    const extension = typeToExtension[file.type];
+    if (!extension) {
+      alert(`Unsupported file type: ${file.type}`);
+      return;
+    }
+    const imageName = `${randomImage()}.${extension}`;
+    newImages.push({ file, name: imageName });
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      newPreviews.push(reader.result);
+      // Once all previews are read, update state
+      if (newPreviews.length === files.length) {
+        setImagePreviews((prev) => [...prev, ...newPreviews]);
+        setSelectedImages((prev) => [...prev, ...newImages]);
       }
-      const imageName = `${randomImage()}.${extension}`;
-      newImages.push({ file, name: imageName });
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        newPreviews.push(reader.result);
-        // Once all previews are read, update state
-        if (newPreviews.length === files.length) {
-          setImagePreviews((prev) => [...prev, ...newPreviews]);
-          setSelectedImages((prev) => [...prev, ...newImages]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
-  };
+    };
+    reader.readAsDataURL(file);
+  });
+};
 
 
   const handleUpload = async () => {
