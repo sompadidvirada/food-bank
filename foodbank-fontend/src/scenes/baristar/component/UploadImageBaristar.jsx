@@ -89,8 +89,6 @@ const UploadImageBaristar = ({
     const newImages = [];
 
     files.forEach((file) => {
-      // Show file type and name in console and toast
-      toast.info(`Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`, { autoClose: 3000 });
 
       const extension = typeToExtension[file.type];
       if (!extension) {
