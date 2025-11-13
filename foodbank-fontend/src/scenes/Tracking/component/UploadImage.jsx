@@ -25,6 +25,8 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { format } from "date-fns";
 import ImageModal from "../../../component/ImageModal";
 
+const URLAPI = import.meta.env.VITE_API_URL;
+
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
 
