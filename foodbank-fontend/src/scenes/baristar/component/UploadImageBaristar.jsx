@@ -111,13 +111,15 @@ const UploadImageBaristar = ({
 
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;
+
     setIsUploading(true);
 
     try {
       const formData = new FormData();
-      formData.append("branchId", selectFormtracksell?.branchId);
+      formData.append("branchId", selectFormtracksell?.brachId);
       formData.append("Datetime", selectFormtracksell?.sellAt);
 
+      // Random filename generator
       const randomImage = (length = 32) => {
         const array = new Uint8Array(length);
         window.crypto.getRandomValues(array);
@@ -126,13 +128,16 @@ const UploadImageBaristar = ({
         ).join("");
       };
 
+      // Rename before sending
       const renamedFiles = selectedImages.map((img) => {
         const file = img.file;
-        const ext = file.name.split(".").pop();
-        const randomName = `${randomImage()}.${ext}`;
+        const extension = file.name.split(".").pop();
+        const randomName = `${randomImage()}.${extension}`;
+
         try {
           return new File([file], randomName, { type: file.type });
         } catch {
+          // fallback for old mobile browsers
           file.name = randomName;
           return file;
         }
@@ -140,19 +145,23 @@ const UploadImageBaristar = ({
 
       renamedFiles.forEach((file) => formData.append("images", file));
 
+      // Upload to backend
       const res = await axios.post(`${URLAPI}/uploadimagetrack`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const uploaded = res.data.data;
+      // Response contains uploadedImages
+      const uploaded = res.data.data; // [{ imageName, publicUrl }, ...]
+
+      // Update your state to show them immediately
       setCheckImage((prev) => [
         ...prev,
         ...uploaded.map((img) => ({
           imageName: img.imageName,
           url: img.publicUrl,
-          branchId: selectFormtracksell?.branchId,
+          branchId: selectFormtracksell?.brachId,
           date: selectFormtracksell?.sellAt,
         })),
       ]);
