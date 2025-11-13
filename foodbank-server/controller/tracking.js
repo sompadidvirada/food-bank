@@ -546,6 +546,8 @@ exports.uploadImageTrack = async (req, res) => {
     const { branchId, Datetime } = req.body;
     const files = req.files;
 
+    console.log(files)
+
     if (!branchId || !Datetime || !files || files.length === 0) {
       return res.status(400).json({ message: "Invalid or missing values." });
     }

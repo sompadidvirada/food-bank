@@ -109,7 +109,6 @@ const UploadImageBaristar = ({
     });
   };
 
-
   const handleUpload = async () => {
     if (selectedImages.length === 0) return;
 
@@ -142,6 +141,7 @@ const UploadImageBaristar = ({
       // Upload to backend
       const res = await axios.post(`${URLAPI}/uploadimagetrack`, formData, {
         headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
       });
