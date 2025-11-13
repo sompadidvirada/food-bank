@@ -53,6 +53,7 @@ const UploadImageBaristar = ({
   const [imagePreviews, setImagePreviews] = useState([]);
   const token = useFoodBankStorage((state) => state.token);
   const imageModalRef = useRef();
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -89,8 +90,10 @@ const UploadImageBaristar = ({
 
     files.forEach((file) => {
       // Show file type and name in console and toast
-      toast.info(`Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`, { autoClose: 3000 });
-      toast.info(`Name: ${file.name}, Type: ${file.type}`, { autoClose: 3000 });
+      toast.info(
+        `Name: ${file.name}, Size: ${(file.size / 1024).toFixed(2)} KB`,
+        { autoClose: 3000 }
+      );
 
       const extension = typeToExtension[file.type];
       if (!extension) {
@@ -117,7 +120,7 @@ const UploadImageBaristar = ({
     if (selectedImages.length === 0) return;
 
     setIsUploading(true);
-
+    setErrorMessage(""); // Reset previous error
     try {
       const formData = new FormData();
       formData.append("branchId", selectFormtracksell?.brachId);
@@ -169,7 +172,10 @@ const UploadImageBaristar = ({
       setImagePreviews([]);
     } catch (err) {
       console.error("Upload failed", err);
-      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.",err);
+      const message =
+        err?.response?.data?.message || err.message || "Unknown error";
+      setErrorMessage(message); // <-- show on page
+      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.", err);
     } finally {
       setIsUploading(false);
     }
@@ -265,6 +271,20 @@ const UploadImageBaristar = ({
             >
               ອັປໂຫລດຮູບ
             </Button>
+            {errorMessage && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 2,
+                  backgroundColor: "#fdecea",
+                  color: "#611a15",
+                  borderRadius: 1,
+                  fontFamily: "Noto Sans Lao",
+                }}
+              >
+                ❌ {errorMessage}
+              </Box>
+            )}
           </Box>
         ) : (
           <Box
