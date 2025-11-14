@@ -8,16 +8,35 @@ export default function Calendar({
   setSelectFormtracksell,
   setSelectDateBrachCheck,
 }) {
-  const [value, setValue] = React.useState(null);
+  // 👉 Default to previous day
+  const defaultDate = dayjs().subtract(1, "day").startOf("day");
+  const [value, setValue] = React.useState(defaultDate);
+
+  // 👉 Run once on mount to update parent state with default date
+  React.useEffect(() => {
+    const formattedDate = defaultDate.toISOString();
+
+    setSelectFormtracksell((prevState) => ({
+      ...prevState,
+      sellAt: formattedDate,
+    }));
+
+    setSelectDateBrachCheck((prevState) => ({
+      ...prevState,
+      sellDate: formattedDate,
+    }));
+  }, []);
 
   const handleDateChange = (newValue) => {
     setValue(newValue);
     if (newValue) {
       const formattedDate = dayjs(newValue).startOf("day").toISOString();
+
       setSelectFormtracksell((prevState) => ({
         ...prevState,
         sellAt: formattedDate,
       }));
+
       setSelectDateBrachCheck((prevState) => ({
         ...prevState,
         sellDate: formattedDate,
