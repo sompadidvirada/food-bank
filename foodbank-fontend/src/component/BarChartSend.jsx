@@ -18,6 +18,12 @@ const BarChartSend = ({ isDashboard = false, data }) => {
 
   const chartData = Array.isArray(data) ? data || dataBar : [];
 
+  const sortedChartData = [...chartData].sort((a, b) => {
+  const totalA = keys.reduce((sum, key) => sum + (a[key] || 0), 0);
+  const totalB = keys.reduce((sum, key) => sum + (b[key] || 0), 0);
+  return totalB - totalA;
+});
+
   const maxValue =
     chartData.length > 0
       ? Math.max(
@@ -28,7 +34,7 @@ const BarChartSend = ({ isDashboard = false, data }) => {
       : 100; // Fallback maxValue when data is empty
   return (
     <ResponsiveBar
-      data={chartData}
+      data={sortedChartData}
       maxValue={maxValue}
       layout="horizontal"
       padding={0.05}
