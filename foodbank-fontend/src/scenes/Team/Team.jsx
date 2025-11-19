@@ -52,7 +52,7 @@ const Team = () => {
   const token = useFoodBankStorage((state) => state.token);
   const branchs = useFoodBankStorage((state) => state.branchs);
   const getBranch = useFoodBankStorage((state) => state.getBrnachs);
-  const [staffsInfo, setStaffsInfos] = useState();
+  const [staffsInfo, setStaffsInfos] = useState([]);
   const user = useFoodBankStorage((state) => state.user);
   const [open, setOpen] = useState(false);
   const [openStatus, setOpenStatus] = useState(false);
@@ -263,6 +263,8 @@ const Team = () => {
     setOpenRole(true);
   };
 
+  console.log(staffsInfo);
+
   const handleCloseEditRole = () => {
     setOpenRole(false);
   };
@@ -336,6 +338,13 @@ const Team = () => {
       setStaffsInfos(filtered);
     }
   }, [searchText, allStaffs]);
+
+  const filteredStaff = React.useMemo(() => {
+    if (user.role === "staff") {
+      return staffsInfo?.filter((staff) => staff.role === "baristar" || staff.id === user.id);
+    }
+    return staffsInfo; // admin or other roles see full list
+  }, [staffsInfo, user.role]);
 
   const columns = [
     { field: "id", headerName: "ໄອດີ" },
@@ -661,7 +670,7 @@ const Team = () => {
         </Box>
 
         <DataGrid
-          rows={staffsInfo}
+          rows={filteredStaff}
           columns={columns}
           sx={{
             "& .MuiDataGrid-columnHeaders": {
