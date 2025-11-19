@@ -533,65 +533,63 @@ const Team = () => {
           },
         ]
       : []),
-    ...(user.role === "admin"
-      ? [
-          {
-            field: "manage",
-            headerName: "ຈັດການ",
-            headerAlign: "center",
-            flex: 0.6,
-            renderCell: (row) => (
-              <Box
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                width="100%"
-                height="100%"
-              >
-                <Tooltip
-                  title="ລົບຢູເຊີພະນັກງານ"
-                  arrow
-                  placement="top"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        fontSize: "14px",
-                        fontFamily: "Noto Sans Lao",
-                        color: "#fff",
-                        backgroundColor: "#333",
-                      },
-                    },
-                  }}
-                >
-                  <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
-                    <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
-                  </IconButton>
-                </Tooltip>
+    {
+      field: "manage",
+      headerName: "ຈັດການ",
+      headerAlign: "center",
+      flex: 0.6,
+      renderCell: (row) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          {user?.role === "admin" && (
+            <Tooltip
+              title="ລົບຢູເຊີພະນັກງານ"
+              arrow
+              placement="top"
+              componentsProps={{
+                tooltip: {
+                  sx: {
+                    fontSize: "14px",
+                    fontFamily: "Noto Sans Lao",
+                    color: "#fff",
+                    backgroundColor: "#333",
+                  },
+                },
+              }}
+            >
+              <IconButton onClick={() => handleOpenDeleteStaff(row.row)}>
+                <PersonRemoveIcon sx={{ color: colors.redAccent[400] }} />
+              </IconButton>
+            </Tooltip>
+          )}
 
-                <Tooltip
-                  title="ລ້າງລະຫັດຜ່ານ"
-                  arrow
-                  placement="top"
-                  componentsProps={{
-                    tooltip: {
-                      sx: {
-                        fontSize: "14px",
-                        fontFamily: "Noto Sans Lao",
-                        color: "#fff",
-                        backgroundColor: "#333",
-                      },
-                    },
-                  }}
-                >
-                  <IconButton onClick={() => handleOpenClearPassword(row.row)}>
-                    <KeyOffIcon />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-            ),
-          },
-        ]
-      : []),
+          <Tooltip
+            title="ລ້າງລະຫັດຜ່ານ"
+            arrow
+            placement="top"
+            componentsProps={{
+              tooltip: {
+                sx: {
+                  fontSize: "14px",
+                  fontFamily: "Noto Sans Lao",
+                  color: "#fff",
+                  backgroundColor: "#333",
+                },
+              },
+            }}
+          >
+            <IconButton onClick={() => handleOpenClearPassword(row.row)}>
+              <KeyOffIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      ),
+    },
   ];
 
   return (
@@ -671,7 +669,6 @@ const Team = () => {
               fontWeight: "bold", // optional
               fontSize: "16px", // optional
             },
-            
           }}
           hideFooter
         />
