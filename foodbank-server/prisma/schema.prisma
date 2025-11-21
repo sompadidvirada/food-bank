@@ -15,21 +15,23 @@ datasource db {
 }
 
 model staff {
-  id          Int         @id @unique @default(autoincrement())
-  firstname   String
-  lastname    String
-  password    String?     @default("1234")
-  phonenumber String      @unique
-  role        String      @default("staff")
-  birdDate    DateTime
-  image       String?
-  aviable     Boolean     @default(true)
-  branch      branch?     @relation(fields: [branchId], references: [id])
-  branchId    Int?
-  calendar    calendar[]
-  tracksell   tracksell[]
-  tracksend   tracksend[]
-  trackexp    trackexp[]
+  id                       Int                       @id @unique @default(autoincrement())
+  firstname                String
+  lastname                 String
+  password                 String?                   @default("1234")
+  phonenumber              String                    @unique
+  role                     String                    @default("staff")
+  birdDate                 DateTime
+  image                    String?
+  aviable                  Boolean                   @default(true)
+  branch                   branch?                   @relation(fields: [branchId], references: [id])
+  branchId                 Int?
+  calendar                 calendar[]
+  tracksell                tracksell[]
+  tracksend                tracksend[]
+  trackexp                 trackexp[]
+  commentNotificationReads CommentNotificationRead[]
+  BaristarComment          BaristarComment[]
 }
 
 model branch {
@@ -50,23 +52,25 @@ model branch {
   confirmOrder     confirmOrder[]
   stockRequisition stockRequisition[]
   coffeeSell       coffeeSell[]
+  BaristarComment  BaristarComment[]
 }
 
 model products {
-  id         Int                @id @unique @default(autoincrement())
-  name       String
-  price      Int
-  sellprice  Int
-  status     String             @default("A")
-  lifetime   Int                @default(7)
-  image      String?
-  tracksell  tracksell[]
-  tracksend  tracksend[]
-  trackexp   trackexp[]
-  available  availableproduct[]
-  category   category           @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  order      orderTrack[]
+  id              Int                @id @unique @default(autoincrement())
+  name            String
+  price           Int
+  sellprice       Int
+  status          String             @default("A")
+  lifetime        Int                @default(7)
+  image           String?
+  tracksell       tracksell[]
+  tracksend       tracksend[]
+  trackexp        trackexp[]
+  available       availableproduct[]
+  category        category           @relation(fields: [categoryId], references: [id])
+  categoryId      Int
+  order           orderTrack[]
+  BaristarComment BaristarComment[]
 }
 
 model category {
@@ -270,4 +274,36 @@ model coffeeSell {
   branchId     Int
 
   @@unique([sellDate, coffeeMenuId, branchId])
+}
+
+model BaristarComment {
+  id                       Int                       @id @default(autoincrement())
+  date                     DateTime                  @default(now())
+  title                    String
+  description              String
+  product                  products                  @relation(fields: [productsId], references: [id])
+  productsId               Int
+  branch                   branch                    @relation(fields: [branchId], references: [id])
+  branchId                 Int
+  commentNotificationReads CommentNotificationRead[]
+  imageReportBaristar      imageReportBaristar[]
+  staff                    staff?                    @relation(fields: [staffId], references: [id])
+  staffId                  Int?
+}
+
+model imageReportBaristar {
+  id                Int             @id @default(autoincrement())
+  image             String
+  baristarComment   BaristarComment @relation(fields: [baristarCommentId], references: [id])
+  baristarCommentId Int
+}
+
+model CommentNotificationRead {
+  id        Int      @id @default(autoincrement())
+  commentId Int
+  staffId   Int
+  readAt    DateTime @default(now())
+
+  comment BaristarComment @relation(fields: [commentId], references: [id])
+  staff   staff           @relation(fields: [staffId], references: [id])
 }

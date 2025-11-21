@@ -105,6 +105,7 @@ const router = createBrowserRouter([
       { path: "coffeemenu", element: <CoffeeMenu /> },
       { path: "team", element: <Team /> },
       { path: "trackimageallbranch", element: <TrackUploadImage /> },
+      { path: "trackreport", element: <TrackReport /> },
     ],
   },
   {

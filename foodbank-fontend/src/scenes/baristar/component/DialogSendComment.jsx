@@ -130,7 +130,7 @@ const DialogSendComment = ({ setOpenDialog, openDialog }) => {
       formData.append("staffId", user.id);
 
       const ress = await sendReportBaristar(formData, token);
-      toast.success("success!");
+      toast.success("ສົ່ງລາຍງານສຳເລັດ.");
     } catch (err) {
       console.error("failed", err);
       toast.error("ລອງໃຫ່ມອີກຄັ້ງ.", err);

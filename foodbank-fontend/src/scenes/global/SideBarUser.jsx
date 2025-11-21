@@ -186,6 +186,13 @@ const SideBarUser = () => {
               setSelected={setSelected}
             />
             <Item
+              title="ຕິດຕາມແຈ້ງລາຍງານຈາກສາຂາ"
+              to="/admin/trackreport"
+              icon={<NotificationsIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
               title="ຈັດການສິນຄ້າ"
               to="/user/product"
               icon={<FastfoodIcon />}
