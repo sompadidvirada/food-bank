@@ -47,6 +47,7 @@ const BaristarProfile = () => {
   const [loading, setLoading] = useState(false);
   const [month, setMonth] = useState(dayjs().month());
   const [year, setYear] = useState(dayjs().year());
+  const getProducts = useFoodBankStorage((s) => s.getProduct);
 
   useEffect(() => {
     const handleTouchMove = (event) => {
@@ -70,6 +71,9 @@ const BaristarProfile = () => {
     };
   }, []);
 
+  useEffect(() => {
+    getProducts(true);
+  }, [token]);
 
   const handleSearch = async (monthArg, yearArg) => {
     const m = monthArg !== undefined ? monthArg : month;
@@ -184,7 +188,9 @@ const BaristarProfile = () => {
                         opacity: 0.4,
                       }}
                     >
-                      {user?.role === `admin` ? `ຕຳແຫນ່ງ: ແອດມິນ` : `ຕຳແໜ່ງ: ບາລີສຕ້າ`}
+                      {user?.role === `admin`
+                        ? `ຕຳແຫນ່ງ: ແອດມິນ`
+                        : `ຕຳແໜ່ງ: ບາລີສຕ້າ`}
                     </Typography>
                     {<Editprofile />}
                   </Box>

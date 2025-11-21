@@ -107,8 +107,6 @@ const OrderBakeryBaristar = () => {
     }
   };
 
-  console.log(filteredOrders);
-
   useEffect(() => {
     const handleTouchMove = (event) => {
       if (event.scale !== 1) {

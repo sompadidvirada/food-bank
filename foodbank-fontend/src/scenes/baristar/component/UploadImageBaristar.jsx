@@ -9,20 +9,13 @@ import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import AddIcon from "@mui/icons-material/Add";
-import {
-  checkImages,
-  deleteImages,
-  uploadImageTrack,
-} from "../../../api/tracking";
+import { deleteImages } from "../../../api/tracking";
 import axios from "axios";
 import { toast } from "react-toastify";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { format } from "date-fns";
 import ImageModal from "../../../component/ImageModal";
 
 const URL =
@@ -53,7 +46,6 @@ const UploadImageBaristar = ({
   const [imagePreviews, setImagePreviews] = useState([]);
   const token = useFoodBankStorage((state) => state.token);
   const imageModalRef = useRef();
-  
 
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
@@ -89,7 +81,6 @@ const UploadImageBaristar = ({
     const newImages = [];
 
     files.forEach((file) => {
-
       const extension = typeToExtension[file.type];
       if (!extension) {
         alert(`Unsupported file type: ${file.type}`);
@@ -167,7 +158,7 @@ const UploadImageBaristar = ({
       setImagePreviews([]);
     } catch (err) {
       console.error("Upload failed", err);
-      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.",err);
+      toast.error("ລອງໃຫ່ມອີກຄັ້ງ.", err);
     } finally {
       setIsUploading(false);
     }

@@ -39,6 +39,9 @@ import BaristarProfile from "../scenes/baristar/BaristarProfile";
 import BaristarImage from "../scenes/baristar/BaristarImage";
 import OrderBakeryBaristar from "../scenes/baristar/OrderBakeryBaristar";
 import TrackUploadImage from "../scenes/trackUploadImage/TrackUploadImage";
+import BaristarComment from "../scenes/baristar/BaristarComment";
+import HistoryReport from "../scenes/baristar/component/HistoryReport";
+import TrackReport from "../scenes/track_report/TrackReport";
 
 const router = createBrowserRouter([
   {
@@ -80,6 +83,7 @@ const router = createBrowserRouter([
       { path: "insertcoffeesell", element: <CoffeeSell /> },
       { path: "reporttreekoffuse", element: <ReportTreekoffUse /> },
       { path: "trackimageallbranch", element: <TrackUploadImage /> },
+      { path: "trackreport", element: <TrackReport /> },
     ],
   },
   {
@@ -111,6 +115,8 @@ const router = createBrowserRouter([
     { path: "profile", element: <BaristarProfile /> },
     { path: "image", element: <BaristarImage /> },
     { path: "order", element: <OrderBakeryBaristar /> },
+    { path: "comment", element: <BaristarComment /> },
+    { path: "hisoryreport", element: <HistoryReport /> },
   ],
 }
 ]);

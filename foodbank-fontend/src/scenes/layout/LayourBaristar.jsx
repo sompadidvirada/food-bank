@@ -5,6 +5,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import MapIcon from "@mui/icons-material/Map";
 import BakeryDiningSharpIcon from '@mui/icons-material/BakeryDiningSharp';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import MarkUnreadChatAltIcon from '@mui/icons-material/MarkUnreadChatAlt';
 
 const LayourBaristar = () => {
   const navigate = useNavigate();
@@ -42,6 +43,27 @@ const LayourBaristar = () => {
                 sx={{
                   fontSize: 30,
                   color: isActive("/baristar/order")
+                    ? "rgba(0, 0, 0, 1)"
+                    : "rgba(0, 0, 0,  0.44)",
+                }}
+              />
+            </IconButton>
+          </Box>
+          <Box
+            sx={{
+              display: "flex",
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRight: "1px solid #ddd", // border between buttons
+            }}
+            onClick={() => navigate("/baristar/comment")}
+          >
+            <IconButton color="inherit">
+              <MarkUnreadChatAltIcon
+                sx={{
+                  fontSize: 30,
+                  color: isActive("/baristar/comment")
                     ? "rgba(0, 0, 0, 1)"
                     : "rgba(0, 0, 0,  0.44)",
                 }}

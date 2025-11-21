@@ -25,6 +25,7 @@ import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ArticleIcon from "@mui/icons-material/Article";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import CoffeeIcon from "@mui/icons-material/Coffee";
 import BurstModeIcon from '@mui/icons-material/BurstMode';
@@ -191,6 +192,13 @@ const SideBarAdmin = () => {
               title="ຕິດຕາມຮູບຕູ້ເບເກີລີ້ແຕ່ລະສາຂາ"
               to="/admin/trackimageallbranch"
               icon={<BurstModeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຕິດຕາມແຈ້ງລາຍງານຈາກສາຂາ"
+              to="/admin/trackreport"
+              icon={<NotificationsIcon />}
               selected={selected}
               setSelected={setSelected}
             />

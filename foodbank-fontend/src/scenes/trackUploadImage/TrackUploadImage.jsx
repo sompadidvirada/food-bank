@@ -264,7 +264,7 @@ const TrackUploadImage = () => {
 
   return (
     <Box m="20px">
-      <Header title="ຈັດການການສັ່ງຊຶ້ເບເກີລີ້" />
+      <Header title="ຕິດຕາມການອັປໂຫລດຮູບພາບຕູ້ເບເກີລີ້ຂອງສາຂາ" />
       <Box
         display="flex"
         justifyContent="center"
