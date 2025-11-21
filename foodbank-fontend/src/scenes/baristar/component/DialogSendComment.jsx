@@ -284,7 +284,6 @@ const DialogSendComment = ({ setOpenDialog, openDialog }) => {
                 onChange={handleImageChange}
                 accept="image/*"
                 multiple
-                capture="environment"
               />
             </Button>{" "}
             <Box
