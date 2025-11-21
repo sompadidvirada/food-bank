@@ -1,5 +1,6 @@
 import {
   Box,
+  IconButton,
   ListItemButton,
   Pagination,
   Paper,
@@ -9,9 +10,11 @@ import {
 import React, { useEffect, useState } from "react";
 import Header from "../component/Header";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
-import { getAllReports } from "../../api/baristar";
+import { deleteReport, getAllReports } from "../../api/baristar";
 import CircularProgress from "@mui/material/CircularProgress";
 import DialogDetailAdmin from "./component/DialogDetailAdmin";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DialogDeleteReport from "./component/DialogDeleteReport";
 
 const URL =
   "https://treekoff-storage-track-image.s3.ap-southeast-2.amazonaws.com";
@@ -25,7 +28,15 @@ const TrackReport = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [imageIndex, setImageIndex] = useState(0);
+  const [openDeleteReport, setOpenDeleteReport] = useState(false);
+  const [selectItemDelete, setSelectItemDelete] = useState("");
 
+  const handleOpenDelete = (id) => {
+    setOpenDeleteReport(true);
+    setSelectItemDelete(id);
+  };
+
+  console.log(selectItemDelete);
   const fecthAllReports = async (pageNum) => {
     setLoading(true);
     try {
@@ -51,6 +62,20 @@ const TrackReport = () => {
 
   const handlePageChange = (event, value) => {
     setPage(value);
+  };
+
+  const handleDeleteReport = async () => {
+    try {
+      const ress = await deleteReport(selectItemDelete, token);
+      console.log(ress);
+      setReports(
+        (prev) => prev.filter((item) => item.id !== ress.data.id) // keep everything except the deleted one
+      );
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setOpenDeleteReport(false);
+    }
   };
 
   return (
@@ -91,97 +116,111 @@ const TrackReport = () => {
                 const firstImage = item.imageReportBaristar?.[0]?.image || null;
 
                 return (
-                  <ListItemButton
-                    key={item.id}
-                    sx={{
-                      borderRadius: 2,
-                      mb: 1,
-                      border: "1px solid #dddddd2f",
-                      display: "flex",
-                      alignItems: "flex-start",
-                      gap: 2,
-                      p: 2,
-                    }}
-                   onClick={() => {
+                  <Box sx={{ display: "flex", gap: 1 }} key={item.id}>
+                    {" "}
+                    <ListItemButton
+                      sx={{
+                        borderRadius: 2,
+                        mb: 1,
+                        border: "1px solid #dddddd2f",
+                        display: "flex",
+                        alignItems: "flex-start",
+                        gap: 2,
+                        p: 2,
+                      }}
+                      onClick={() => {
                         setSelectedReport(item);
                         setImageIndex(0); // reset to first image
                         setOpenDialog(true);
                       }}
-                  >
-                    {/* IMAGE */}
-                    {firstImage && (
-                      <img
-                        src={`${URL}/${firstImage}`}
-                        alt="report"
-                        style={{
-                          width: 70,
-                          height: 70,
-                          borderRadius: 8,
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
+                    >
+                      {/* IMAGE */}
+                      {firstImage && (
+                        <img
+                          src={`${URL}/${firstImage}`}
+                          alt="report"
+                          style={{
+                            width: 70,
+                            height: 70,
+                            borderRadius: 8,
+                            objectFit: "cover",
+                          }}
+                        />
+                      )}
 
-                    {/* TEXT */}
-                    <Box sx={{ flex: 1 }}>
-                      <Typography
-                        sx={{
-                          fontFamily: "Noto Sans Lao",
-                          fontSize: 14,
-                          fontWeight: 600,
-                          color: "rgba(5, 151, 255, 0.67)",
-                        }}
-                      >
-                        {item.branch?.branchname}
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontFamily: "Noto Sans Lao",
-                          fontSize: 14,
-                          fontWeight: 600,
-                        }}
-                      >
-                        {item.product?.name}
-                      </Typography>
+                      {/* TEXT */}
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          sx={{
+                            fontFamily: "Noto Sans Lao",
+                            fontSize: 14,
+                            fontWeight: 600,
+                            color: "rgba(5, 151, 255, 0.67)",
+                          }}
+                        >
+                          {item.branch?.branchname}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: "Noto Sans Lao",
+                            fontSize: 14,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {item.product?.name}
+                        </Typography>
 
-                      <Typography
-                        sx={{
-                          fontFamily: "Noto Sans Lao",
-                          fontSize: 13,
-                          color: "#b1b1b1ff",
-                        }}
-                      >
-                        {item.title}
-                      </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: "Noto Sans Lao",
+                            fontSize: 13,
+                            color: "#b1b1b1ff",
+                          }}
+                        >
+                          {item.title}
+                        </Typography>
 
-                      <Typography
-                        sx={{
-                          fontFamily: "Noto Sans Lao",
-                          fontSize: 12,
-                          color: "#777",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                          maxWidth: 240,
-                        }}
-                      >
-                        {item.description}
-                      </Typography>
+                        <Typography
+                          sx={{
+                            fontFamily: "Noto Sans Lao",
+                            fontSize: 12,
+                            color: "#777",
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            maxWidth: 240,
+                          }}
+                        >
+                          {item.description}
+                        </Typography>
 
-                      <Typography
-                        sx={{
-                          fontFamily: "Noto Sans Lao",
-                          fontSize: 11,
-                          color: "#999",
-                          mt: 0.5,
-                        }}
-                      >
-                        {new Date(item.date).toLocaleString("en-GB")}
-                      </Typography>
-                    </Box>
-                  </ListItemButton>
+                        <Typography
+                          sx={{
+                            fontFamily: "Noto Sans Lao",
+                            fontSize: 11,
+                            color: "#999",
+                            mt: 0.5,
+                          }}
+                        >
+                          {new Date(item.date).toLocaleString("en-GB")}
+                        </Typography>
+                      </Box>
+                    </ListItemButton>{" "}
+                    <IconButton
+                      onClick={() => handleOpenDelete(item.id)}
+                      sx={{ width: 30, height: 30, alignSelf: "center" }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
                 );
               })}
+              <DialogDeleteReport
+                openDeleteReport={openDeleteReport}
+                setOpenDeleteReport={setOpenDeleteReport}
+                setSelectItemDelete={setSelectItemDelete}
+                handleDeleteReport={handleDeleteReport}
+              />
 
               <DialogDetailAdmin
                 openDialog={openDialog}

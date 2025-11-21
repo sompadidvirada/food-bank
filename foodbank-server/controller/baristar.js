@@ -162,7 +162,7 @@ exports.createCommentBaristar = async (req, res) => {
       include: {
         branch: true,
         staff: true,
-        product:true
+        product: true,
       },
     });
 
@@ -334,6 +334,39 @@ exports.updateUnreadReportAdmin = async (req, res) => {
       },
     });
     res.status(200).json({ message: `update success.`, data: ress });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
+  }
+};
+
+exports.deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: `emty id.` });
+    }
+
+    const ress = await prisma.baristarComment.delete({
+      where: {
+        id: Number(id),
+      }, include: {
+        imageReportBaristar: true
+      }
+    });
+    if (ress?.imageReportBaristar) {
+      const params = {
+        Bucket: process.env.SECREY_AWS_BUCKET_IMAGE_TRACK,
+        Delete: {
+          Objects: ress?.imageReportBaristar.map((key) => ({ Key: key.image })),
+          Quiet: false,
+        },
+      };
+      const command = new DeleteObjectsCommand(params);
+      await s3.send(command);
+    }
+    res.send(ress);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: `server error.` });

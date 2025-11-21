@@ -56,3 +56,11 @@ export const updateReadReport = (form, token) => {
     }
   })
 }
+
+export const deleteReport = (id, token) =>{
+  return axios.delete(`${URL}/deletereport/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

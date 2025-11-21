@@ -281,20 +281,20 @@ model BaristarComment {
   date                     DateTime                  @default(now())
   title                    String
   description              String
-  product                  products                  @relation(fields: [productsId], references: [id])
+  product                  products                  @relation(fields: [productsId], references: [id], onDelete: Cascade)
   productsId               Int
-  branch                   branch                    @relation(fields: [branchId], references: [id])
+  branch                   branch                    @relation(fields: [branchId], references: [id], onDelete: Cascade)
   branchId                 Int
   commentNotificationReads CommentNotificationRead[]
   imageReportBaristar      imageReportBaristar[]
-  staff                    staff?                    @relation(fields: [staffId], references: [id])
+  staff                    staff?                    @relation(fields: [staffId], references: [id], onDelete: Cascade)
   staffId                  Int?
 }
 
 model imageReportBaristar {
   id                Int             @id @default(autoincrement())
   image             String
-  baristarComment   BaristarComment @relation(fields: [baristarCommentId], references: [id])
+  baristarComment   BaristarComment @relation(fields: [baristarCommentId], references: [id], onDelete: Cascade)
   baristarCommentId Int
 }
 
@@ -304,6 +304,6 @@ model CommentNotificationRead {
   staffId   Int
   readAt    DateTime @default(now())
 
-  comment BaristarComment @relation(fields: [commentId], references: [id])
-  staff   staff           @relation(fields: [staffId], references: [id])
+  comment BaristarComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  staff   staff           @relation(fields: [staffId], references: [id], onDelete: Cascade)
 }
