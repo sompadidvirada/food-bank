@@ -2,12 +2,10 @@ import {
   Backdrop,
   Box,
   Button,
-  DialogContentText,
   DialogTitle,
   FormControl,
   IconButton,
   TextField,
-  Typography,
   useTheme,
 } from "@mui/material";
 import React from "react";
@@ -76,6 +74,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
     description: "",
     image: "",
     type: "",
+    type_2:"",
     size: "",
     sellPrice:""
   });
@@ -111,6 +110,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
       image: productImage,
       size: formData.size,
       type: formData.type,
+      type_2: formData.type_2,
       sellPrice: formData.sellPrice,
     };
     try {
@@ -145,6 +145,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
       description: "",
       image: "",
       type: "",
+      type_2:"",
       size: "",
       sellPrice:""
     });
@@ -268,6 +269,33 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
                 <MenuItem value="COCOA">COCOA</MenuItem>
                 <MenuItem value="MATCHA">MATCHA</MenuItem>
                 <MenuItem value="FRUIT JUICE">FRUIT JUICE</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel
+                id="size-label"
+                sx={{
+                  fontSize: "16px",
+                  fontFamily: "Noto Sans Lao",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "gray",
+                  },
+                  "&.Mui-focused": {
+                    color: colors.grey[100], // 👈 label turns red on focus
+                  },
+                }}
+              >
+                ປະເພດເຄື່ອງດື່ມ
+              </InputLabel>
+              <Select
+                labelId="size-label"
+                value={formData.type}
+                onChange={handleChange}
+                name="type"
+              >
+                <MenuItem value="HOT">HOT</MenuItem>
+                <MenuItem value="ICED">ICED</MenuItem>
+                <MenuItem value="SMOOTIE">SMOOTIE</MenuItem>
               </Select>
             </FormControl>
             <TextField

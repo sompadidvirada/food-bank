@@ -61,6 +61,7 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
     image: "",
     size: "",
     type: "",
+    type_2: "",
     sellPrice: "",
   });
 
@@ -94,7 +95,8 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       description: row?.description,
       size: row?.size,
       type: row?.type,
-      sellPrice:row?.sellPrice
+      type_2: row?.type_2,
+      sellPrice: row?.sellPrice,
     });
 
     setPreviewImage(row?.image ? `${URL}/${row?.image}` : null); // optional preview
@@ -107,6 +109,7 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       description: "",
       image: "",
       type: "",
+      type_2: "",
       size: "",
       sellPrice: "",
     });
@@ -132,6 +135,7 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
       description: formData.description,
       size: formData.size,
       type: formData.type,
+      type_2: formData.type_2,
       sellPrice: formData.sellPrice,
       image: productImage,
       contentType: contentType,
@@ -187,7 +191,7 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
         fullWidth // expands to 100% of maxWidth
       >
         <DialogTitle fontFamily={"Noto Sans Lao"}>
-          {"ເພີ່ມລາຍການວັດຖຸດິບ"}
+          {"ເແກ້ໄຂລາຍການວັດຖຸດິບ"}
         </DialogTitle>
         <DialogContent>
           <Box
@@ -275,6 +279,33 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
                 <MenuItem value="COCOA">COCOA</MenuItem>
                 <MenuItem value="MATCHA">MATCHA</MenuItem>
                 <MenuItem value="FRUIT JUICE">FRUIT JUICE</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <InputLabel
+                id="size-label"
+                sx={{
+                  fontSize: "16px",
+                  fontFamily: "Noto Sans Lao",
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "gray",
+                  },
+                  "&.Mui-focused": {
+                    color: colors.grey[100], // 👈 label turns red on focus
+                  },
+                }}
+              >
+                ປະເພດເຄື່ອງດື່ມ
+              </InputLabel>
+              <Select
+                labelId="size-label"
+                value={formData.type_2}
+                onChange={handleChange}
+                name="type_2"
+              >
+                <MenuItem value="HOT">HOT</MenuItem>
+                <MenuItem value="ICED">ICED</MenuItem>
+                <MenuItem value="SMOOTIE">SMOOTIE</MenuItem>
               </Select>
             </FormControl>
 

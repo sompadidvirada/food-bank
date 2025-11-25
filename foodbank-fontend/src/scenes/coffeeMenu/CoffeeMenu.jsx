@@ -175,7 +175,7 @@ const CoffeeMenu = () => {
     },
     {
       field: "type",
-      headerName: "ປະເພດເມນູ",
+      headerName: "ໝວດໝູ່",
       headerAlign: "center",
       align: "center",
       sortable: false,
@@ -195,6 +195,32 @@ const CoffeeMenu = () => {
             }}
           >
             {row.type ? row.type : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      field: "type_2",
+      headerName: "ປະເພດເຄື່ອງດື່ມ",
+      headerAlign: "center",
+      align: "center",
+      sortable: false,
+      flex: 1,
+      renderCell: ({ row }) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <Typography
+            sx={{
+              fontFamily: "Noto Sans Lao",
+              fontSize:12
+            }}
+          >
+            {row.type_2 ? row.type_2 : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
           </Typography>
         </Box>
       ),
