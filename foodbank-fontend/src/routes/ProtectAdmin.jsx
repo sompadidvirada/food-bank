@@ -29,6 +29,8 @@ const ProtectAdmin = ({ element }) => {
 
   useEffect(() => {
     if (ok === false) {
+      
+      useFoodBankStorage.persist.clearStorage();
       navigate("/");
     }
   }, [ok, navigate]);

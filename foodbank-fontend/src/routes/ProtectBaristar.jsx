@@ -27,7 +27,7 @@ const ProtectBaristar = ({ element }) => {
 
   useEffect(() => {
     if (ok === false) {
-      useFoodBankStorage.getState().reset();
+      useFoodBankStorage.persist.clearStorage();
       navigate("/");
     }
   }, [ok, navigate]);
