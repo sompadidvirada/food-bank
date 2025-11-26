@@ -289,9 +289,9 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
               </InputLabel>
               <Select
                 labelId="size-label"
-                value={formData.type}
+                value={formData.type_2}
                 onChange={handleChange}
-                name="type"
+                name="type_2"
               >
                 <MenuItem value="HOT">HOT</MenuItem>
                 <MenuItem value="ICED">ICED</MenuItem>

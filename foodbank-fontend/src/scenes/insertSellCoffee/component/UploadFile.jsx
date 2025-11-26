@@ -30,13 +30,19 @@ const handleFileUpload = async (event) => {
   const doc = parser.parseFromString(htmlText, "text/html");
 
   const rows = doc.querySelectorAll("table.list tr");
-  
+
+  // 💡 Store grouped results: key = menuId-size
+  const groupedMap = new Map();
+
+  const normalize = (str) =>
+    str.replace(/\s+/g, " ").trim().toLowerCase();
+
   rows.forEach((row, index) => {
-    if (index === 0) return; // skip header row
+    if (index === 0) return; // skip header
     const cells = row.querySelectorAll("td");
     if (cells.length < 7) return;
 
-    const menuName = cells[2]?.textContent.trim();
+    let menuName = cells[2]?.textContent.trim();
     const quantityText = cells[3]?.textContent.trim();
     const size = cells[6]?.textContent.trim();
 
@@ -45,24 +51,50 @@ const handleFileUpload = async (event) => {
     const quantity = parseInt(quantityText, 10);
     if (isNaN(quantity)) return;
 
-    // find match in coffeeMenu
+    // 🟦 RULE: If it's a combo "A + B", use ONLY the FIRST part (A)
+    if (menuName.includes("+")) {
+      const parts = menuName.split("+").map((p) => p.trim());
+      menuName = parts[0]; // FIRST part
+    }
+
+    const normalizedName = normalize(menuName);
+    const normalizedSize = size.toUpperCase().trim();
+
+    // 🔍 Try to find product in DB by name + size
     const matchedMenu = coffeeMenu.find(
       (menu) =>
-        menu.name.toLowerCase().trim() === menuName.toLowerCase().trim() &&
-        menu.size.toUpperCase().trim() === size.toUpperCase().trim()
+        normalize(menu.name) === normalizedName &&
+        menu.size.toUpperCase().trim() === normalizedSize
     );
 
     if (matchedMenu) {
-      setTimeout(() => {
-        handleSetSell(matchedMenu.id, quantity, matchedMenu);
-      }, 150);
+      const key = `${matchedMenu.id}-${normalizedSize}`;
+
+      if (!groupedMap.has(key)) {
+        groupedMap.set(key, {
+          product: matchedMenu,
+          productId: matchedMenu.id,
+          size: normalizedSize,
+          totalSell: quantity,
+        });
+      } else {
+        groupedMap.get(key).totalSell += quantity;
+      }
     } else {
       console.warn(`⚠️ Menu not found: ${menuName} (${size})`);
     }
   });
 
-  event.target.value = ""; // clear after successful upload
+  // 📌 Send grouped results to your handler
+  for (const entry of groupedMap.values()) {
+    await new Promise((res) => setTimeout(res, 150));
+    handleSetSell(entry.productId, entry.totalSell, entry.product);
+  }
+
+  event.target.value = "";
+  toast.success("ອັບໂຫລດຍອດຂາຍສຳເລັດ.");
 };
+
 
 
   return (
