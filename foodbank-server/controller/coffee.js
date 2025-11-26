@@ -18,7 +18,7 @@ const s3 = new S3Client({
 
 exports.createCoffeeMenu = async (req, res) => {
   try {
-    const { name, description, image, size, type, sellPrice } = req.body;
+    const { name, description, image, size, type, sellPrice, type_2 } = req.body;
 
     if (!name) {
       return res.status(400).json({ message: `emty value.` });
@@ -30,6 +30,7 @@ exports.createCoffeeMenu = async (req, res) => {
         size,
         image,
         type,
+        type_2,
         sellPrice: Number(sellPrice),
       },
     });
@@ -53,7 +54,7 @@ exports.getAllCoffeeMenu = async (req, res) => {
 exports.updateCoffeeMenu = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description, image, contentType, size, type, sellPrice } =
+    const { name, description, image, contentType, size, type, type_2, sellPrice } =
       req.body;
 
     let imageUploadUrl = null;
@@ -107,6 +108,7 @@ exports.updateCoffeeMenu = async (req, res) => {
         size: size,
         ...(image ? { image } : {}),
         type: type,
+        type_2,
         sellPrice: Number(sellPrice),
       },
     });

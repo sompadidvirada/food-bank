@@ -42,6 +42,7 @@ import TrackUploadImage from "../scenes/trackUploadImage/TrackUploadImage";
 import BaristarComment from "../scenes/baristar/BaristarComment";
 import HistoryReport from "../scenes/baristar/component/HistoryReport";
 import TrackReport from "../scenes/track_report/TrackReport";
+import ReportCoffee from "../scenes/report_coffee/ReportCoffee";
 
 const router = createBrowserRouter([
   {
@@ -84,6 +85,7 @@ const router = createBrowserRouter([
       { path: "reporttreekoffuse", element: <ReportTreekoffUse /> },
       { path: "trackimageallbranch", element: <TrackUploadImage /> },
       { path: "trackreport", element: <TrackReport /> },
+      { path: "reportcoffee", element: <ReportCoffee /> },
     ],
   },
   {

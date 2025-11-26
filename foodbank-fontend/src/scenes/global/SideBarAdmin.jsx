@@ -260,6 +260,13 @@ const SideBarAdmin = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title=" REPORT SELL TREEKOFF"
+              to="/admin/reportcoffee"
+              icon={<ArticleIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               display={isCollapsed ? "none" : "block"}
