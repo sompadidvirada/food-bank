@@ -32,3 +32,11 @@ export const getReportTreekoff = (form, token) => {
     }
   })
 }
+
+export const getMenuSellByName = (form, token) => {
+  return axios.post(`${URL}/getcoffeesellbyname`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

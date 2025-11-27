@@ -91,7 +91,6 @@ export default function ReportCoffee() {
       : 100;
 
   const handleClick = (dataA) => {
-    console.log(dataA);
     setOpen(true);
     setSelectDataBar(dataA);
   };
@@ -100,6 +99,7 @@ export default function ReportCoffee() {
     (acc, cur) => acc + cur.value,
     0
   );
+
 
   return (
     <Box sx={{ flexGrow: 1, bgcolor: colors.primary[450], minHeight: "100vh" }}>

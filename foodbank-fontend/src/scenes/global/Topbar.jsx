@@ -87,7 +87,6 @@ const Topbar = () => {
     };
   }, []);
 
-  console.log(unReadReports);
   const handleUpdateReadReport = async (id) => {
     try {
       const ress = await updateReadReport({ id: id, staffId: user.id }, token);
