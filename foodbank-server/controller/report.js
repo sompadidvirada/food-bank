@@ -309,13 +309,13 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
       },
       include: {
         coffeeMenu: true, // This brings in the full coffeeMenu object
-      }
+      },
     });
 
     // 2. Aggregate the sales data by coffeeMenuId
     const aggregatedDataMap = salesData.reduce((acc, curr) => {
       const menuId = curr.coffeeMenuId;
-      
+
       if (!acc[menuId]) {
         // Initialize if not present. Use coffeeMenuId as the unique ID for the DataGrid row.
         acc[menuId] = {
@@ -326,8 +326,8 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
           sellPrice: curr.coffeeMenu.sellPrice,
           image: curr.coffeeMenu.image,
           size: curr.coffeeMenu.size,
-          type:curr.coffeeMenu.type,
-          type_2:curr.coffeeMenu.type_2,
+          type: curr.coffeeMenu.type,
+          type_2: curr.coffeeMenu.type_2,
           totalSellCount: 0,
           totalRevenue: 0, // Calculate total revenue (optional but useful)
         };
@@ -335,11 +335,11 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
 
       // Sum the sellCount
       acc[menuId].totalSellCount += curr.sellCount;
-      
+
       // Calculate and sum total revenue
       const price = curr.coffeeMenu.sellPrice || 0;
       acc[menuId].totalRevenue += curr.sellCount * price;
-      
+
       return acc;
     }, {});
 
@@ -351,4 +351,98 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
     console.error(err);
     return res.status(500).json({ message: `server error.` });
   }
+};
+
+exports.getReportCoffeeSellByName = async (req, res) => {
+    try {
+        const { coffeeName, startDate, endDate } = req.body;
+
+        if (!coffeeName || !startDate || !endDate) {
+            return res
+                .status(400)
+                .json({
+                    message: `Missing required parameters: coffeeName, startDate, or endDate.`,
+                });
+        }
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+
+        // --- 1 & 2: Prisma Query (No Change) ---
+        const menuItems = await prisma.coffeeMenu.findMany({
+            where: {
+                name: { contains: coffeeName },
+            },
+            select: { id: true },
+        });
+
+        if (menuItems.length === 0) {
+            return res
+                .status(404)
+                .json({
+                    message: `No coffee menu found matching the name: ${coffeeName}.`,
+                });
+        }
+
+        const menuIds = menuItems.map((item) => item.id);
+
+        const salesReport = await prisma.coffeeSell.findMany({
+            where: {
+                AND: [
+                    { sellDate: { gte: start, lte: end } },
+                    { coffeeMenuId: { in: menuIds } },
+                ],
+            },
+            include: {
+                coffeeMenu: true,
+                branch: true,
+            },
+        });
+
+        // --- 3 & 4: Aggregation (No Change) ---
+        const branchMap = {};
+        const nivoKeys = new Set(); 
+
+        salesReport.forEach((sale) => {
+            const branchName = sale.branch.branchname;
+            const menuName = sale.coffeeMenu.name;
+            const count = sale.sellCount;
+
+            nivoKeys.add(menuName);
+
+            if (!branchMap[branchName]) {
+                branchMap[branchName] = { branch: branchName };
+            }
+
+            const currentCount = branchMap[branchName][menuName] || 0;
+            branchMap[branchName][menuName] = currentCount + count;
+        });
+
+        // 4. แปลง Map ให้เป็น Array 
+        const groupedSalesData = Object.values(branchMap);
+        
+        // --- 5. SORTING LOGIC ADDED HERE ---
+        // Sort the data from highest value (high) to lowest value (low)
+        const sortedData = groupedSalesData.sort((a, b) => {
+            // The sorting key is the name of the coffee being queried (e.g., "ICED CAPPUCCINO")
+            const valueA = a[coffeeName] || 0;
+            const valueB = b[coffeeName] || 0;
+            
+            // Descending sort (B minus A)
+            return valueB - valueA;
+        });
+
+        // 6. ส่งผลลัพธ์: ใช้ข้อมูลที่เรียงลำดับแล้ว (sortedData)
+        return res.send({
+            data: sortedData,
+            keys: Array.from(nivoKeys), 
+            indexBy: "branch", 
+        });
+    } catch (err) {
+        console.error(err);
+        return res
+            .status(500)
+            .json({ message: `Server error during sales report generation.` });
+    }
 };
