@@ -158,7 +158,7 @@ exports.TotalData = async (req, res) => {
       return {
         id: product.id,
         name: product.name,
-        status:product.status,
+        status: product.status,
         price: product.price,
         sellPrice: product.sellprice,
         image: product.image,
@@ -175,5 +175,180 @@ exports.TotalData = async (req, res) => {
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: `Something went wrong 500.` });
+  }
+};
+
+exports.reportTreekoffSellDashborad = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    const sells = await prisma.coffeeSell.findMany({
+      where: {
+        sellDate: {
+          gte: start,
+          lte: end,
+        },
+      },
+      select: {
+        sellCount: true,
+        coffeeMenu: {
+          select: {
+            name: true,
+            type_2: true,
+            type: true,
+          },
+        },
+        branch: true,
+      },
+    });
+
+    // 1. Calculate Totals
+    const typeTotals = {};
+    const typeTotalsType = {};
+    sells.forEach((sell) => {
+      const type = sell.coffeeMenu.type_2 || "UNKNOWN";
+      typeTotals[type] = (typeTotals[type] || 0) + sell.sellCount;
+    });
+    sells.forEach((sell) => {
+      const type = sell.coffeeMenu.type || "UNKNOWN";
+      typeTotalsType[type] = (typeTotalsType[type] || 0) + sell.sellCount;
+    });
+
+    // --- CHANGED SECTION START ---
+
+    // Calculate the numeric sum
+    const TOTAL = Object.values(typeTotals).reduce((sum, v) => sum + v, 0);
+
+    // Create a single object containing the types and the TOTAL
+    const total_type_2 = {
+      ...typeTotals, // Spreads existing keys (e.g., Hot: 5, Frappe: 10)
+      TOTAL: TOTAL, // Adds the TOTAL key
+    };
+
+    // --- CHANGED SECTION END ---
+
+    const branchMap = {};
+
+    sells.forEach((sell) => {
+      const branchName = sell.branch.branchname;
+      const product = sell.coffeeMenu.name;
+
+      if (!branchMap[branchName]) {
+        branchMap[branchName] = {
+          country: branchName,
+          branchInfo: sell.branch, // full branch info
+        };
+      }
+
+      branchMap[branchName][product] =
+        (branchMap[branchName][product] || 0) + sell.sellCount;
+    });
+
+    // --- NEW SORTING LOGIC START ---
+
+    let data_for_bar_chart = Object.values(branchMap);
+
+    // 1. Get a list of all product keys to ensure accurate summation
+    const allProductKeys = Array.from(
+      new Set(data_for_bar_chart.flatMap((item) => Object.keys(item)))
+    ).filter((key) => key !== "country" && key !== "branchInfo");
+
+    // 2. Sort the array based on the sum of all product sales (high to low)
+    data_for_bar_chart.sort((a, b) => {
+      // Function to calculate total sales for a given branch object
+      const calculateTotal = (branch) => {
+        return allProductKeys.reduce((sum, key) => sum + (branch[key] || 0), 0);
+      };
+
+      const totalA = calculateTotal(a);
+      const totalB = calculateTotal(b);
+
+      // Sort in descending order (totalB - totalA)
+      return totalB - totalA;
+    });
+
+    // --- NEW SORTING LOGIC END ---
+
+    const pie_chart_data = Object.entries(typeTotalsType).map(
+      ([type, value], i) => ({
+        id: type,
+        label: type,
+        value: value,
+        color: `hsl(${i * 40}, 70%, 50%)`, // optional color
+      })
+    );
+
+    res.json({
+      total_type_2,
+      data_for_bar_chart, // This array is now sorted
+      pie_chart_data,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.reportTotalTreekoffDataGrid = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+
+    // 1. Fetch sales data and include the related coffeeMenu data
+    const salesData = await prisma.coffeeSell.findMany({
+      where: {
+        sellDate: {
+          gte: start,
+          lte: end,
+        },
+      },
+      include: {
+        coffeeMenu: true, // This brings in the full coffeeMenu object
+      }
+    });
+
+    // 2. Aggregate the sales data by coffeeMenuId
+    const aggregatedDataMap = salesData.reduce((acc, curr) => {
+      const menuId = curr.coffeeMenuId;
+      
+      if (!acc[menuId]) {
+        // Initialize if not present. Use coffeeMenuId as the unique ID for the DataGrid row.
+        acc[menuId] = {
+          id: menuId, // Required by DataGrid
+          // Extract coffee details from the first record found for this menuId
+          name: curr.coffeeMenu.name,
+          size: curr.coffeeMenu.size,
+          sellPrice: curr.coffeeMenu.sellPrice,
+          image: curr.coffeeMenu.image,
+          size: curr.coffeeMenu.size,
+          type:curr.coffeeMenu.type,
+          type_2:curr.coffeeMenu.type_2,
+          totalSellCount: 0,
+          totalRevenue: 0, // Calculate total revenue (optional but useful)
+        };
+      }
+
+      // Sum the sellCount
+      acc[menuId].totalSellCount += curr.sellCount;
+      
+      // Calculate and sum total revenue
+      const price = curr.coffeeMenu.sellPrice || 0;
+      acc[menuId].totalRevenue += curr.sellCount * price;
+      
+      return acc;
+    }, {});
+
+    // 3. Convert the map back into an array of objects for the DataGrid `rows` prop
+    const dataGridRows = Object.values(aggregatedDataMap);
+
+    res.send(dataGridRows);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: `server error.` });
   }
 };

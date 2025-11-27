@@ -27,6 +27,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import CalendarReportTreekoff from "./component/CalendarReportTreekoff";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import DataGridReportTreekoff from "./component/DataGridReportTreekoff";
+import DialogBarChart from "./component/DialogBarChart";
 
 // --- Component ย่อย: Stat Card ---
 const StatCard = ({ title, value, icon, color }) => (
@@ -67,6 +68,8 @@ export default function ReportCoffee() {
   const colors = tokens(theme.palette.mode);
   const [dataReport, setDataReport] = useState({});
   const branch = useFoodBankStorage((s) => s.branchs);
+  const [open, setOpen] = useState(false);
+  const [selectDataBar, setSelectDataBar] = useState({});
 
   const [loading, setLoading] = useState(false);
 
@@ -89,6 +92,8 @@ export default function ReportCoffee() {
 
   const handleClick = (dataA) => {
     console.log(dataA);
+    setOpen(true);
+    setSelectDataBar(dataA);
   };
 
   const total = dataReport?.pie_chart_data?.reduce(
@@ -96,7 +101,6 @@ export default function ReportCoffee() {
     0
   );
 
-  console.log(dataReport);
   return (
     <Box sx={{ flexGrow: 1, bgcolor: colors.primary[450], minHeight: "100vh" }}>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4, pb: 2 }}>
@@ -143,7 +147,9 @@ export default function ReportCoffee() {
                 title="ຍອດຂາຍຈອກຮ້ອນ"
                 value={
                   dataReport?.total_type_2
-                    ? `${dataReport?.total_type_2?.HOT?.toLocaleString() || 0} ຈອກ`
+                    ? `${
+                        dataReport?.total_type_2?.HOT?.toLocaleString() || 0
+                      } ຈອກ`
                     : "0 ຈອກ"
                 }
                 icon={<CoffeeIcon sx={{ color: "black" }} />}
@@ -155,7 +161,9 @@ export default function ReportCoffee() {
                 title="ຍອດຂາຍຈອກເຢັນ"
                 value={
                   dataReport?.total_type_2
-                    ? `${dataReport?.total_type_2?.ICED?.toLocaleString() || 0} ຈອກ`
+                    ? `${
+                        dataReport?.total_type_2?.ICED?.toLocaleString() || 0
+                      } ຈອກ`
                     : "0 ຈອກ"
                 }
                 icon={<AcUnitIcon sx={{ color: "black" }} />}
@@ -167,7 +175,9 @@ export default function ReportCoffee() {
                 title="ຍອດຂາຍປັ່ນ"
                 value={
                   dataReport?.total_type_2
-                    ? `${dataReport?.total_type_2?.SMOOTIE?.toLocaleString() || 0} ຈອກ`
+                    ? `${
+                        dataReport?.total_type_2?.SMOOTIE?.toLocaleString() || 0
+                      } ຈອກ`
                     : "0 ຈອກ"
                 }
                 icon={<BlenderIcon sx={{ color: "black" }} />}
@@ -213,7 +223,7 @@ export default function ReportCoffee() {
                         legend: {
                           text: {
                             fill: colors.grey[100],
-                            fontSize:  30,
+                            fontSize: 30,
                             fontFamily: '"Noto Serif Lao", serif', // Custom font for axis labels
                           },
                         },
@@ -223,7 +233,7 @@ export default function ReportCoffee() {
                             strokeWidth: 1,
                           },
                           text: {
-                            fontSize:  11,
+                            fontSize: 11,
                             fill: colors.grey[100],
                             fontFamily: '"Noto Serif Lao", serif', // Custom font for tick labels
                           },
@@ -232,7 +242,7 @@ export default function ReportCoffee() {
                       legends: {
                         text: {
                           fill: colors.grey[100],
-                          fontSize:  12,
+                          fontSize: 12,
                           fontFamily: '"Noto Serif Lao", serif', // Custom font for legend text
                         },
                       },
@@ -433,6 +443,12 @@ export default function ReportCoffee() {
           </Grid>
         )}
       </Container>
+      <DialogBarChart
+        open={open}
+        setOpen={setOpen}
+        selectDataBar={selectDataBar}
+        setSelectDataBar={setSelectDataBar}
+      />
     </Box>
   );
 }

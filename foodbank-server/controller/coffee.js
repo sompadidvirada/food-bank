@@ -359,6 +359,7 @@ exports.checkCoffeeSell = async (req, res) => {
           gte: startofDay,
           lt: endofDay,
         },
+        branchId: Number(brachId)
       },
     });
     res.send(ress);
