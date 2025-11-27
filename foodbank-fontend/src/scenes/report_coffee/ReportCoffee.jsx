@@ -299,7 +299,7 @@ export default function ReportCoffee() {
                 </Typography>
                 <ResponsiveContainer width="100%" height="95%">
                   <ResponsivePie /* or Pie for fixed dimensions */
-                    data={dataReport?.pie_chart_data}
+                    data={dataReport?.pie_chart_data || []}
                     theme={{
                       axis: {
                         domain: {
