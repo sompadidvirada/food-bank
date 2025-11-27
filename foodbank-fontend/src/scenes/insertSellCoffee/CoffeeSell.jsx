@@ -123,6 +123,7 @@ const CoffeeSell = () => {
     }
   };
 
+
   useEffect(() => {
     if (selectDateBrachCheck.sellDate && selectDateBrachCheck.brachId) {
       fecthCoffeeSell();
@@ -140,6 +141,7 @@ const CoffeeSell = () => {
       toast.error(`ລອງໃຫ່ມພາຍຫຼັງ.`);
     }
   };
+
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", width:60 },
@@ -234,6 +236,111 @@ const CoffeeSell = () => {
               }}
             >
               {params.value}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "type",
+      headerName: "ໝວດໝູ່",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {params.value}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "type_2",
+      headerName: "ປະເພດ",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {params.value}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "sellPrice",
+      headerName: "ລາຄາຂາຍ",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 100,
+      renderCell: (params) => {
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+                 {params.value?.toLocaleString()} ກີບ
             </Typography>
           </Box>
         );

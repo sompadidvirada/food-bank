@@ -16,3 +16,19 @@ export const fecthReportAll = (form, token) => {
     },
   });
 };
+
+export const fecthReportTreekoff = (form, token) => {
+  return axios.post(`${URL}/reporttreekoffdashborad`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
+export const getReportTreekoff = (form, token) => {
+  return axios.post(`${URL}/reporttotaltreekoff`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}

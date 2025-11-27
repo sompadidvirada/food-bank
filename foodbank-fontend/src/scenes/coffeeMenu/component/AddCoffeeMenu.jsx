@@ -262,6 +262,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
               >
                 <MenuItem value="COFFEE">COFFEE</MenuItem>
                 <MenuItem value="CHOCOLATE">CHOCOLATE</MenuItem>
+                <MenuItem value="SMOOTHIES">SMOOTHIES</MenuItem>
                 <MenuItem value="TEA">TEA</MenuItem>
                 <MenuItem value="ITALIAN SODA">ITALIAN SODA</MenuItem>
                 <MenuItem value="MILK">MILK</MenuItem>
