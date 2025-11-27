@@ -130,7 +130,10 @@ const Dialog2BarChart = ({ menuName, open2Dialog, setOpen2Dialog,setMenuName }) 
           alignItems: "center",
         }}
       >
-        {queryForm?.startDate && queryForm?.endDate ? (
+       {queryForm?.startDate &&
+          queryForm?.endDate &&
+          typeof queryForm.startDate === "string" &&
+          queryForm.startDate.length > 0 ? (
           <Box>
             <Typography variant="h6" fontFamily="Noto Sans Lao">
               ລາຍງານຍອດຂາຍເມນູ: {menuName || ""} ຂອງທຸກສາຂາ

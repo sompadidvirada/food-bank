@@ -85,7 +85,7 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
   const handleClick = (barData) => {
     setMenuName(barData?.coffeeMenuName);
     // handleClose();
-    setOpen2Dialog(true)
+    setOpen2Dialog(true);
   };
 
   return (
@@ -107,18 +107,30 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
             alignItems: "center",
           }}
         >
-          {queryForm?.startDate && queryForm?.endDate ? (
+          {/* ... inside DialogTitle ... */}
+
+          {queryForm?.startDate &&
+          queryForm?.endDate &&
+          typeof queryForm.startDate === "string" &&
+          queryForm.startDate.length > 0 ? (
             <Box>
               <Typography variant="h6" fontFamily="Noto Sans Lao">
-                ລາຍງານຍອດຂາຍປະເພດ: {selectDataBar?.country || ""}
+                ລາຍງານຍອດຂາຍເມນູ: {menuName || ""} ຂອງທຸກສາຂາ
               </Typography>
               <Typography
                 variant="body2"
                 fontFamily="Noto Sans Lao"
                 color="textSecondary"
               >
-                ວັນທີ {format(parseISO(queryForm?.startDate), "dd/MM/yyyy")} -{" "}
-                {format(parseISO(queryForm?.endDate), "dd/MM/yyyy")}
+                {/* Added check and safe fallback for parsing */}
+                ວັນທີ{" "}
+                {queryForm.startDate
+                  ? format(parseISO(queryForm.startDate), "dd/MM/yyyy")
+                  : "..."}{" "}
+                -{" "}
+                {queryForm.endDate
+                  ? format(parseISO(queryForm.endDate), "dd/MM/yyyy")
+                  : "..."}
               </Typography>
             </Box>
           ) : (
