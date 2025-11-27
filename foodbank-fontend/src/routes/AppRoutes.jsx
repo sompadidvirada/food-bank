@@ -108,6 +108,8 @@ const router = createBrowserRouter([
       { path: "team", element: <Team /> },
       { path: "trackimageallbranch", element: <TrackUploadImage /> },
       { path: "trackreport", element: <TrackReport /> },
+      { path: "reportcoffee", element: <ReportCoffee /> },
+      { path: "insertcoffeesell", element: <CoffeeSell /> },
     ],
   },
   {

@@ -311,6 +311,20 @@ const SideBarUser = () => {
               selected={selected}
               setSelected={setSelected}
             />
+            <Item
+              title="ຈັດການເມນູທຮີຄອຟ"
+              to="/user/insertcoffeesell"
+              icon={<CoffeeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="ຈັດການເມນູທຮີຄອຟ"
+              to="/user/reportcoffee"
+              icon={<CoffeeIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
           </Box>
         </Menu>
       </ProSidebar>
