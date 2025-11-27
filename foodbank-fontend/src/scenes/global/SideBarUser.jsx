@@ -30,7 +30,9 @@ import EditCalendarIcon from "@mui/icons-material/EditCalendar";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import ImageModal from "../../component/ImageModal";
 import CoffeeIcon from "@mui/icons-material/Coffee";
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import WarehouseIcon from "@mui/icons-material/Warehouse";
+import FindInPageIcon from '@mui/icons-material/FindInPage';
 
 const URL =
   "https://treekoff-store-staff-image.s3.ap-southeast-2.amazonaws.com";
@@ -312,16 +314,16 @@ const SideBarUser = () => {
               setSelected={setSelected}
             />
             <Item
-              title="ຈັດການເມນູທຮີຄອຟ"
+              title="ຄີຍອດຂາຍ TREEKOFF"
               to="/user/insertcoffeesell"
-              icon={<CoffeeIcon />}
+              icon={<MonetizationOnIcon />}
               selected={selected}
               setSelected={setSelected}
             />
             <Item
-              title="ຈັດການເມນູທຮີຄອຟ"
+              title="ລາຍງານຍອດຂາຍ TREEKOFF"
               to="/user/reportcoffee"
-              icon={<CoffeeIcon />}
+              icon={<FindInPageIcon />}
               selected={selected}
               setSelected={setSelected}
             />
