@@ -70,7 +70,12 @@ const CustomTooltip = ({ id, value, indexValue, color }) => {
   );
 };
 
-const Dialog2BarChart = ({ menuName, open2Dialog, setOpen2Dialog,setMenuName }) => {
+const Dialog2BarChart = ({
+  menuName,
+  open2Dialog,
+  setOpen2Dialog,
+  setMenuName,
+}) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const queryForm = useFoodBankStorage((s) => s.queryForm);
@@ -88,7 +93,7 @@ const Dialog2BarChart = ({ menuName, open2Dialog, setOpen2Dialog,setMenuName }) 
       keys: [],
       indexBy: "",
     });
-    setMenuName("")
+    setMenuName("");
   };
 
   const fecthMenu = async () => {
@@ -130,10 +135,10 @@ const Dialog2BarChart = ({ menuName, open2Dialog, setOpen2Dialog,setMenuName }) 
           alignItems: "center",
         }}
       >
-       {queryForm?.startDate &&
-          queryForm?.endDate &&
-          typeof queryForm.startDate === "string" &&
-          queryForm.startDate.length > 0 ? (
+        {queryForm?.startDate &&
+        queryForm?.endDate &&
+        typeof queryForm.startDate === "string" &&
+        queryForm.startDate.length > 0 ? (
           <Box>
             <Typography variant="h6" fontFamily="Noto Sans Lao">
               ລາຍງານຍອດຂາຍເມນູ: {menuName || ""} ຂອງທຸກສາຂາ
@@ -164,8 +169,10 @@ const Dialog2BarChart = ({ menuName, open2Dialog, setOpen2Dialog,setMenuName }) 
             indexScale={{ type: "band", round: true }}
             colors={{ scheme: "nivo" }}
             colorBy="indexValue"
-            enableLabel={true}
+            enableLabel={false}
+            enableTotals={true}
             labelSkipHeight={12}
+            enableGridY={false}
             tooltip={(props) => <CustomTooltip {...props} />}
             axisTop={null}
             axisRight={null}

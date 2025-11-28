@@ -60,6 +60,9 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
   const colors = tokens(theme.palette.mode);
   const queryForm = useFoodBankStorage((s) => s.queryForm);
 
+
+  console.log(selectDataBar)
+
   const [open2Dialog, setOpen2Dialog] = useState(false);
   const [menuName, setMenuName] = useState("");
 
@@ -76,6 +79,11 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
       }))
       .sort((a, b) => b.value - a.value);
   }, [selectDataBar]);
+
+  const highestValue =
+    chartData.length > 0 ? Math.max(...chartData.map((d) => d.value)) : 0;
+
+  const dynamicMaxValue = highestValue * 1.1;
 
   const handleClose = () => {
     setOpen(false);
@@ -122,7 +130,7 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
           queryForm.startDate.length > 0 ? (
             <Box>
               <Typography variant="h6" fontFamily="Noto Sans Lao">
-                ລາຍງານຍອດຂາຍເມນູ: {menuName || ""} ຂອງທຸກສາຂາ
+                ລາຍງານຍອດຂາຍເມນູແຕ່ລະເມນູຂອງສາຂາ: {selectDataBar?.country || ""}
               </Typography>
               <Typography
                 variant="body2"
@@ -159,11 +167,13 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
                 colors={{ scheme: "nivo" }}
                 colorBy="indexValue"
                 layout="horizontal"
+                maxValue={dynamicMaxValue}
                 enableLabel={true}
                 labelSkipWidth={28}
                 tooltip={(props) => <CustomTooltip {...props} />}
                 axisTop={null}
                 axisRight={null}
+                enableGridY={false}
                 labelTextColor={"#000000ff"}
                 enableTotals={true}
                 totalsOffset={29}

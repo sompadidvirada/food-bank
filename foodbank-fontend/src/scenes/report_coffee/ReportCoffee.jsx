@@ -228,22 +228,11 @@ export default function ReportCoffee() {
                           },
                         },
                         ticks: {
-                          line: {
-                            stroke: colors.grey[100],
-                            strokeWidth: 1,
-                          },
                           text: {
                             fontSize: 11,
                             fill: colors.grey[100],
                             fontFamily: '"Noto Serif Lao", serif', // Custom font for tick labels
                           },
-                        },
-                      },
-                      legends: {
-                        text: {
-                          fill: colors.grey[100],
-                          fontSize: 12,
-                          fontFamily: '"Noto Serif Lao", serif', // Custom font for legend text
                         },
                       },
                       tooltip: {
@@ -269,6 +258,8 @@ export default function ReportCoffee() {
                     borderColor={{ from: "color", modifiers: [] }}
                     enableTotals={true}
                     totalsOffset={25}
+                    
+                    enableGridY={false}
                     axisBottom={{ tickSize: 7, tickPadding: 4 }}
                     animate={false}
                     motionConfig={{
