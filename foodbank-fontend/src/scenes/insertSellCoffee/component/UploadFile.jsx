@@ -15,8 +15,9 @@ const VisuallyHiddenInput = styled("input")({
   width: 1,
 });
 
-const UploadFile = ({ handleSetSell, selectDateBrachCheck, coffeeMenu }) => {
+const UploadFile = ({ handleSetSell, selectDateBrachCheck, coffeeMenu,setLoading }) => {
   const handleFileUpload = async (event) => {
+    setLoading(true)
     const file = event.target.files[0];
     if (!file) return;
 
@@ -87,7 +88,7 @@ const UploadFile = ({ handleSetSell, selectDateBrachCheck, coffeeMenu }) => {
         }
       } else {
         console.warn(`⚠️ Menu not found: ${menuName} (${size})`);
-      }
+      } 
     });
 
     // 📌 Send grouped results to your handler
@@ -98,6 +99,7 @@ const UploadFile = ({ handleSetSell, selectDateBrachCheck, coffeeMenu }) => {
 
     event.target.value = "";
     toast.success("ອັບໂຫລດຍອດຂາຍສຳເລັດ.");
+    setLoading(false)
   };
 
   return (

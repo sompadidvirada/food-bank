@@ -18,6 +18,7 @@ import { getCoffeeMenu } from "../../api/coffeeMenu";
 import { useEffect } from "react";
 import CalendarCoffeeSell from "./component/CalendarCoffeeSell";
 import SelectBracnhCoffeeSell from "./component/SelectBracnhCoffeeSell";
+import CircularProgress from "@mui/material/CircularProgress";
 import { DataGrid } from "@mui/x-data-grid";
 import {
   checkCoffeeSell,
@@ -37,6 +38,7 @@ const CoffeeSell = () => {
   const [coffeeMenu, setCoffeeMenu] = useState([]);
   const [checked, setChecked] = useState([]);
   const [sendCounts, setSendCounts] = useState({});
+  const [loading, setLoading] = useState(false);
   const [selectFormtracksend, setSelectFormtracksend] = useState({
     coffeeMenuId: "",
     sellCount: "",
@@ -123,7 +125,6 @@ const CoffeeSell = () => {
     }
   };
 
-
   useEffect(() => {
     if (selectDateBrachCheck.sellDate && selectDateBrachCheck.brachId) {
       fecthCoffeeSell();
@@ -142,13 +143,12 @@ const CoffeeSell = () => {
     }
   };
 
-
   const columns = [
-    { field: "id", headerName: "ໄອດີ", width:60 },
+    { field: "id", headerName: "ໄອດີ", width: 60 },
     {
       field: "image",
       headerName: "ຮູບພາບ",
-      width:80,
+      width: 80,
       renderCell: (params) => {
         const imageUrl = params.row.image
           ? `${URL}/${params.row?.image}`
@@ -340,7 +340,7 @@ const CoffeeSell = () => {
                 wordBreak: "break-word", // breaks long words too
               }}
             >
-                 {params.value?.toLocaleString()} ກີບ
+              {params.value?.toLocaleString()} ກີບ
             </Typography>
           </Box>
         );
@@ -350,7 +350,7 @@ const CoffeeSell = () => {
       field: "manage",
       headerName: "ຈຳນວນທີ່ໄດ້ຂາຍ",
       flex: 0.5,
-      headerAlign:"left",
+      headerAlign: "left",
       renderCell: (params) => {
         const menuId = params.row.id;
 
@@ -481,73 +481,93 @@ const CoffeeSell = () => {
                 handleSetSell={handleSetSell}
                 selectDateBrachCheck={selectDateBrachCheck}
                 coffeeMenu={coffeeMenu}
+                setLoading={setLoading}
               />
             </Box>
           </Box>
         </Box>
 
         {/**Section 2 insert data */}
-        <Box
-          sx={{
-            height: "100vh",
-            "& .MuiDataGrid-root": {
-              border: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .name-column--cell": {
-              color: colors.greenAccent[300],
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: colors.blueAccent[700],
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: colors.primary[400],
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: "none",
-              backgroundColor: colors.blueAccent[700],
-            },
-            "& .MuiCheckbox-root": {
-              color: `${colors.greenAccent[200]} !important`,
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${colors.grey[100]} !important`,
-            },
-          }}
-        >
-          {/**DATAGRID */}
-          {selectFormtracksend.sellDate && selectFormtracksend.brachId ? (
-            <Box>
-              <DataGrid
-                rows={coffeeMenu}
-                columns={columns}
-                autoHeight
-                hideFooter
-                sx={{
-                  width: "100%",
-                  "& .MuiDataGrid-columnHeaders": {
-                    fontFamily: "Noto Sans Lao",
-                    fontWeight: "bold", // optional
-                    fontSize: "14px", // optional
-                  },
-                }}
-              />
-            </Box>
-          ) : (
-            <Box sx={{ width: "100%", textAlign: "center" }}>
-              <Typography
-                variant="laoText"
-                fontWeight="bold"
-                color={colors.grey[100]}
-              >
-                "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
-              </Typography>
-            </Box>
-          )}
-        </Box>
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "80vh",
+            }}
+          >
+            <CircularProgress
+              size={60}
+              thickness={5}
+              sx={{
+                color: "#00b0ff", // bright cyan blue, visible in dark
+              }}
+            />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              height: "100vh",
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                borderBottom: "none",
+              },
+              "& .name-column--cell": {
+                color: colors.greenAccent[300],
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: colors.blueAccent[700],
+                borderBottom: "none",
+              },
+              "& .MuiDataGrid-virtualScroller": {
+                backgroundColor: colors.primary[400],
+              },
+              "& .MuiDataGrid-footerContainer": {
+                borderTop: "none",
+                backgroundColor: colors.blueAccent[700],
+              },
+              "& .MuiCheckbox-root": {
+                color: `${colors.greenAccent[200]} !important`,
+              },
+              "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                color: `${colors.grey[100]} !important`,
+              },
+            }}
+          >
+            {/**DATAGRID */}
+            {selectFormtracksend.sellDate && selectFormtracksend.brachId ? (
+              <Box>
+                <DataGrid
+                  rows={coffeeMenu}
+                  columns={columns}
+                  autoHeight
+                  hideFooter
+                  sx={{
+                    width: "100%",
+                    "& .MuiDataGrid-columnHeaders": {
+                      fontFamily: "Noto Sans Lao",
+                      fontWeight: "bold", // optional
+                      fontSize: "14px", // optional
+                    },
+                  }}
+                />
+              </Box>
+            ) : (
+              <Box sx={{ width: "100%", textAlign: "center" }}>
+                <Typography
+                  variant="laoText"
+                  fontWeight="bold"
+                  color={colors.grey[100]}
+                >
+                  "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
       </Box>
       {/** image modal */}
       <ImageModal ref={imageModalRef} />
