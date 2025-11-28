@@ -135,10 +135,7 @@ const Dialog2BarChart = ({
           alignItems: "center",
         }}
       >
-        {queryForm?.startDate &&
-        queryForm?.endDate &&
-        typeof queryForm.startDate === "string" &&
-        queryForm.startDate.length > 0 ? (
+        {queryForm?.startDate && queryForm?.endDate ? (
           <Box>
             <Typography variant="h6" fontFamily="Noto Sans Lao">
               ລາຍງານຍອດຂາຍເມນູ: {menuName || ""} ຂອງທຸກສາຂາ
@@ -148,8 +145,22 @@ const Dialog2BarChart = ({
               fontFamily="Noto Sans Lao"
               color="textSecondary"
             >
-              ວັນທີ {format(parseISO(queryForm?.startDate), "dd/MM/yyyy")} -{" "}
-              {format(parseISO(queryForm?.endDate), "dd/MM/yyyy")}
+              ວັນທີ{" "}
+              {queryForm.startDate 
+                ? new Date(queryForm.startDate).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "..."}{" "}
+              -{" "}
+              {queryForm.endDate 
+                ? new Date(queryForm.endDate).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "..."}
             </Typography>
           </Box>
         ) : (

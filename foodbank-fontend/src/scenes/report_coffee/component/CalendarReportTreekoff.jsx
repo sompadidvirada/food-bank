@@ -6,21 +6,25 @@ import dayjs from "dayjs";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { fecthReportTreekoff } from "../../../api/report";
 
-export default function CalendarReportTreekoff({ setDataReport,setLoading }) {
+export default function CalendarReportTreekoff({ setDataReport, setLoading }) {
   const token = useFoodBankStorage((state) => state.token);
   const { queryForm, setQueryForm } = useFoodBankStorage();
 
-  const fecthReportTree = async () => {
+  const fecthReportTree = React.useCallback(async () => {
+    if (!queryForm.startDate || !queryForm.endDate) {
+      return; // Exit if dates aren't fully selected
+    }
+
     try {
-      setLoading(true)
+      setLoading(true);
       const ress = await fecthReportTreekoff(queryForm, token);
       setDataReport(ress.data);
     } catch (err) {
-      console.log(err);
-    } finally{
-      setLoading(false)
+      console.error("Failed to fetch report:", err);
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [queryForm, token, setLoading, setDataReport]);
 
   React.useEffect(() => {
     if (queryForm.startDate && queryForm.endDate) {

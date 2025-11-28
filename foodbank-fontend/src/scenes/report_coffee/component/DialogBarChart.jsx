@@ -60,9 +60,6 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
   const colors = tokens(theme.palette.mode);
   const queryForm = useFoodBankStorage((s) => s.queryForm);
 
-
-  console.log(selectDataBar)
-
   const [open2Dialog, setOpen2Dialog] = useState(false);
   const [menuName, setMenuName] = useState("");
 
@@ -96,6 +93,8 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
     setOpen2Dialog(true);
   };
 
+  console.log(queryForm);
+
   return (
     <>
       {" "}
@@ -124,10 +123,7 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
         >
           {/* ... inside DialogTitle ... */}
 
-          {queryForm?.startDate &&
-          queryForm?.endDate &&
-          typeof queryForm.startDate === "string" &&
-          queryForm.startDate.length > 0 ? (
+          {queryForm?.startDate && queryForm?.endDate ? (
             <Box>
               <Typography variant="h6" fontFamily="Noto Sans Lao">
                 ລາຍງານຍອດຂາຍເມນູແຕ່ລະເມນູຂອງສາຂາ: {selectDataBar?.country || ""}
@@ -137,14 +133,22 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
                 fontFamily="Noto Sans Lao"
                 color="textSecondary"
               >
-                {/* Added check and safe fallback for parsing */}
                 ວັນທີ{" "}
-                {queryForm.startDate
-                  ? format(parseISO(queryForm.startDate), "dd/MM/yyyy")
+                {/* Use length check for the safest guard against empty string, null, and undefined */}
+                {queryForm.startDate 
+                  ? new Date(queryForm.startDate).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })
                   : "..."}{" "}
                 -{" "}
                 {queryForm.endDate
-                  ? format(parseISO(queryForm.endDate), "dd/MM/yyyy")
+                  ? new Date(queryForm.endDate).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })
                   : "..."}
               </Typography>
             </Box>

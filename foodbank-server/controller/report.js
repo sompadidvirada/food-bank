@@ -199,6 +199,7 @@ exports.reportTreekoffSellDashborad = async (req, res) => {
             name: true,
             type_2: true,
             type: true,
+            size: true,
           },
         },
         branch: true,
@@ -234,7 +235,7 @@ exports.reportTreekoffSellDashborad = async (req, res) => {
 
     sells.forEach((sell) => {
       const branchName = sell.branch.branchname;
-      const product = sell.coffeeMenu.name;
+      const product = `${sell.coffeeMenu.name} (${sell.coffeeMenu.size})`;
 
       if (!branchMap[branchName]) {
         branchMap[branchName] = {
@@ -355,7 +356,7 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
 
 exports.getReportCoffeeSellByName = async (req, res) => {
   try {
-    const { coffeeName, startDate, endDate } = req.body;
+    let { coffeeName, startDate, endDate } = req.body;
 
     if (!coffeeName || !startDate || !endDate) {
       return res.status(400).json({
@@ -366,6 +367,9 @@ exports.getReportCoffeeSellByName = async (req, res) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
+
+    const regex = /\s*\([^)]*\)/g;
+    coffeeName = coffeeName.replace(regex, "");
 
     // --- 1 & 2: Prisma Query (No Change) ---
     const menuItems = await prisma.coffeeMenu.findMany({
