@@ -356,6 +356,7 @@ exports.reportTotalTreekoffDataGrid = async (req, res) => {
 
 exports.getReportCoffeeSellByName = async (req, res) => {
   try {
+    console.log(req.body);
     let { coffeeName, startDate, endDate } = req.body;
 
     if (!coffeeName || !startDate || !endDate) {
@@ -368,13 +369,33 @@ exports.getReportCoffeeSellByName = async (req, res) => {
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
-    const regex = /\s*\([^)]*\)/g;
-    coffeeName = coffeeName.replace(regex, "");
+    let modifierType2 = null;
 
-    // --- 1 & 2: Prisma Query (No Change) ---
+    // Regex 1: Find and CAPTURE the content inside parentheses
+    const modifierRegex = /\(([^)]+)\)/;
+    const match = coffeeName.match(modifierRegex);
+
+    if (match) {
+      // match[1] holds the captured text inside the parentheses (e.g., "TALL")
+      modifierType2 = match[1].trim();
+    }
+
+    // Regex 2: Remove the parentheses and contents (and any leading space)
+    const cleanupRegex = /\s*\([^)]*\)/g;
+    // Clean the name and use .trim() to remove any leading/trailing spaces,
+    // especially those left from the space before the parenthesis.
+    coffeeName = coffeeName.replace(cleanupRegex, "").trim();
+
+    console.log(coffeeName)
+    console.log(modifierType2)
+
     const menuItems = await prisma.coffeeMenu.findMany({
       where: {
-        name: coffeeName,
+        // Apply the filters dynamically
+        AND: [
+          { name: coffeeName},
+          {size: modifierType2 }
+        ],
       },
       select: { id: true },
     });
@@ -444,5 +465,75 @@ exports.getReportCoffeeSellByName = async (req, res) => {
     return res
       .status(500)
       .json({ message: `Server error during sales report generation.` });
+  }
+};
+
+exports.getCoffeeSellMenuFromType = async (req, res) => {
+  try {
+    const { type, startDate, endDate } = req.body;
+
+    console.log(req.body);
+
+    if (!type || !startDate || !endDate) {
+      return res.status(400).json({ message: `empty value.` });
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999); // --- 1. Find all relevant CoffeeMenu IDs, Names, and Sizes (No Change) ---
+
+    const menuItems = await prisma.coffeeMenu.findMany({
+      where: {
+        type: type,
+      },
+      select: { id: true, name: true, type: true, size: true },
+    });
+
+    if (menuItems.length === 0) {
+      return res.status(404).json({
+        message: `No coffee menu found matching the type: ${type}.`,
+      });
+    }
+
+    const menuIds = menuItems.map((item) => item.id);
+    const menuMap = menuItems.reduce((map, item) => {
+      const label = item.size ? `${item.name} ${item.size}` : item.name;
+      map[item.id] = label;
+      return map;
+    }, {}); // --- 2. Aggregate sales data using $groupBy (No Change) ---
+
+    const aggregatedSales = await prisma.coffeeSell.groupBy({
+      by: ["coffeeMenuId"],
+      where: {
+        AND: [
+          { sellDate: { gte: start, lte: end } },
+          { coffeeMenuId: { in: menuIds } },
+        ],
+      },
+      _sum: {
+        sellCount: true,
+      },
+    }); // --- 3. Format and Sort the result for the Bar Chart ---
+
+    const pieChartData = aggregatedSales
+      .map((item) => {
+        const totalValue = item._sum.sellCount || 0;
+        const combinedLabel = menuMap[item.coffeeMenuId];
+
+        return {
+          id: combinedLabel,
+          label: combinedLabel,
+          value: totalValue,
+        };
+      })
+      .filter((item) => item.value > 0)
+
+      // 👇 MODIFIED: Sort by 'value' (sellCount) in descending order (highest first)
+      .sort((a, b) => a.value - b.value); // --- 4. Send the structured data (No Change) ---
+
+    res.send({ pie_chart_data: pieChartData });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: `server error.` });
   }
 };
