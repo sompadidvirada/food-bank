@@ -28,6 +28,7 @@ import CalendarReportTreekoff from "./component/CalendarReportTreekoff";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
 import DataGridReportTreekoff from "./component/DataGridReportTreekoff";
 import DialogBarChart from "./component/DialogBarChart";
+import DialogPieChart from "./component/DialogPieChart";
 
 // --- Component ย่อย: Stat Card ---
 const StatCard = ({ title, value, icon, color }) => (
@@ -70,6 +71,8 @@ export default function ReportCoffee() {
   const branch = useFoodBankStorage((s) => s.branchs);
   const [open, setOpen] = useState(false);
   const [selectDataBar, setSelectDataBar] = useState({});
+  const [openDialogPie, setOpenDialogPie] = useState(false);
+  const [selectDataPie, setSelectDataPie] = useState("");
 
   const [loading, setLoading] = useState(false);
 
@@ -100,6 +103,10 @@ export default function ReportCoffee() {
     0
   );
 
+  const handleClickPie = (data) => {
+    setOpenDialogPie(true);
+    setSelectDataPie(data.id);
+  };
 
   return (
     <Box sx={{ flexGrow: 1, bgcolor: colors.primary[450], minHeight: "100vh" }}>
@@ -258,7 +265,6 @@ export default function ReportCoffee() {
                     borderColor={{ from: "color", modifiers: [] }}
                     enableTotals={true}
                     totalsOffset={25}
-                    
                     enableGridY={false}
                     axisBottom={{ tickSize: 7, tickPadding: 4 }}
                     animate={false}
@@ -386,6 +392,9 @@ export default function ReportCoffee() {
                     arcLinkLabelsDiagonalLength={15}
                     arcLinkLabelsStraightLength={10}
                     arcLinkLabelsThickness={3}
+                    onClick={(data, event) => {
+                      handleClickPie(data);
+                    }}
                     arcLinkLabelsColor={{ from: "color" }}
                     arcLabelsRadiusOffset={0.55}
                     arcLabelsSkipAngle={20}
@@ -439,6 +448,12 @@ export default function ReportCoffee() {
         setOpen={setOpen}
         selectDataBar={selectDataBar}
         setSelectDataBar={setSelectDataBar}
+      />
+      <DialogPieChart
+        selectDataPie={selectDataPie}
+        setSelectDataPie={setSelectDataPie}
+        openDialogPie={openDialogPie}
+        setOpenDialogPie={setOpenDialogPie}
       />
     </Box>
   );

@@ -13,8 +13,6 @@ import {
 } from "@mui/material";
 import { tokens } from "../../../theme";
 import { ResponsiveBar } from "@nivo/bar";
-import { format, parseISO } from "date-fns";
-import { useReactToPrint } from "react-to-print";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import Dialog2BarChart from "./Dialog2BarChart";
 
@@ -93,7 +91,6 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
     setOpen2Dialog(true);
   };
 
-  console.log(queryForm);
 
   return (
     <>

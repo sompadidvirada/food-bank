@@ -40,3 +40,11 @@ export const getMenuSellByName = (form, token) => {
     }
   })
 }
+
+export const getCoffeeSellByType = (form, token) => {
+  return axios.post(`${URL}/reportcoffeesellbytype`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
