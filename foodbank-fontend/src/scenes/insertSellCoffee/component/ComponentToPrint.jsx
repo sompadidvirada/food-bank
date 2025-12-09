@@ -54,6 +54,9 @@ const ComponentToPrint = forwardRef(
               ຂະໝາດຈອກ
             </th>
             <th style={{ border: "1px solid black", padding: "6px" }}>
+              ໝວດໝູ່
+            </th>
+            <th style={{ border: "1px solid black", padding: "6px" }}>
               ປະເພດເຄື່ອງດື່ມ
             </th>
             <th style={{ border: "1px solid black", padding: "6px" }}>
@@ -89,6 +92,9 @@ const ComponentToPrint = forwardRef(
                 {/* category */}
                 <td style={{ border: "1px solid black", padding: "6px" }}>
                   {row?.menuDetails?.type}
+                </td>
+                <td style={{ border: "1px solid black", padding: "6px" }}>
+                  {row?.menuDetails?.type_2}
                 </td>
 
                  <td style={{ border: "1px solid black", padding: "6px" }}>

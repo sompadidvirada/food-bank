@@ -434,12 +434,14 @@ const CoffeeSell = () => {
     },
   ];
 
-  const getDetailedCheckedSales = (checked, coffeeMenu) => {
+const getDetailedCheckedSales = (checked, coffeeMenu) => {
+    // 1. Create Menu Map for O(1) lookup
     const menuMap = new Map();
     for (const menu of coffeeMenu) {
       menuMap.set(menu.id, menu);
     }
 
+    // 2. Merge Data (Your existing logic)
     const detailedSales = checked.map((sale) => {
       const menuDetails = menuMap.get(sale.coffeeMenuId);
 
@@ -451,20 +453,36 @@ const CoffeeSell = () => {
           productSize: menuDetails.size,
           productSellPrice: menuDetails.sellPrice,
           productImage: menuDetails.image,
+          // Include type_2 directly for easier sorting/grouping
+          productType2: menuDetails.type_2, 
         };
       } else {
-        // Handle cases where the menu item is not found (optional)
         console.warn(
           `Menu item with ID ${sale.coffeeMenuId} not found for sale ID ${sale.id}`
         );
-        return { ...sale, menuDetails: { name: "Product Not Found" } };
+        return { 
+            ...sale, 
+            menuDetails: { name: "Product Not Found" }, 
+            productType2: "Z_UNSORTED" // Use a key that sorts to the end
+        };
       }
     });
 
+    // 3. Sort the Detailed Sales Data by productType2
+    detailedSales.sort((a, b) => {
+        // Use the productType2 field for sorting
+        const typeA = a.productType2 || ""; // Handle undefined/null safely
+        const typeB = b.productType2 || ""; 
+        
+        // Sorts alphabetically (e.g., COFFEE, ICED, SMOOTIE)
+        return typeA.localeCompare(typeB);
+    });
+
     return detailedSales;
-  };
+};
 
   const detailedSalesData = getDetailedCheckedSales(checked, coffeeMenu);
+  
   const aggregateSalesByObject = (checked, coffeeMenu) => {
     // 1. Map Menu for Quick Lookup (O(1) efficiency)
     const menuMap = new Map();
