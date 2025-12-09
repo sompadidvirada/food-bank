@@ -28,6 +28,7 @@ import {
 import EditCoffeeSell from "./component/EditCoffeeSell";
 import UploadFile from "./component/UploadFile";
 import ImageModal from "../../component/ImageModal";
+import PrintCoffeeSell from "./component/PrintCoffeeSell";
 const URL =
   "https://treekoff-storage-coffee-menu.s3.ap-southeast-2.amazonaws.com";
 
@@ -433,6 +434,92 @@ const CoffeeSell = () => {
     },
   ];
 
+  const getDetailedCheckedSales = (checked, coffeeMenu) => {
+    const menuMap = new Map();
+    for (const menu of coffeeMenu) {
+      menuMap.set(menu.id, menu);
+    }
+
+    const detailedSales = checked.map((sale) => {
+      const menuDetails = menuMap.get(sale.coffeeMenuId);
+
+      if (menuDetails) {
+        return {
+          ...sale,
+          menuDetails: menuDetails,
+          productName: menuDetails.name,
+          productSize: menuDetails.size,
+          productSellPrice: menuDetails.sellPrice,
+          productImage: menuDetails.image,
+        };
+      } else {
+        // Handle cases where the menu item is not found (optional)
+        console.warn(
+          `Menu item with ID ${sale.coffeeMenuId} not found for sale ID ${sale.id}`
+        );
+        return { ...sale, menuDetails: { name: "Product Not Found" } };
+      }
+    });
+
+    return detailedSales;
+  };
+
+  const detailedSalesData = getDetailedCheckedSales(checked, coffeeMenu);
+  const aggregateSalesByObject = (checked, coffeeMenu) => {
+    // 1. Map Menu for Quick Lookup (O(1) efficiency)
+    const menuMap = new Map();
+    for (const menu of coffeeMenu) {
+      menuMap.set(menu.id, menu);
+    }
+
+    // 2. Aggregate into a single object
+    const type2Totals = {
+      ICED: 0,
+      HOT: 0,
+      SMOOTIE: 0,
+      // Add any other categories you want to track explicitly
+      OTHER: 0,
+    };
+
+    for (const sale of checked) {
+      const menuDetails = menuMap.get(sale.coffeeMenuId);
+
+      if (menuDetails && menuDetails.type_2) {
+        const category = menuDetails.type_2;
+        const count = parseInt(sale.sellCount, 10) || 0;
+
+        if (type2Totals.hasOwnProperty(category)) {
+          type2Totals[category] += count;
+        } else {
+          // If you encounter a category not listed (e.g., 'COLD' not 'ICED')
+          type2Totals.OTHER += count;
+        }
+      }
+    }
+
+    return type2Totals;
+  };
+  const calculateGrandTotalUnits = (checked) => {
+    if (!checked || checked.length === 0) {
+      return 0;
+    }
+
+    // Use the reduce method to sum the 'sellCount' property of every sale object
+    const total = checked.reduce((accumulator, sale) => {
+      // Ensure sellCount is treated as a number
+      const count = parseInt(sale.sellCount, 10);
+      // Add the current sale count to the accumulator
+      return accumulator + (isNaN(count) ? 0 : count);
+    }, 0); // Start with an initial value of 0
+
+    return total;
+  };
+
+  const grandTotalUnitsSold = React.useMemo(() => {
+    return calculateGrandTotalUnits(checked);
+  }, [checked]); // Recalculate whenever the sales data changes
+  const aggregatedCounts = aggregateSalesByObject(checked, coffeeMenu);
+
   return (
     <Box m="20px">
       <Header title="ຄີຍອດຂາຍ TREEKOFF ແຕ່ລະສາຂາ" />
@@ -476,6 +563,12 @@ const CoffeeSell = () => {
                 <Typography variant="laoText">ລ້າງຂໍມູນທີ່ຄີມື້ນິ້</Typography>
               </Button>
             </Box>
+            <PrintCoffeeSell
+              detailedSalesData={detailedSalesData}
+              aggregatedCounts={aggregatedCounts}
+              grandTotalUnitsSold={grandTotalUnitsSold}
+              selectDateBrachCheck={selectDateBrachCheck}
+            />
             <Box>
               <UploadFile
                 handleSetSell={handleSetSell}
