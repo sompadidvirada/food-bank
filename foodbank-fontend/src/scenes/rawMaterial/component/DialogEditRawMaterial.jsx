@@ -63,6 +63,7 @@ const DialogEditRawMaterial = ({
     name: "",
     description: "",
     categoryMeterailId: "",
+    minOrder:"",
     sizeUnit: "",
     image: "",
   });
@@ -95,6 +96,7 @@ const DialogEditRawMaterial = ({
       id: row?.id,
       name: row?.name,
       description: row?.description,
+      minOrder: row?.minOrder,
       sizeUnit: row?.sizeUnit,
       categoryMeterailId: row?.categoryMeterailId,
     });
@@ -108,6 +110,7 @@ const DialogEditRawMaterial = ({
       name: "",
       description: "",
       categoryMeterailId: "",
+      minOrder:"",
       sizeUnit: "",
       image: "",
     });
@@ -132,11 +135,11 @@ const DialogEditRawMaterial = ({
       name: formData.name,
       description: formData.description,
       categoryMeterailId: formData.categoryMeterailId,
+      minOrder: formData.minOrder,
       sizeUnit: formData.sizeUnit,
       image: productImage,
       contentType: contentType,
     };
-    console.log(payload);
     try {
       const ress = await updateRawMaterial(row.id, payload, token);
       if (ress.data.imageUploadUrl) {
@@ -244,6 +247,29 @@ const DialogEditRawMaterial = ({
               }}
               name="description"
               value={formData.description}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="ສະຕ໋ອກທີ່ຄວນມີ"
+              sx={{
+                "& .MuiInputBase-input": {
+                  fontFamily: "Noto Sans Lao",
+                },
+                "& .MuiInputLabel-root": {
+                  fontFamily: "Noto Sans Lao",
+                  color: colors.grey[100],
+                  opacity: 0.5,
+                },
+                "& .MuiInputLabel-shrink": {
+                  // 👇 fix label cut when shrink
+                  transform: "translate(14px, -9px) scale(0.75)",
+                  fontFamily: "Noto Sans Lao",
+                },
+                mt: 1,
+              }}
+              name="minOrder"
+              value={formData.minOrder}
               onChange={handleChange}
               fullWidth
             />

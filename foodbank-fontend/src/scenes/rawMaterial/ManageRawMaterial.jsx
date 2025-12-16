@@ -184,6 +184,25 @@ const ManageRawMaterial = () => {
       ),
     },
     {
+      field: "minOrder",
+      headerName: "min order",
+      headerAlign: "center",
+      align: "center",
+      renderCell: ({ row }) => (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          width="100%"
+          height="100%"
+        >
+          <Typography sx={{ fontFamily: "Noto Sans Lao" }}>
+            {row.minOrder} ວັນ
+          </Typography>
+        </Box>
+      ),
+    },
+    {
       field: "costPriceKip",
       headerName: "ຕົ້ນທືນກີບ",
       type: "number",
@@ -328,6 +347,9 @@ const ManageRawMaterial = () => {
     fecthCategoryRawMaterial();
     fecthAllRawMaterial();
   }, [token]);
+
+
+  console.log(filteredRows)
 
   return (
     <Box m="20px">

@@ -22,6 +22,9 @@ import {
 import SelectMaterialVariantForStock from "./component/SelectMaterialVariantForStock";
 import PrintReportStockRequisition from "./component/PrintReportStockRequisition";
 import ImageModal from "../../component/ImageModal";
+import { deleteStockRemain, getStockRemain } from "../../api/stockRemain";
+import UploadFile from "./component/UploadFile";
+import { toast } from "react-toastify";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -31,6 +34,7 @@ const ReportStockReqiosition = () => {
   const token = useFoodBankStorage((state) => state.token);
   const [rawMaterialVariants, setRawMaterialVariants] = useState([]);
   const [rawMaterial, setRawMaterial] = useState([]);
+  const [stockRemain, setStockRemain] = useState([]);
   const [queryForm, setQueryFormState] = useState({
     startDate: "",
     endDate: "",
@@ -80,13 +84,37 @@ const ReportStockReqiosition = () => {
     }
   };
 
+  const fecthStockRemain = async () => {
+    try {
+      const ress = await getStockRemain(token);
+      setStockRemain(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteStockRemain = async () => {
+    if (!stockRemain) {
+      toast.error(`ບໍ່ມີລາຍການໃຫ້ລົບ.`);
+    }
+    try {
+      await deleteStockRemain(token);
+      toast.success(`ລ້າງລາຍການສະຕ໋ອກສຳເລັດ`);
+      setStockRemain([]);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   useEffect(() => {
     if (queryForm?.startDate && queryForm?.endDate && queryForm?.branchId) {
       fecthStockRequisition();
     }
   }, [token, queryForm]);
+
   useEffect(() => {
     fecthRawMaterial();
+    fecthStockRemain();
   }, [token]);
 
   const imageModalRef = useRef();
@@ -303,7 +331,9 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avarageReq)
-                  ? `${avarageReq * 30} (${selectedVariant?.variantName}) / ເດືອນ`
+                  ? `${avarageReq * 30} (${
+                      selectedVariant?.variantName
+                    }) / ເດືອນ`
                   : `${(avarageReq * 30).toFixed(2)} (${
                       selectedVariant?.variantName
                     }) / ເດືອນ`
@@ -314,72 +344,74 @@ const ReportStockReqiosition = () => {
       },
     },
     {
-      field: "costPriceVarinatKip",
-      type: "number",
-      headerName: "ລາຄາຕົ້ນທືນກີບ",
-      flex: 0.3,
+      field: "stock_remain",
+      headerName: "ສະຕ໋ອກຄົງເຫລືອ",
+      type: "text",
+      headerAlign: "right",
+      flex: 0.35,
+      align: "right",
       renderCell: (params) => {
-        const variant = rawMaterialVariants?.find(
+        const selectedVariant = rawMaterialVariants.find(
           (v) => v.rawMaterialId === params.row.id
         );
 
+        const stock = stockRemain
+          ?.find((v) => v.id === params.row.id)
+          ?.stockRemain.find(
+            (r) => r.id === selectedVariant?.materialVariantId
+          );
+
+        const stockReq = stockRequisitionData
+          ?.find((v) => v.id === params.row.id)
+          ?.Allstockrequisition.find(
+            (r) => r.id === selectedVariant?.materialVariantId
+          );
+        const avarageReq = stockReq?.quantityRequition / diffDays;
+
         return (
           <Box
-            display="flex"
-            flexDirection="column"
-            justifyContent="center"
-            width="100%"
-            height="100%"
             sx={{
+              height: "100%",
+              width: "100%",
+              alignContent: "center",
               whiteSpace: "normal",
               wordWrap: "break-word",
               overflowWrap: "break-word",
             }}
           >
             <Typography
-              fontWeight="bold"
-              fontSize={12}
-              color={colors.blueAccent[300]}
               sx={{
                 fontFamily: "Noto Sans Lao",
+                fontSize: 13,
                 whiteSpace: "normal",
-                wordBreak: "break-word", // breaks long words too
+                wordBreak: "break-word",
               }}
+              color={colors.blueAccent[200]}
             >
-              {/* show variant name if exists */}
-              {variant ? variant.costPriceKip?.toLocaleString("en-US") : ""} ກີບ
-            </Typography>
-            <Typography
-              fontWeight="bold"
-              fontSize={12}
-              color={colors.greenAccent[300]}
-              sx={{
-                fontFamily: "Noto Sans Lao",
-                whiteSpace: "normal",
-                wordBreak: "break-word", // breaks long words too
-              }}
-            >
-              {variant ? variant.sellPriceKip?.toLocaleString("en-US") : ""} ກີບ
+              {stock?.calculatedStock
+                ? `${stock.calculatedStock.toLocaleString()} (${
+                    selectedVariant?.variantName
+                  }) / ${(
+                    stock.calculatedStock / avarageReq
+                  ).toLocaleString()} ວັນ`
+                : `0`}
             </Typography>
           </Box>
         );
       },
     },
     {
-      field: "costPriceBath",
-      type: "number",
-      headerName: "ລາຄາຕົ້ນທືນບາດ",
-      flex: 0.3,
+      field: "minOrder",
+      headerName: "ສິນຄ້າທີ່ຕ້ອງຄົງເຫຼືອ",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 100,
       renderCell: (params) => {
-        const variant = rawMaterialVariants?.find(
-          (v) => v.rawMaterialId === params.row.id
-        );
-
         return (
           <Box
             display="flex"
-            flexDirection="column"
-            justifyContent="center"
+            alignItems="center"
             width="100%"
             height="100%"
             sx={{
@@ -389,33 +421,17 @@ const ReportStockReqiosition = () => {
             }}
           >
             <Typography
-              fontWeight="bold"
-              fontSize={12}
-              color={colors.blueAccent[300]}
+              fontSize={14}
+              color={colors.grey[100]}
               sx={{
                 fontFamily: "Noto Sans Lao",
                 whiteSpace: "normal",
                 wordBreak: "break-word", // breaks long words too
               }}
             >
+              {/* product name */}
+              {params.value} ວັນ
               {/* show variant name if exists */}
-              {variant
-                ? variant.costPriceBath?.toLocaleString("en-US")
-                : ""}{" "}
-              ບາດ
-            </Typography>
-            <Typography
-              fontWeight="bold"
-              fontSize={12}
-              color={colors.greenAccent[300]}
-              sx={{
-                fontFamily: "Noto Sans Lao",
-                whiteSpace: "normal",
-                wordBreak: "break-word", // breaks long words too
-              }}
-            >
-              {variant ? variant.sellPriceBath?.toLocaleString("en-US") : ""}{" "}
-              ບາດ
             </Typography>
           </Box>
         );
@@ -469,6 +485,7 @@ const ReportStockReqiosition = () => {
         );
       },
     },
+
     {
       field: "totalBath",
       type: "number",
@@ -519,6 +536,8 @@ const ReportStockReqiosition = () => {
     },
   ];
 
+  console.log(rawMaterial);
+
   return (
     <Box m="20px">
       <Header
@@ -561,6 +580,24 @@ const ReportStockReqiosition = () => {
                 rawMaterial={rawMaterial}
                 stockRequisitionData={stockRequisitionData}
               />
+            </Box>
+            <Box>
+              <UploadFile
+                rawMaterial={rawMaterial}
+                queryForm={queryForm}
+                fecthStockRemain={fecthStockRemain}
+              />
+            </Box>
+            <Box>
+              <Button
+                variant="contained"
+                color="error"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+                disabled={!stockRemain?.length}
+                onClick={handleDeleteStockRemain}
+              >
+                ລ້າງສະຕ໋ອກຄົງເຫລືອ
+              </Button>
             </Box>
           </Box>
         </Box>
