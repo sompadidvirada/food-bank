@@ -303,8 +303,8 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avarageReq)
-                  ? `${avarageReq * 30} (${selectedVariant?.variantName}) / ມື້`
-                  : `${(avarageReq * 30).toFixed(3)} (${
+                  ? `${avarageReq * 30} (${selectedVariant?.variantName}) / ເດືອນ`
+                  : `${(avarageReq * 30).toFixed(2)} (${
                       selectedVariant?.variantName
                     }) / ເດືອນ`
                 : "-"}
