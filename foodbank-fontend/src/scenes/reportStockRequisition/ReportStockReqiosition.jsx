@@ -137,6 +137,15 @@ const ReportStockReqiosition = () => {
     return Number.isInteger(value) ? value.toString() : value.toFixed(digits);
   };
 
+  const RightText = ({ children, color }) => (
+    <Typography
+      sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
+      color={color}
+    >
+      {children}
+    </Typography>
+  );
+
   const stockRemainMap = useMemo(() => {
     const map = new Map();
     stockRemain?.forEach((rm) => {
@@ -460,7 +469,7 @@ const ReportStockReqiosition = () => {
                 : colors.redAccent[400]
             }
           >
-            {`${formatDays(final)} ວັນ`}
+            {`${formatDays(final)} ວັນ`} / {`${formatDays(final) - params.row.minOrder} ມື້`}
           </Typography>
         );
       },
@@ -546,7 +555,6 @@ const ReportStockReqiosition = () => {
         );
       },
     },
-
     {
       field: "totalBath",
       type: "number",
