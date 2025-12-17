@@ -132,7 +132,7 @@ const ReportStockReqiosition = () => {
     return Number.isInteger(value) ? value.toString() : value.toFixed(2);
   };
 
-  const formatQty = (value, digits = 3) => {
+  const formatQty = (value, digits = 2) => {
     if (!Number.isFinite(value)) return "-";
     return Number.isInteger(value) ? value.toString() : value.toFixed(digits);
   };
@@ -469,7 +469,7 @@ const ReportStockReqiosition = () => {
                 : colors.redAccent[400]
             }
           >
-            {`${formatDays(final)} ວັນ`} / {`${formatDays(final) - params.row.minOrder} ມື້`}
+            {`${formatDays(final)} ວັນ`} / {`${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
           </Typography>
         );
       },
