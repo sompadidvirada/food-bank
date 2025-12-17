@@ -21,18 +21,11 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
   const token = useFoodBankStorage((s) => s.token);
 
   const handleCreateStock = async (id, count) => {
-    if (!id && !count) return;
+    if (!id || !count) return;
 
-    try {
-      const ress = await createStockRemain(
-        { materialVariantId: id, count: count },
-        token
-      );
-      console.log(ress);
-    } catch (err) {
-      console.log(err);
-    }
+    return createStockRemain({ materialVariantId: id, count }, token);
   };
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -42,56 +35,59 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
       return;
     }
 
-    const htmlText = await file.text();
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlText, "text/html");
+    try {
+      const htmlText = await file.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(htmlText, "text/html");
 
-    const rows = doc.querySelectorAll("table.list tr");
-    const extracted = [];
+      const rows = doc.querySelectorAll("table.list tr");
+      const extracted = [];
 
-    rows.forEach((row, index) => {
-      if (index === 0) return; // skip header row
-      const cells = row.querySelectorAll("td");
-      if (cells.length < 3) return;
+      rows.forEach((row, index) => {
+        if (index === 0) return;
 
-      const barcode = cells[2]?.textContent.trim();
-      const quantityText = cells[8]?.textContent.trim(); // e.g. "2 ແກັດ"
+        const cells = row.querySelectorAll("td");
+        if (cells.length < 9) return;
 
-      if (!barcode || !quantityText) return;
+        const barcode = cells[2]?.textContent.trim();
+        const quantityText = cells[8]?.textContent.trim();
 
-      const quantity = parseInt(quantityText, 10);
-      if (isNaN(quantity)) return;
+        if (!barcode || !quantityText) return;
 
-      let matchedVariant = null;
-      let matchedRaw = null;
+        const quantity = parseInt(quantityText, 10);
+        if (isNaN(quantity)) return;
 
-      rawMaterial.forEach((rm) => {
-        rm.materialVariant.forEach((variant) => {
-          if (variant.barcode === barcode) {
-            matchedVariant = variant;
-            matchedRaw = rm; // ✅ capture parent raw material
-          }
+        rawMaterial.forEach((rm) => {
+          rm.materialVariant.forEach((variant) => {
+            if (variant.barcode === barcode) {
+              extracted.push({
+                materialVariantId: variant.id,
+                quantityRequisition: quantity,
+              });
+            }
+          });
         });
       });
 
-      if (matchedVariant && matchedRaw) {
-        extracted.push({
-          quantityRequisition: quantity,
-          materialVariantId: matchedVariant.id,
-        });
-      } else {
-        console.warn(`⚠️ Barcode ${barcode} not found in materialVariant`);
-      }
-    });
-    extracted.map((entry) => {
-      setTimeout(() => {
-        handleCreateStock(entry.materialVariantId, entry.quantityRequisition);
-      }, 150);
-    });
+      // 🔥 upload all stocks and wait
+      await Promise.all(
+        extracted.map((entry) =>
+          handleCreateStock(entry.materialVariantId, entry.quantityRequisition)
+        )
+      );
 
-    event.target.value = ""; // ✅ clear after successful upload
-    await fecthStockRemain();
+      // ✅ refresh stock remain AFTER success
+      await fecthStockRemain();
+
+      toast.success("ອັປໂຫລດສຳເລັດ.");
+    } catch (err) {
+      console.error(err);
+      toast.error("ອັປໂຫລດລົ້ມເຫຼວ");
+    } finally {
+      event.target.value = "";
+    }
   };
+
   return (
     <div className="p-4">
       <Button

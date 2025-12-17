@@ -63,6 +63,8 @@ const ReportStockReqiosition = () => {
     { totalKip: 0, totalBath: 0 }
   );
 
+  console.log(stockRemain)
+
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
@@ -536,7 +538,6 @@ const ReportStockReqiosition = () => {
     },
   ];
 
-  console.log(rawMaterial);
 
   return (
     <Box m="20px">
