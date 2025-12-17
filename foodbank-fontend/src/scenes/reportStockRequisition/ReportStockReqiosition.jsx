@@ -175,11 +175,11 @@ const ReportStockReqiosition = () => {
   }, [rawMaterialVariants]);
 
   const columns = [
-    { field: "id", headerName: "ໄອດີ", flex: 0.1 },
+    { field: "id", headerName: "ໄອດີ", width: 52 },
     {
       field: "image",
       headerName: "ຮູບພາບ",
-      flex: 0.155,
+      width: 80,
       renderCell: (params) => {
         const imageUrl = params.row.image
           ? `${URL}/${params.row?.image}`
@@ -261,7 +261,7 @@ const ReportStockReqiosition = () => {
       headerName: "ໝວດໝູ່",
       type: "text",
       headerAlign: "left",
-      flex: 0.28,
+      width: 100,
       align: "left",
       renderCell: (params) => {
         return params?.row?.categoryMeterail ? (
@@ -283,7 +283,7 @@ const ReportStockReqiosition = () => {
       headerName: "ຈຳນວນທີ່ເບີກ",
       type: "number",
       headerAlign: "right",
-      flex: 0.2,
+      width: 100,
       align: "right",
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
@@ -315,7 +315,7 @@ const ReportStockReqiosition = () => {
       headerName: "ຈຳນວນເບີກສະເລ່ຍ",
       type: "number",
       headerAlign: "right",
-      flex: 0.35,
+      width: 100,
       align: "right",
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
@@ -348,7 +348,7 @@ const ReportStockReqiosition = () => {
       headerName: "ໃຊ້ສະເລ່ຍຕໍ່ເດືອນ",
       type: "number",
       headerAlign: "right",
-      flex: 0.35,
+      width: 150,
       align: "right",
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
@@ -383,7 +383,7 @@ const ReportStockReqiosition = () => {
       headerName: "ສະຕ໋ອກຄົງເຫລືອ",
       type: "text",
       headerAlign: "right",
-      flex: 0.35,
+      width: 100,
       align: "right",
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
@@ -426,7 +426,7 @@ const ReportStockReqiosition = () => {
       headerName: "ຍອດທີສາມາດນຳໃຊ້ໄດ້",
       type: "text",
       headerAlign: "right",
-      flex: 0.35,
+      width: 100,
       align: "right",
       renderCell: (params) => {
         const variant = rawMaterialVariants.find(
@@ -450,37 +450,60 @@ const ReportStockReqiosition = () => {
           avgReq > 0 && stock?.calculatedStock > 0
             ? stock.calculatedStock / avgReq
             : 0;
+        const halfMinOrder = params.row.minOrder / 2;
 
         return (
-          <Typography
-            sx={{
-              fontFamily: "Noto Sans Lao",
-              fontSize: 13,
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "end",
               height: "100%",
               width: "100%",
-              alignContent: "center",
-              whiteSpace: "normal",
-              wordWrap: "break-word",
-              overflowWrap: "break-word",
+              gap:6
             }}
-            color={
-              final > params.row.minOrder
-                ? colors.greenAccent[400]
-                : colors.redAccent[400]
-            }
           >
-            {`${formatDays(final)} ວັນ`} / {`${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
-          </Typography>
+            <Typography
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                fontSize: 13,
+                lineHeight: 1.1, // 🔥 removes gap
+                margin: 0,
+                padding: 0,
+                color: colors.blueAccent[200],
+              }}
+            >
+              {`${formatDays(final)} ວັນ`}
+            </Typography>
+
+            <Typography
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                fontSize: 13,
+                lineHeight: 1.1, // 🔥 removes gap
+                margin: 0,
+                padding: 0,
+                color:
+                  final < halfMinOrder
+                    ? colors.redAccent[400]
+                    : final < params.row.minOrder
+                    ? "rgba(239, 248, 64, 0.93)"
+                    : colors.greenAccent[300],
+              }}
+            >
+              {`${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
+            </Typography>
+          </div>
         );
       },
     },
     {
       field: "minOrder",
-      headerName: "ສິນຄ້າທີ່ຕ້ອງຄົງເຫຼືອ",
+      headerName: "ຈຳນວນມຶ້ສະຕ໋ອກ",
       type: "text",
       headerAlign: "left",
       align: "left",
-      width: 100,
+      width: 70,
       renderCell: (params) => {
         return (
           <Box
@@ -512,10 +535,73 @@ const ReportStockReqiosition = () => {
       },
     },
     {
+      field: "orderDifferent",
+      headerName: "ຈຳນວນທີຄວນສັ່ງ",
+      type: "text",
+      headerAlign: "left",
+      align: "left",
+      width: 100,
+      renderCell: (params) => {
+        const variant = rawMaterialVariants.find(
+          (v) => v.rawMaterialId === params.row.id
+        );
+
+        const stock = stockRemainMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
+
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
+
+        const quantityReq = stockReq?.quantityRequition ?? 0;
+        const days = diffDays > 0 ? diffDays : 0;
+
+        const avgReq = quantityReq > 0 && days > 0 ? quantityReq / days : 0;
+
+        const final =
+          avgReq > 0 && stock?.calculatedStock > 0
+            ? stock.calculatedStock / avgReq
+            : 0;
+
+        const total = final - params.row.minOrder;
+
+        return (
+          <Box
+            display="flex"
+            alignItems="center"
+            width="100%"
+            height="100%"
+            sx={{
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              fontSize={14}
+              color={colors.grey[100]}
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                whiteSpace: "normal",
+                wordBreak: "break-word", // breaks long words too
+              }}
+            >
+              {total < 0
+                ? `${Math.abs(formatQty(total * avgReq))} ${
+                    variant?.variantName
+                  }`
+                : "-"}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
       field: "totalKip",
       type: "number",
       headerName: "ມູນຄ່າການຈັດສົ່ງກີບທັງໝົດ",
-      flex: 0.3,
+      width: 100,
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
         const stockReq = stockReqMap.get(
@@ -559,7 +645,7 @@ const ReportStockReqiosition = () => {
       field: "totalBath",
       type: "number",
       headerName: "ມູນຄ່າການຈັດສົ່ງບາດທັງໝົດ",
-      flex: 0.3,
+      width: 100,
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
 
@@ -609,14 +695,14 @@ const ReportStockReqiosition = () => {
         subtitle="ລາຍງານລາຍລະອຽດຂອງການເບີກວັດຖຸດິບໃຫ້ກັບແຕ່ລະສາຂາ"
       />
       <Box
-        mt="30px"
-        display="grid"
-        gridTemplateColumns="repeat(1, 20fr)"
-        gridAutoRows="60px"
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
         gap="20px"
       >
         {" "}
-        <Box gridColumn="span 1" backgroundColor={colors.primary[400]}>
+        <Box backgroundColor={colors.primary[400]} width={"100%"}>
           <Box
             display="flex"
             justifyContent="center"
@@ -665,7 +751,7 @@ const ReportStockReqiosition = () => {
             </Box>
           </Box>
         </Box>
-        <Box gridColumn="span 1" backgroundColor={colors.primary[400]}>
+        <Box backgroundColor={colors.primary[400]} width={"100%"}>
           <Box
             display="flex"
             justifyContent="center"
@@ -680,67 +766,69 @@ const ReportStockReqiosition = () => {
             </Box>
           </Box>
         </Box>
-        {/**Section 2 insert data */}
-        <Box
-          sx={{
-            height: "100vh",
-            "& .MuiDataGrid-root": {
-              border: "none",
-            },
-            "& .MuiDataGrid-cell": {
-              borderBottom: "none",
-            },
-            "& .name-column--cell": {
-              color: colors.greenAccent[300],
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: colors.blueAccent[700],
-              borderBottom: "none",
-            },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: colors.primary[400],
-            },
-            "& .MuiDataGrid-footerContainer": {
-              borderTop: "none",
-              backgroundColor: colors.blueAccent[700],
-            },
-            "& .MuiCheckbox-root": {
-              color: `${colors.greenAccent[200]} !important`,
-            },
-            "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
-              color: `${colors.grey[100]} !important`,
-            },
-          }}
-        >
-          {queryForm.startDate && queryForm.endDate && queryForm.branchId ? (
-            <Box>
-              <DataGrid
-                rows={rawMaterial}
-                columns={columns}
-                autoHeight
-                hideFooter
-                sx={{
-                  width: "100%",
-                  "& .MuiDataGrid-columnHeaders": {
-                    fontFamily: "Noto Sans Lao",
-                    fontWeight: "bold", // optional
-                    fontSize: "12px", // optional
-                  },
-                }}
-              />
-            </Box>
-          ) : (
-            <Box sx={{ width: "100%", textAlign: "center" }}>
-              <Typography
-                variant="laoText"
-                fontWeight="bold"
-                color={colors.grey[100]}
-              >
-                "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງເບີ່ງຂໍ້ມູນ"
-              </Typography>
-            </Box>
-          )}
-        </Box>
+      </Box>
+      {/**Section 2 insert data */}
+      <Box
+        sx={{
+          height: "100vh",
+          width: "100%",
+          overflow: "hidden", // important
+          overflowX: "auto",
+          "& .MuiDataGrid-root": {
+            border: "none",
+          },
+          "& .MuiDataGrid-cell": {
+            borderBottom: "none",
+          },
+          "& .name-column--cell": {
+            color: colors.greenAccent[300],
+          },
+          "& .MuiDataGrid-columnHeaders": {
+            backgroundColor: colors.blueAccent[700],
+            borderBottom: "none",
+          },
+          "& .MuiDataGrid-virtualScroller": {
+            backgroundColor: colors.primary[400],
+            overflowY: "hidden",
+          },
+          "& .MuiDataGrid-footerContainer": {
+            borderTop: "none",
+            backgroundColor: colors.blueAccent[700],
+          },
+          "& .MuiCheckbox-root": {
+            color: `${colors.greenAccent[200]} !important`,
+          },
+          "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+            color: `${colors.grey[100]} !important`,
+          },
+        }}
+      >
+        {queryForm.startDate && queryForm.endDate && queryForm.branchId ? (
+          <DataGrid
+            rows={rawMaterial}
+            columns={columns}
+            autoHeight
+            hideFooter
+            sx={{
+              width: "100%",
+              "& .MuiDataGrid-columnHeaders": {
+                fontFamily: "Noto Sans Lao",
+                fontWeight: "bold", // optional
+                fontSize: "12px", // optional
+              },
+            }}
+          />
+        ) : (
+          <Box sx={{ width: "100%", textAlign: "center" }}>
+            <Typography
+              variant="laoText"
+              fontWeight="bold"
+              color={colors.grey[100]}
+            >
+              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງເບີ່ງຂໍ້ມູນ"
+            </Typography>
+          </Box>
+        )}
       </Box>
       {/** image modal */}
       <ImageModal ref={imageModalRef} />

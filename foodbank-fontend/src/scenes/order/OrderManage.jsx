@@ -1004,7 +1004,7 @@ const result = checked
               fontWeight="bold"
               color={colors.grey[100]}
             >
-              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
+              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ" 
             </Typography>
           </Box>
         )}
