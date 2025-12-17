@@ -601,7 +601,7 @@ const ReportStockReqiosition = () => {
       field: "totalKip",
       type: "number",
       headerName: "ມູນຄ່າການຈັດສົ່ງກີບທັງໝົດ",
-      width: 100,
+      width: 150,
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
         const stockReq = stockReqMap.get(
@@ -645,7 +645,7 @@ const ReportStockReqiosition = () => {
       field: "totalBath",
       type: "number",
       headerName: "ມູນຄ່າການຈັດສົ່ງບາດທັງໝົດ",
-      width: 100,
+      width: 150,
       renderCell: (params) => {
         const variant = variantMap.get(params.row.id);
 
