@@ -7,7 +7,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Header from "../component/Header";
 import { tokens } from "../../theme";
 import useFoodBankStorage from "../../zustand/foodbank-storage";
@@ -127,6 +127,44 @@ const ReportStockReqiosition = () => {
 
   // coumn for datagrid
 
+  const formatDays = (value) => {
+    if (!Number.isFinite(value) || value <= 0) return "0";
+    return Number.isInteger(value) ? value.toString() : value.toFixed(2);
+  };
+
+  const formatQty = (value, digits = 3) => {
+    if (!Number.isFinite(value)) return "-";
+    return Number.isInteger(value) ? value.toString() : value.toFixed(digits);
+  };
+
+  const stockRemainMap = useMemo(() => {
+    const map = new Map();
+    stockRemain?.forEach((rm) => {
+      rm.stockRemain.forEach((s) => {
+        map.set(`${rm.id}_${s.id}`, s);
+      });
+    });
+    return map;
+  }, [stockRemain]);
+
+  const stockReqMap = useMemo(() => {
+    const map = new Map();
+    stockRequisitionData?.forEach((rm) => {
+      rm.Allstockrequisition.forEach((s) => {
+        map.set(`${rm.id}_${s.id}`, s);
+      });
+    });
+    return map;
+  }, [stockRequisitionData]);
+
+  const variantMap = useMemo(() => {
+    const map = new Map();
+    rawMaterialVariants?.forEach((v) => {
+      map.set(v.rawMaterialId, v);
+    });
+    return map;
+  }, [rawMaterialVariants]);
+
   const columns = [
     { field: "id", headerName: "ໄອດີ", flex: 0.1 },
     {
@@ -177,9 +215,7 @@ const ReportStockReqiosition = () => {
       align: "left",
       width: 180,
       renderCell: (params) => {
-        const variant = rawMaterialVariants?.find(
-          (v) => v.rawMaterialId === params.row.id
-        );
+        const variant = variantMap.get(params.row.id);
 
         return (
           <Box
@@ -241,15 +277,11 @@ const ReportStockReqiosition = () => {
       flex: 0.2,
       align: "right",
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
-        );
+        const variant = variantMap.get(params.row.id);
 
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
 
         return (
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
@@ -259,9 +291,9 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(stockReq.quantityRequition)
-                  ? `${stockReq.quantityRequition} (${selectedVariant?.variantName})`
+                  ? `${stockReq.quantityRequition} (${variant?.variantName})`
                   : `${stockReq.quantityRequition.toFixed(3)} (${
-                      selectedVariant?.variantName
+                      variant?.variantName
                     })`
                 : "-"}
             </Typography>
@@ -277,16 +309,14 @@ const ReportStockReqiosition = () => {
       flex: 0.35,
       align: "right",
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
+        const variant = variantMap.get(params.row.id);
+
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
         );
 
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
-        const avarageReq = stockReq?.quantityRequition / diffDays;
+        const avgReq =
+          stockReq && diffDays > 0 ? stockReq.quantityRequition / diffDays : 0;
 
         return (
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
@@ -295,11 +325,9 @@ const ReportStockReqiosition = () => {
               color={colors.blueAccent[300]}
             >
               {stockReq?.quantityRequition != null
-                ? Number.isInteger(avarageReq)
-                  ? `${avarageReq} (${selectedVariant?.variantName}) / ມື້`
-                  : `${avarageReq.toFixed(3)} (${
-                      selectedVariant?.variantName
-                    }) / ມື້`
+                ? Number.isInteger(avgReq)
+                  ? `${avgReq} (${variant?.variantName}) / ມື້`
+                  : `${avgReq.toFixed(3)} (${variant?.variantName}) / ມື້`
                 : "-"}
             </Typography>
           </Box>
@@ -314,16 +342,14 @@ const ReportStockReqiosition = () => {
       flex: 0.35,
       align: "right",
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
+        const variant = variantMap.get(params.row.id);
+
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
         );
 
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
-        const avarageReq = stockReq?.quantityRequition / diffDays;
+        const avgReq =
+          stockReq && diffDays > 0 ? stockReq.quantityRequition / diffDays : 0;
 
         return (
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
@@ -332,12 +358,10 @@ const ReportStockReqiosition = () => {
               color={colors.greenAccent[300]}
             >
               {stockReq?.quantityRequition != null
-                ? Number.isInteger(avarageReq)
-                  ? `${avarageReq * 30} (${
-                      selectedVariant?.variantName
-                    }) / ເດືອນ`
-                  : `${(avarageReq * 30).toFixed(2)} (${
-                      selectedVariant?.variantName
+                ? Number.isInteger(avgReq)
+                  ? `${avgReq * 30} (${variant?.variantName}) / ເດືອນ`
+                  : `${(avgReq * 30).toFixed(2)} (${
+                      variant?.variantName
                     }) / ເດືອນ`
                 : "-"}
             </Typography>
@@ -353,23 +377,11 @@ const ReportStockReqiosition = () => {
       flex: 0.35,
       align: "right",
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
+        const variant = variantMap.get(params.row.id);
+
+        const stock = stockRemainMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
         );
-
-        const stock = stockRemain
-          ?.find((v) => v.id === params.row.id)
-          ?.stockRemain.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
-
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
-        const avarageReq = stockReq?.quantityRequition / diffDays;
-
         return (
           <Box
             sx={{
@@ -392,7 +404,7 @@ const ReportStockReqiosition = () => {
             >
               {stock?.calculatedStock
                 ? `${stock.calculatedStock.toLocaleString()} (${
-                    selectedVariant?.variantName
+                    variant?.variantName
                   }) `
                 : `0`}
             </Typography>
@@ -408,26 +420,33 @@ const ReportStockReqiosition = () => {
       flex: 0.35,
       align: "right",
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
+        const variant = rawMaterialVariants.find(
           (v) => v.rawMaterialId === params.row.id
         );
 
-        const stock = stockRemain
-          ?.find((v) => v.id === params.row.id)
-          ?.stockRemain.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
+        const stock = stockRemainMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
 
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
-        const avarageReq = stockReq?.quantityRequition / diffDays;
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
+
+        const quantityReq = stockReq?.quantityRequition ?? 0;
+        const days = diffDays > 0 ? diffDays : 0;
+
+        const avgReq = quantityReq > 0 && days > 0 ? quantityReq / days : 0;
+
+        const final =
+          avgReq > 0 && stock?.calculatedStock > 0
+            ? stock.calculatedStock / avgReq
+            : 0;
 
         return (
-          <Box
+          <Typography
             sx={{
+              fontFamily: "Noto Sans Lao",
+              fontSize: 13,
               height: "100%",
               width: "100%",
               alignContent: "center",
@@ -435,21 +454,14 @@ const ReportStockReqiosition = () => {
               wordWrap: "break-word",
               overflowWrap: "break-word",
             }}
+            color={
+              final > params.row.minOrder
+                ? colors.greenAccent[400]
+                : colors.redAccent[400]
+            }
           >
-            <Typography
-              sx={{
-                fontFamily: "Noto Sans Lao",
-                fontSize: 13,
-                whiteSpace: "normal",
-                wordBreak: "break-word",
-              }}
-              color={colors.redAccent[400]}
-            >
-              {stock?.calculatedStock
-                ? `${(stock.calculatedStock / avarageReq).toFixed(2)} ວັນ`
-                : `0`}
-            </Typography>
-          </Box>
+            {`${formatDays(final)} ວັນ`}
+          </Typography>
         );
       },
     },
@@ -496,14 +508,10 @@ const ReportStockReqiosition = () => {
       headerName: "ມູນຄ່າການຈັດສົ່ງກີບທັງໝົດ",
       flex: 0.3,
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
+        const variant = variantMap.get(params.row.id);
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
         );
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
 
         return (
           <Box
@@ -545,14 +553,11 @@ const ReportStockReqiosition = () => {
       headerName: "ມູນຄ່າການຈັດສົ່ງບາດທັງໝົດ",
       flex: 0.3,
       renderCell: (params) => {
-        const selectedVariant = rawMaterialVariants.find(
-          (v) => v.rawMaterialId === params.row.id
+        const variant = variantMap.get(params.row.id);
+
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
         );
-        const stockReq = stockRequisitionData
-          ?.find((v) => v.id === params.row.id)
-          ?.Allstockrequisition.find(
-            (r) => r.id === selectedVariant?.materialVariantId
-          );
 
         return (
           <Box
