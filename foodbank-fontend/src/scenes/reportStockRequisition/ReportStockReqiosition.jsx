@@ -63,7 +63,7 @@ const ReportStockReqiosition = () => {
     { totalKip: 0, totalBath: 0 }
   );
 
-  console.log(stockRemain)
+  console.log(stockRemain);
 
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
@@ -393,9 +393,60 @@ const ReportStockReqiosition = () => {
               {stock?.calculatedStock
                 ? `${stock.calculatedStock.toLocaleString()} (${
                     selectedVariant?.variantName
-                  }) / ${(
-                    stock.calculatedStock / avarageReq
-                  ).toLocaleString()} ວັນ`
+                  }) `
+                : `0`}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "stock_remain_using",
+      headerName: "ຍອດທີສາມາດນຳໃຊ້ໄດ້",
+      type: "text",
+      headerAlign: "right",
+      flex: 0.35,
+      align: "right",
+      renderCell: (params) => {
+        const selectedVariant = rawMaterialVariants.find(
+          (v) => v.rawMaterialId === params.row.id
+        );
+
+        const stock = stockRemain
+          ?.find((v) => v.id === params.row.id)
+          ?.stockRemain.find(
+            (r) => r.id === selectedVariant?.materialVariantId
+          );
+
+        const stockReq = stockRequisitionData
+          ?.find((v) => v.id === params.row.id)
+          ?.Allstockrequisition.find(
+            (r) => r.id === selectedVariant?.materialVariantId
+          );
+        const avarageReq = stockReq?.quantityRequition / diffDays;
+
+        return (
+          <Box
+            sx={{
+              height: "100%",
+              width: "100%",
+              alignContent: "center",
+              whiteSpace: "normal",
+              wordWrap: "break-word",
+              overflowWrap: "break-word",
+            }}
+          >
+            <Typography
+              sx={{
+                fontFamily: "Noto Sans Lao",
+                fontSize: 13,
+                whiteSpace: "normal",
+                wordBreak: "break-word",
+              }}
+              color={colors.redAccent[400]}
+            >
+              {stock?.calculatedStock
+                ? `${(stock.calculatedStock / avarageReq).toFixed(2)} ວັນ`
                 : `0`}
             </Typography>
           </Box>
@@ -537,7 +588,6 @@ const ReportStockReqiosition = () => {
       },
     },
   ];
-
 
   return (
     <Box m="20px">
