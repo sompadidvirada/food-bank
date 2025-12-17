@@ -18,6 +18,25 @@ const s3 = new S3Client({
 
 // CATEGORY MATERIAL
 
+exports.deleteStockRequisition = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ message: `emty id.` });
+    }
+    const ress = await prisma.stockRequisition.delete({
+      where: {
+        id: Number(id),
+      },
+    });
+    res.status(200).json({ message: `delete success.`, data: ress });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `server error.` });
+  }
+};
+
 exports.createCategoryMaterial = async (req, res) => {
   try {
     const { categoryMaterialName } = req.body;
@@ -160,6 +179,7 @@ exports.updateRawMaterial = async (req, res) => {
       description,
       categoryMeterailId,
       sizeUnit,
+      minOrder,
       image,
       contentType,
     } = req.body;
@@ -219,6 +239,7 @@ exports.updateRawMaterial = async (req, res) => {
         description: description,
         sizeUnit: sizeUnit,
         categoryMeterailId: Number(categoryMeterailId),
+        minOrder: Number(minOrder),
         ...(image ? { image } : {}),
       },
     });
@@ -255,6 +276,7 @@ exports.getRawMaterial = async (req, res) => {
         description: item.description,
         isActive: item.isActive,
         createAt: item.createAt,
+        minOrder: item.minOrder,
         sizeUnit: item.sizeUnit,
         categoryMeterailId: item.categoryMeterailId,
         categoryMeterail: item.categoryMeterail.name,

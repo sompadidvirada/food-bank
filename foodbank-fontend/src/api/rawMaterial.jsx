@@ -153,3 +153,11 @@ export const exchangeRateCalcurate = (form, token) => {
         }
     })
 }
+
+export const deleteStockRequi = (id, token) => {
+    return axios.delete(`${URL}/deletestockrequisition/${id}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    })
+}

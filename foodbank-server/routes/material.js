@@ -24,6 +24,7 @@ const {
   getStockRequisitionAllItem,
   calculatePriceKipByExchangeRate,
   updateMaterialVariantByExchangeRate,
+  deleteStockRequisition,
 } = require("../controller/material");
 const router = express.Router();
 
@@ -54,6 +55,7 @@ router.delete("/deletematerialvariant/:id", authCheck, deleteMaterialVariant)
 router.put("/updatematerialvariant/:id", authCheck, updateMaterialVariant)
 router.post("/getstockrequisition", authCheck, getStockRequisitionHistory)
 router.get("/getRawMaterialVariant", getRawMaterialVariant)
+router.delete("/deletestockrequisition/:id", authCheck, deleteStockRequisition)
 
 
 // stockrequisition

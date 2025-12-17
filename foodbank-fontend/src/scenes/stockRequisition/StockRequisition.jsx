@@ -18,6 +18,7 @@ import SelecBranch from "./component/SelecBranch";
 import { toast } from "react-toastify";
 import {
   deleteAllStockrequisitionByDate,
+  deleteStockRequi,
   getAllRawMaterial,
   getRawMaterialVariantToInsert,
   getStockRequisitionByDate,
@@ -158,6 +159,19 @@ const StockRequisition = () => {
       if (countOrForm instanceof HTMLFormElement) {
         countOrForm.reset();
       }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const handleDeleteStockRequi = async (id) => {
+    try {
+      const ress = await deleteStockRequi(id, token);
+      console.log(ress.data);
+      setChecked((prevChecked) => {
+        return prevChecked.filter((item) => item.id !== ress.data.data.id);
+      });
+      toast.success(`ລົບສຳເລັດ.`)
     } catch (err) {
       console.log(err);
     }
@@ -327,7 +341,7 @@ const StockRequisition = () => {
     {
       field: "manage",
       headerName: "ຈຳນວນທີເບີກ",
-      flex: 0.5,
+      flex: 0.6,
       renderCell: (params) => {
         const materialVariantId = rawMaterialVariants.find(
           (item) => item.rawMaterialId === params.row.id
@@ -350,9 +364,19 @@ const StockRequisition = () => {
                   fontFamily: "Noto Sans Lao",
                 }}
               >
-                ຍອດທີ່ບັນທືກ. ({tracked.quantityRequisition})
+                ບັນທືກ. ({tracked.quantityRequisition})
               </span>
-              <DialogEdit trackedProduct={tracked} setChecked={setChecked} />
+              <DialogEdit trackedProduct={tracked} setChecked={setChecked} />{" "}
+              <>
+                <Button
+                  variant="contained"
+                  color="error"
+                  sx={{ fontFamily: "Noto Sans Lao" }}
+                  onClick={() => handleDeleteStockRequi(tracked.id)}
+                >
+                  ລົບ
+                </Button>
+              </>
             </Box>
           );
         }
