@@ -1,9 +1,10 @@
 import { styled } from "@mui/material/styles";
-import Button from "@mui/material/Button";
+import { Button, LinearProgress, Box, CircularProgress } from "@mui/material";
 import { toast } from "react-toastify";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { createStockRemain } from "../../../api/stockRemain";
+import { useState } from "react";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -20,6 +21,9 @@ const VisuallyHiddenInput = styled("input")({
 const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
   const token = useFoodBankStorage((s) => s.token);
 
+  const [loading, setLoading] = useState(false);
+  const [progress, setProgress] = useState(0);
+
   const handleCreateStock = async (id, count) => {
     if (!id || !count) return;
 
@@ -34,6 +38,9 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
       toast.error("ຟາຍທີ່ອັບໂຫລດບໍ່ຖືກຕ້ອງ");
       return;
     }
+
+    setLoading(true);
+    setProgress(0);
 
     try {
       const htmlText = await file.text();
@@ -51,11 +58,9 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
 
         const barcode = cells[2]?.textContent.trim();
         const quantityText = cells[8]?.textContent.trim();
-
-        if (!barcode || !quantityText) return;
-
         const quantity = parseInt(quantityText, 10);
-        if (isNaN(quantity)) return;
+
+        if (!barcode || isNaN(quantity)) return;
 
         rawMaterial.forEach((rm) => {
           rm.materialVariant.forEach((variant) => {
@@ -69,14 +74,21 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
         });
       });
 
-      // 🔥 upload all stocks and wait
-      await Promise.all(
-        extracted.map((entry) =>
-          handleCreateStock(entry.materialVariantId, entry.quantityRequisition)
-        )
-      );
+      const total = extracted.length;
+      let completed = 0;
 
-      // ✅ refresh stock remain AFTER success
+      // 🔥 upload with progress
+      for (const item of extracted) {
+        await handleCreateStock(
+          item.materialVariantId,
+          item.quantityRequisition
+        );
+
+        completed += 1;
+        setProgress(Math.round((completed / total) * 100));
+      }
+
+      // 🔄 refresh stock remain
       await fecthStockRemain();
 
       toast.success("ອັປໂຫລດສຳເລັດ.");
@@ -84,34 +96,48 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
       console.error(err);
       toast.error("ອັປໂຫລດລົ້ມເຫຼວ");
     } finally {
+      setLoading(false);
       event.target.value = "";
     }
   };
 
   return (
-    <div className="p-4">
+    <Box className="p-4">
       <Button
         component="label"
-        role={undefined}
         variant="contained"
         color="info"
-        tabIndex={-1}
         disabled={
-          queryForm?.startDate && queryForm?.endDate && queryForm?.branchId
-            ? false
-            : true
+          loading ||
+          !(queryForm?.startDate && queryForm?.endDate && queryForm?.branchId)
         }
-        startIcon={<AttachFileIcon />}
-        sx={{ fontFamily: "Noto Sans Lao" }}
+        startIcon={
+          loading ? (
+            <CircularProgress size={18} color="inherit" />
+          ) : (
+            <AttachFileIcon />
+          )
+        }
+        sx={{ fontFamily: "Noto Sans Lao", width: "100%" }}
       >
-        ອັປໂຫລດຟາຍຍອດຂາຍ
+        {loading ? "ກຳລັງອັປໂຫລດ..." : "ອັປໂຫລດຟາຍຍອດຂາຍ"}
         <VisuallyHiddenInput
           type="file"
           accept=".html"
           onChange={handleFileUpload}
         />
       </Button>
-    </div>
+
+      {/* 📊 Progress Bar */}
+      {loading && (
+        <Box mt={2}>
+          <LinearProgress variant="determinate" value={progress} color="info"/>
+          <Box textAlign="right" fontSize={12} mt={0.5}>
+            {progress}%
+          </Box>
+        </Box>
+      )}
+    </Box>
   );
 };
 
