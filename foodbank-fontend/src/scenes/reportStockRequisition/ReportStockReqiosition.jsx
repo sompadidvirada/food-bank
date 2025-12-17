@@ -460,7 +460,7 @@ const ReportStockReqiosition = () => {
               justifyContent: "end",
               height: "100%",
               width: "100%",
-              gap:6
+              gap: 6,
             }}
           >
             <Typography
@@ -771,9 +771,6 @@ const ReportStockReqiosition = () => {
       <Box
         sx={{
           height: "100vh",
-          width: "100%",
-          overflow: "hidden", // important
-          overflowX: "auto",
           "& .MuiDataGrid-root": {
             border: "none",
           },
