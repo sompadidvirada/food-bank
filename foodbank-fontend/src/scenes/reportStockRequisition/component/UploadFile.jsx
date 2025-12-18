@@ -102,7 +102,15 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
   };
 
   return (
-    <Box className="p-4">
+    <Box
+      sx={{
+        height: 100,
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        position: "relative",
+      }}
+    >
       <Button
         component="label"
         variant="contained"
@@ -130,8 +138,8 @@ const UploadFile = ({ queryForm, rawMaterial, fecthStockRemain }) => {
 
       {/* 📊 Progress Bar */}
       {loading && (
-        <Box mt={2}>
-          <LinearProgress variant="determinate" value={progress} color="info"/>
+        <Box mt={1} sx={{ position: "absolute", top: 66, width: "100%" }}>
+          <LinearProgress variant="determinate" value={progress} color="info" />
           <Box textAlign="right" fontSize={12} mt={0.5}>
             {progress}%
           </Box>
