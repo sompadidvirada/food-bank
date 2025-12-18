@@ -468,7 +468,11 @@ const ReportStockReqiosition = () => {
                 lineHeight: 1.1, // 🔥 removes gap
                 margin: 0,
                 padding: 0,
-                color: colors.blueAccent[300],
+                color: final <= halfMinOrder
+                    ? colors.redAccent[400]
+                    : final > params.row.minOrder
+                    ? colors.greenAccent[300]
+                    : colors.yellowAccent[200],
               }}
             >
               {`${formatDays(final)} ວັນ`}
@@ -483,10 +487,10 @@ const ReportStockReqiosition = () => {
                 padding: 0,
                 color:
                   final <= halfMinOrder
-                    ? colors.yellowAccent[200]
+                    ? colors.redAccent[400]
                     : final > params.row.minOrder
                     ? colors.greenAccent[300]
-                    : colors.redAccent[400],
+                    : colors.yellowAccent[200],
               }}
             >
               {final === 0
