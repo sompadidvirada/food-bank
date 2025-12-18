@@ -38,7 +38,7 @@ const Tracksell = () => {
   const getProduct = useFoodBankStorage((state) => state.getProduct);
   const [checked, setChecked] = useState(null);
   const [checkImage, setCheckImage] = useState([]);
-  const [productDetial, setProductDetial] = useState([]);
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(true);
   const [selectFormtracksell, setSelectFormtracksell] = useState({
     sellCount: "",
     sellAt: "",
@@ -355,6 +355,16 @@ const Tracksell = () => {
     /** function handlechange for input insert tracking*/
   }
 
+  const rowsToShow = showOnlyAvailable
+    ? products?.filter((product) =>
+        product.available?.some(
+          (item) =>
+            item.aviableStatus === true &&
+            item.branchId === selectFormtracksell.brachId
+        )
+      )
+    : products;
+
   return (
     <Box m="20px">
       <Header title="ຄີຍອດຂາຍແຕ່ລະສາຂາ" />
@@ -387,6 +397,24 @@ const Tracksell = () => {
                 setSelectFormtracksell={setSelectFormtracksell}
                 setSelectDateBrachCheck={setSelectDateBrachCheck}
               />
+            </Box>
+            <Box>
+              <Button
+                variant={showOnlyAvailable ? "contained" : "outlined"}
+                color="info"
+                onClick={() => setShowOnlyAvailable((prev) => !prev)}
+                disabled={
+                  selectFormtracksell?.sellAt && selectFormtracksell?.brachId
+                    ? false
+                    : true
+                }
+              >
+                <Typography variant="laoText">
+                  {showOnlyAvailable
+                    ? "ສະແດງສິນຄ້າທີ່ມີໃນສາຂາ"
+                    : "ສະແດງສິນຄ້າທັງໝົດ"}
+                </Typography>
+              </Button>
             </Box>
             <Box>
               <Button
@@ -452,13 +480,7 @@ const Tracksell = () => {
                 setCheckImage={setCheckImage}
               />
               <DataGrid
-                rows={products?.filter((product) =>
-                  product.available?.some(
-                    (item) =>
-                      item.aviableStatus === true &&
-                      item.branchId === selectFormtracksell.brachId
-                  )
-                )}
+                rows={rowsToShow || []}
                 columns={columns}
                 autoHeight
                 hideFooter
