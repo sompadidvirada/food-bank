@@ -411,8 +411,8 @@ const Tracksell = () => {
               >
                 <Typography variant="laoText">
                   {showOnlyAvailable
-                    ? "ສະແດງສິນຄ້າທີ່ມີໃນສາຂາ"
-                    : "ສະແດງສິນຄ້າທັງໝົດ"}
+                    ? "ສະແດງສິນຄ້າທັງໝົດ"
+                    : "ສະແດງສິນຄ້າທີ່ມີໃນສາຂາ"}
                 </Typography>
               </Button>
             </Box>
