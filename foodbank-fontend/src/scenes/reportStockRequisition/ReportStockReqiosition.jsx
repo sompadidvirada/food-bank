@@ -63,10 +63,10 @@ const ReportStockReqiosition = () => {
     { totalKip: 0, totalBath: 0 }
   );
 
-  console.log(stockRemain);
 
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
 
   const fecthStockRequisition = async () => {
     try {
@@ -296,7 +296,7 @@ const ReportStockReqiosition = () => {
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
             <Typography
               sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
-              color={colors.grey[100]}
+              color={colors.greenAccent[400]}
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(stockReq.quantityRequition)
@@ -331,7 +331,7 @@ const ReportStockReqiosition = () => {
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
             <Typography
               sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
-              color={colors.blueAccent[300]}
+              color={colors.blueAccent[200]}
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avgReq)
@@ -364,7 +364,7 @@ const ReportStockReqiosition = () => {
           <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
             <Typography
               sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
-              color={colors.greenAccent[300]}
+              color={colors.blueAccent[400]}
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avgReq)
@@ -409,7 +409,7 @@ const ReportStockReqiosition = () => {
                 whiteSpace: "normal",
                 wordBreak: "break-word",
               }}
-              color={colors.blueAccent[200]}
+              color={colors.greenAccent[200]}
             >
               {stock?.calculatedStock
                 ? `${stock.calculatedStock.toLocaleString()} (${
@@ -470,7 +470,7 @@ const ReportStockReqiosition = () => {
                 lineHeight: 1.1, // 🔥 removes gap
                 margin: 0,
                 padding: 0,
-                color: colors.blueAccent[200],
+                color: colors.blueAccent[300],
               }}
             >
               {`${formatDays(final)} ວັນ`}
@@ -487,7 +487,7 @@ const ReportStockReqiosition = () => {
                   final < halfMinOrder
                     ? colors.redAccent[400]
                     : final < params.row.minOrder
-                    ? "rgba(239, 248, 64, 0.93)"
+                    ? colors.yellowAccent[200]
                     : colors.greenAccent[300],
               }}
             >
@@ -519,7 +519,7 @@ const ReportStockReqiosition = () => {
           >
             <Typography
               fontSize={14}
-              color={colors.grey[100]}
+              color={colors.yellowAccent[200]}
               sx={{
                 fontFamily: "Noto Sans Lao",
                 whiteSpace: "normal",
@@ -561,7 +561,7 @@ const ReportStockReqiosition = () => {
 
         const final =
           avgReq > 0 && stock?.calculatedStock > 0
-            ? stock.calculatedStock / avgReq
+            ? stock.calculatedStock / (avgReq + 8)
             : 0;
 
         const total = final - params.row.minOrder;
@@ -580,7 +580,7 @@ const ReportStockReqiosition = () => {
           >
             <Typography
               fontSize={14}
-              color={colors.grey[100]}
+              color={colors.redAccent[300]}
               sx={{
                 fontFamily: "Noto Sans Lao",
                 whiteSpace: "normal",
