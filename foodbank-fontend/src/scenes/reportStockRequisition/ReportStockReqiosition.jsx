@@ -63,10 +63,8 @@ const ReportStockReqiosition = () => {
     { totalKip: 0, totalBath: 0 }
   );
 
-
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
 
   const fecthStockRequisition = async () => {
     try {
@@ -484,14 +482,16 @@ const ReportStockReqiosition = () => {
                 margin: 0,
                 padding: 0,
                 color:
-                  final < halfMinOrder
-                    ? colors.redAccent[400]
-                    : final < params.row.minOrder
+                  final <= halfMinOrder
                     ? colors.yellowAccent[200]
-                    : colors.greenAccent[300],
+                    : final > params.row.minOrder
+                    ? colors.greenAccent[300]
+                    : colors.redAccent[400],
               }}
             >
-              {`${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
+              {final === 0
+                ? "0 ວັນ"
+                : `${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
             </Typography>
           </div>
         );
@@ -561,7 +561,7 @@ const ReportStockReqiosition = () => {
 
         const final =
           avgReq > 0 && stock?.calculatedStock > 0
-            ? stock.calculatedStock / (avgReq + 8)
+            ? stock.calculatedStock / avgReq
             : 0;
 
         const total = final - params.row.minOrder;
@@ -588,7 +588,7 @@ const ReportStockReqiosition = () => {
               }}
             >
               {total < 0
-                ? `${Math.abs(formatQty(total * avgReq))} ${
+                ? `${formatQty(Math.abs(total + 8) * avgReq)} ${
                     variant?.variantName
                   }`
                 : "-"}
