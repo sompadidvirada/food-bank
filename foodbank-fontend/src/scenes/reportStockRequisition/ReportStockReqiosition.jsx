@@ -493,9 +493,7 @@ const ReportStockReqiosition = () => {
                     : colors.yellowAccent[200],
               }}
             >
-              {final === 0
-                ? "0 ວັນ"
-                : `${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
+              {`${formatQty(formatDays(final) - params.row.minOrder)} ມື້`}
             </Typography>
           </div>
         );
@@ -591,7 +589,7 @@ const ReportStockReqiosition = () => {
                 wordBreak: "break-word", // breaks long words too
               }}
             >
-              {total < 0
+              {total < 0 && avgReq > 0
                 ? `${formatQty(Math.abs(total + 8) * avgReq)} ${
                     variant?.variantName
                   }`
