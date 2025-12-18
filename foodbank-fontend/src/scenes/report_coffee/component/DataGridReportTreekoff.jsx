@@ -29,12 +29,12 @@ const DataGridReportTreekoff = () => {
   const queryForm = useFoodBankStorage((s) => s.queryForm);
   const token = useFoodBankStorage((s) => s.token);
   const [excludedStatuses, setExcludedStatuses] = useState([]);
-  const [reportTreekoff, setReportTreekoff] = useState([])
+  const [reportTreekoff, setReportTreekoff] = useState([]);
 
   const fecthReportTreekoff = async () => {
     try {
       const ress = await getReportTreekoff(queryForm, token);
-      setReportTreekoff(ress.data)
+      setReportTreekoff(ress.data);
     } catch (err) {
       console.log(err);
     }
@@ -49,6 +49,15 @@ const DataGridReportTreekoff = () => {
   const handleImageClick = (url) => {
     imageModalRef.current.openModal(url);
   };
+
+  console.log(reportTreekoff);
+
+  const totalAllRevenue = useMemo(() => {
+    return reportTreekoff.reduce(
+      (sum, row) => sum + (row.totalRevenue || 0),
+      0
+    );
+  }, [reportTreekoff]);
 
   const columns = useMemo(
     () => [
@@ -204,10 +213,40 @@ const DataGridReportTreekoff = () => {
           </Box>
         ),
       },
-    ],
-    [colors]
-  );
+      {
+        field: "revenuePercent",
+        headerName: "ເປີເຊັນ % ຂອງຍອດຂາຍ",
+        headerAlign: "center",
+        flex: 0.5,
+        sortable: false,
+        renderCell: ({ row }) => {
+          const percent =
+            totalAllRevenue > 0
+              ? (row.totalRevenue / totalAllRevenue) * 100
+              : 0;
 
+          return (
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              width="100%"
+              height="100%"
+            >
+              <Typography
+                fontSize={12}
+                fontFamily="Noto Sans Lao"
+                color={colors.grey[100]}
+              >
+                {percent.toFixed(2)} %
+              </Typography>
+            </Box>
+          );
+        },
+      },
+    ],
+    [colors, totalAllRevenue]
+  );
 
   const handlePrint = () => {
     const formatCell = (value) => {
@@ -317,13 +356,19 @@ const DataGridReportTreekoff = () => {
 
   return (
     <>
-      <Box
-        display="flex"
-        alignItems="center"
-        gap="20px"
-      >
+      <Box display="flex" alignItems="center" gap="20px">
         {/* ✅ Multi-select with chips for excluded statuses */}
-
+        ຍອດຂາຍລວມທັງຫມົດທຸກເມນູ{" "}
+        <span
+          style={{
+            fontFamily: "Noto Sans Lao",
+            fontSize: 20,
+            color: "rgba(0, 240, 24, 1)",
+          }}
+        >
+          {(totalAllRevenue || 0).toLocaleString()} ກີບ
+        </span>
+        
         <Button
           variant="contained"
           color="info"
