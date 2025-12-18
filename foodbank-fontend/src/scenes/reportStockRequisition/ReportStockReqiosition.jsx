@@ -590,7 +590,7 @@ const ReportStockReqiosition = () => {
               }}
             >
               {total < 0 && avgReq > 0
-                ? `${formatQty(Math.abs(total + 8) * avgReq)} ${
+                ? `${formatQty((Math.abs(total) + 8) * avgReq)} ${
                     variant?.variantName
                   }`
                 : "-"}
