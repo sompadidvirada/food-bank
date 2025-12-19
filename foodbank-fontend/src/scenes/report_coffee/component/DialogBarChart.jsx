@@ -20,9 +20,11 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const CustomTooltip = ({ id, value, indexValue, data }) => {
+const CustomTooltip = ({ id, value, indexValue, data, totalValue }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
+  const percentage = totalValue > 0 ? (value / totalValue) * 100 : 0;
+  const formattedPercentage = percentage.toFixed(2);
 
   return (
     <Card
@@ -38,7 +40,7 @@ const CustomTooltip = ({ id, value, indexValue, data }) => {
       >
         <Typography
           variant="h6"
-          sx={{ fontSize: 14, fontWeight: "bold", mb: 1 }}
+          sx={{ fontSize: 12, fontWeight: "bold", mb: 1 }}
         >
           {data.coffeeMenuName}
         </Typography>
@@ -46,7 +48,14 @@ const CustomTooltip = ({ id, value, indexValue, data }) => {
         <strong>ຍອດຂາຍ:</strong>
         <br />
         <Typography fontFamily={"Noto Sans Lao"}>
-          ຈຳນວນ: {value ? value.toLocaleString("en-US") : 0}
+          ຈຳນວນ: {value ? value.toLocaleString("en-US") : 0} ຈອກ
+        </Typography>
+        <Typography fontFamily={"Noto Sans Lao"}>
+          ເປີເຊັນ: {formattedPercentage}%
+        </Typography>
+        <Typography fontFamily={"Noto Sans Lao"}>
+          ຈາກຍອດຂາຍທັງຫມົດຂອງສາຂາ:{" "}
+          {totalValue ? totalValue.toLocaleString("en-US") : 0} ຈອກ
         </Typography>
       </CardContent>
     </Card>
@@ -75,6 +84,8 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
       .sort((a, b) => b.value - a.value);
   }, [selectDataBar]);
 
+  const totalValue = chartData.reduce((sum, item) => sum + item.value, 0);
+
   const highestValue =
     chartData.length > 0 ? Math.max(...chartData.map((d) => d.value)) : 0;
 
@@ -90,7 +101,6 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
     // handleClose();
     setOpen2Dialog(true);
   };
-
 
   return (
     <>
@@ -132,7 +142,7 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
               >
                 ວັນທີ{" "}
                 {/* Use length check for the safest guard against empty string, null, and undefined */}
-                {queryForm.startDate 
+                {queryForm.startDate
                   ? new Date(queryForm.startDate).toLocaleDateString("en-GB", {
                       day: "2-digit",
                       month: "2-digit",
@@ -171,7 +181,9 @@ const DialogBarChart = ({ open, setOpen, selectDataBar, setSelectDataBar }) => {
                 maxValue={dynamicMaxValue}
                 enableLabel={true}
                 labelSkipWidth={28}
-                tooltip={(props) => <CustomTooltip {...props} />}
+                tooltip={(props) => (
+                  <CustomTooltip {...props} totalValue={totalValue} />
+                )}
                 axisTop={null}
                 axisRight={null}
                 enableGridY={false}
