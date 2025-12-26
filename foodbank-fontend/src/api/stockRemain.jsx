@@ -12,15 +12,27 @@ export const getStockRemain = (token) => {
 export const createStockRemain = (form, token) => {
   return axios.post(`${URL}/createstockremain`, form, {
     headers: {
-      Authorization: `Bearer ${token}`
-    }
-  })
-}
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 export const deleteStockRemain = (token) => {
-  return axios.post(`${URL}/deletestockremain`, {}, {
-    headers: {
-      Authorization: `Bearer ${token}`
+  return axios.post(
+    `${URL}/deletestockremain`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     }
-  })
-}
+  );
+};
+
+export const editStockRemain = (id, form, token) => {
+  return axios.put(`${URL}/updatestockreamin/${id}`, form, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};

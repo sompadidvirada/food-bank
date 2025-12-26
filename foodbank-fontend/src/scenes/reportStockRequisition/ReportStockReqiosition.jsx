@@ -22,9 +22,10 @@ import {
 import SelectMaterialVariantForStock from "./component/SelectMaterialVariantForStock";
 import PrintReportStockRequisition from "./component/PrintReportStockRequisition";
 import ImageModal from "../../component/ImageModal";
-import { deleteStockRemain, getStockRemain } from "../../api/stockRemain";
+import { deleteStockRemain, editStockRemain, getStockRemain } from "../../api/stockRemain";
 import UploadFile from "./component/UploadFile";
 import { toast } from "react-toastify";
+import DialogEditStockRemain from "./component/DialogEditStockRemain";
 const URL =
   "https://treekoff-storage-rawmaterials.s3.ap-southeast-2.amazonaws.com";
 
@@ -171,6 +172,7 @@ const ReportStockReqiosition = () => {
     });
     return map;
   }, [rawMaterialVariants]);
+
 
   const columns = [
     { field: "id", headerName: "ໄອດີ", width: 52 },
@@ -400,21 +402,8 @@ const ReportStockReqiosition = () => {
               overflowWrap: "break-word",
             }}
           >
-            <Typography
-              sx={{
-                fontFamily: "Noto Sans Lao",
-                fontSize: 13,
-                whiteSpace: "normal",
-                wordBreak: "break-word",
-              }}
-              color={colors.greenAccent[200]}
-            >
-              {stock?.calculatedStock
-                ? `${stock.calculatedStock.toLocaleString()} (${
-                    variant?.variantName
-                  }) `
-                : `0`}
-            </Typography>
+            
+            <DialogEditStockRemain stock={stock} variant={variant} fecthStockRemain={fecthStockRemain}/>
           </Box>
         );
       },
