@@ -790,7 +790,7 @@ const ReportStockReqiosition = () => {
           >
             <Box>
               <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize: 20 }}>
-                ເປັນຈຳນວນມື້ທັງໝົດ {diffDays ? diffDays : "0"} ມື້
+                ເປັນຈຳນວນມື້ທັງໝົດ {diffDays ? diffDays : "0"} ມື້ / ມີຈຳນວນສາຂາທັງໝົດ ${countBranch} ສາຂາ
               </Typography>
             </Box>
           </Box>
