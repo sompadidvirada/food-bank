@@ -23,7 +23,6 @@ const DialogEditStockRemain = ({ stock, variant, fecthStockRemain }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-
   const handleEditStock = async (id, count) => {
     try {
       const ress = await editStockRemain(id, count, token);
@@ -37,7 +36,7 @@ const DialogEditStockRemain = ({ stock, variant, fecthStockRemain }) => {
     setEditCount({
       id: variant?.rawMaterialId,
       count: stock?.calculatedStock,
-      materialVariantId: variant?.materialVariantId
+      materialVariantId: variant?.materialVariantId,
     });
   };
 
@@ -64,7 +63,10 @@ const DialogEditStockRemain = ({ stock, variant, fecthStockRemain }) => {
     try {
       await handleEditStock(
         editCount?.id,
-        { editCount: editCount?.count, materialVariantId: editCount?.materialVariantId },
+        {
+          editCount: editCount?.count,
+          materialVariantId: editCount?.materialVariantId,
+        },
         token
       );
       fecthStockRemain();
@@ -83,6 +85,9 @@ const DialogEditStockRemain = ({ stock, variant, fecthStockRemain }) => {
           whiteSpace: "normal",
           wordBreak: "break-word",
           cursor: "pointer",
+          "&:hover": {
+            color: colors.greenAccent[500], // Replace with your desired hover color
+          },
         }}
         onClick={handleClickOpen}
         color={colors.greenAccent[200]}

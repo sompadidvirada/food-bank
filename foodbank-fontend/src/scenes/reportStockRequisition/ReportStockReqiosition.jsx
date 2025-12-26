@@ -406,10 +406,10 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avgReq)
-                  ? `${((avgReq * 30) / countBranch).toFixed(2)} (${variant?.variantName}) / ສາຂາ`
+                  ? `${((avgReq * 30) / countBranch).toFixed(2)} (${variant?.variantName}) / ສາຂາ / ເດືອນ`
                   : `${((avgReq * 30) / countBranch).toFixed(2)} (${
                       variant?.variantName
-                    }) / ສາຂາ`
+                    }) / ສາຂາ / ເດືອນ`
                 : "-"}
             </Typography>
           </Box>
