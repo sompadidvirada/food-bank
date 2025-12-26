@@ -36,11 +36,14 @@ const ReportStockReqiosition = () => {
   const [rawMaterialVariants, setRawMaterialVariants] = useState([]);
   const [rawMaterial, setRawMaterial] = useState([]);
   const [stockRemain, setStockRemain] = useState([]);
+  const branchs = useFoodBankStorage((s)=>s.branchs)
   const [queryForm, setQueryFormState] = useState({
     startDate: "",
     endDate: "",
     branchId: "",
   });
+  const countBranch = branchs ? branchs?.length : 0
+
   const [stockRequisitionData, setStockRequisitionData] = useState([]);
   const [branchName, setBranchName] = useState();
 
@@ -368,10 +371,45 @@ const ReportStockReqiosition = () => {
             >
               {stockReq?.quantityRequition != null
                 ? Number.isInteger(avgReq)
-                  ? `${avgReq * 30} (${variant?.variantName}) / ເດືອນ`
+                  ? `${(avgReq * 30)} (${variant?.variantName}) / ເດືອນ`
                   : `${(avgReq * 30).toFixed(2)} (${
                       variant?.variantName
                     }) / ເດືອນ`
+                : "-"}
+            </Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      field: "averageRequisitioPerBranch",
+      headerName: "ໃຊ້ສະເລ່ຍຕໍ່ສາຂາ",
+      type: "number",
+      headerAlign: "right",
+      width: 150,
+      align: "right",
+      renderCell: (params) => {
+        const variant = variantMap.get(params.row.id);
+
+        const stockReq = stockReqMap.get(
+          `${params.row.id}_${variant?.materialVariantId}`
+        );
+
+        const avgReq =
+          stockReq && diffDays > 0 ? stockReq.quantityRequition / diffDays : 0;
+
+        return (
+          <Box sx={{ height: "100%", width: "100%", alignContent: "center" }}>
+            <Typography
+              sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
+              color={colors.blueAccent[400]}
+            >
+              {stockReq?.quantityRequition != null
+                ? Number.isInteger(avgReq)
+                  ? `${((avgReq * 30) / countBranch).toFixed(2)} (${variant?.variantName}) / ສາຂາ`
+                  : `${((avgReq * 30) / countBranch).toFixed(2)} (${
+                      variant?.variantName
+                    }) / ສາຂາ`
                 : "-"}
             </Typography>
           </Box>

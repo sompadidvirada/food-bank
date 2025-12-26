@@ -23,12 +23,10 @@ const DialogEditStockRemain = ({ stock, variant, fecthStockRemain }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
 
-  console.log(variant);
 
   const handleEditStock = async (id, count) => {
     try {
       const ress = await editStockRemain(id, count, token);
-      console.log(ress);
     } catch (err) {
       console.log(err);
     }
