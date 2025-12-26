@@ -132,3 +132,36 @@ exports.deleteAllStockRemain = async (req, res) => {
     return res.status(500).json({ message: `server error` });
   }
 };
+
+exports.updateStockRemain = async (req, res) => {
+
+  try {
+    const { id } = req.params;
+    const { editCount, materialVariantId } = req.body;
+
+    if (!id || !editCount || !materialVariantId) {
+      return res.status(400).json({ message: `emty value to update.` });
+    }
+
+   // Delete all stock_remain records where the variant belongs to the rawMaterial
+    const deleteResult = await prisma.stock_remain.deleteMany({
+      where: {
+        materialVariant: {
+          rawMaterialId: Number(id)
+        }
+      }
+    });
+
+    const createNewStockRemain = await prisma.stock_remain.create({
+      data: {
+        materialVariantId: Number(materialVariantId),
+        count: Number(editCount)
+      }
+    })
+
+    res.status(200).json({ message: `update success.` });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: `error update stockremain.` });
+  }
+};
