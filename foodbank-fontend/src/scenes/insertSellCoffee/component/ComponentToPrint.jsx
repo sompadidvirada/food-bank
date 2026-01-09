@@ -35,6 +35,12 @@ const ComponentToPrint = forwardRef(
       <h2>
         ປັ່ນ: {aggregatedCounts?.SMOOTIE ? aggregatedCounts?.SMOOTIE.toLocaleString() : 0} ຈອກ
       </h2>
+      <h2>
+        extra : {aggregatedCounts?.EXTRA ? aggregatedCounts?.EXTRA.toLocaleString() : 0} ຈອກ
+      </h2>
+      <h2>
+        pormotion : {aggregatedCounts?.PROMOTION ? aggregatedCounts?.PROMOTION.toLocaleString() : 0} ຈອກ
+      </h2>
       
 
       <table

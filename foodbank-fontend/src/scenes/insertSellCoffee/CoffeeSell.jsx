@@ -495,8 +495,8 @@ const getDetailedCheckedSales = (checked, coffeeMenu) => {
       ICED: 0,
       HOT: 0,
       SMOOTIE: 0,
-      // Add any other categories you want to track explicitly
-      OTHER: 0,
+      EXTRA:0,
+      PROMOTION:0
     };
 
     for (const sale of checked) {

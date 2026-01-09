@@ -328,7 +328,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
               type="number"
               onWheel={(e) => e.target.blur()}
               inputProps={{
-                min: 1,
+                min: 0,
               }}
               value={formData.sellPrice}
               onChange={handleChange}
