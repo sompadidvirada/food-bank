@@ -307,6 +307,7 @@ const UpdateCoffeeMenu = ({ row, fecthCoffeeMenu }) => {
                 <MenuItem value="ICED">ICED</MenuItem>
                 <MenuItem value="SMOOTIE">SMOOTIE</MenuItem>
                 <MenuItem value="EXTRA">EXTRA</MenuItem>
+                <MenuItem value="PROMOTION">PROMOTION</MenuItem>
               </Select>
             </FormControl>
 

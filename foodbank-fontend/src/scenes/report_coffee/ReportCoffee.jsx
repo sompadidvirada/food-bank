@@ -29,6 +29,8 @@ import useFoodBankStorage from "../../zustand/foodbank-storage";
 import DataGridReportTreekoff from "./component/DataGridReportTreekoff";
 import DialogBarChart from "./component/DialogBarChart";
 import DialogPieChart from "./component/DialogPieChart";
+import CoffeeMakerIcon from '@mui/icons-material/CoffeeMaker';
+import BeenhereIcon from '@mui/icons-material/Beenhere';
 
 // --- Component ย่อย: Stat Card ---
 const StatCard = ({ title, value, icon, color }) => (
@@ -187,7 +189,7 @@ export default function ReportCoffee() {
                       } ຈອກ`
                     : "0 ຈອກ"
                 }
-                icon={<BlenderIcon sx={{ color: "black" }} />}
+                icon={<CoffeeMakerIcon sx={{ color: "black" }} />}
                 color="warning"
               />
             </Grid>
@@ -202,6 +204,20 @@ export default function ReportCoffee() {
                     : "-"
                 }
                 icon={<BlenderIcon sx={{ color: "black" }} />}
+                color="warning"
+              />
+            </Grid>
+            <Grid item xs={10} md={3}>
+              <StatCard
+                title="ຍອດຂາຍ PROMOTION"
+                value={
+                  dataReport?.total_type_2
+                    ? `${
+                        dataReport?.total_type_2?.PROMOTION?.toLocaleString() || 0
+                      }`
+                    : "-"
+                }
+                icon={<BeenhereIcon sx={{ color: "black" }} />}
                 color="warning"
               />
             </Grid>
