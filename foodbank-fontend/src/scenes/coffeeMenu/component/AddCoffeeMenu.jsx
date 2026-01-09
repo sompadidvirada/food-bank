@@ -236,6 +236,8 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
               >
                 <MenuItem value="TALL">TALL</MenuItem>
                 <MenuItem value="SHORT">SHORT</MenuItem>
+                <MenuItem value="EXTRA">EXTRA</MenuItem>
+                <MenuItem value="PROMOTION">PROMOTION</MenuItem>
               </Select>
             </FormControl>
             <FormControl fullWidth>
@@ -268,6 +270,7 @@ const AddCoffeeMenu = ({ fecthCoffeeMenu }) => {
                 <MenuItem value="OVALTINE & MILO">OVALTINE & MILO</MenuItem>
                 <MenuItem value="MILK">MILK</MenuItem>
                 <MenuItem value="EXTRA">EXTRA</MenuItem>
+                <MenuItem value="PROMOTION">PROMOTION</MenuItem>
                 <MenuItem value="COCOA">COCOA</MenuItem>
                 <MenuItem value="MATCHA">MATCHA</MenuItem>
                 <MenuItem value="FRUIT JUICE">FRUIT JUICE</MenuItem>

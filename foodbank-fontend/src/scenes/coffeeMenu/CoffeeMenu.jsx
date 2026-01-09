@@ -165,7 +165,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
-              fontSize:12
+              fontSize: 12,
             }}
           >
             {row.name}
@@ -191,7 +191,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
-              fontSize:12
+              fontSize: 12,
             }}
           >
             {row.type ? row.type : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
@@ -217,7 +217,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
-              fontSize:12
+              fontSize: 12,
             }}
           >
             {row.type_2 ? row.type_2 : "ຍັງບໍ່ໄດ້ກຳນົດປະເພດ"}
@@ -243,7 +243,7 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
-              fontSize:12
+              fontSize: 12,
             }}
           >
             {row.size}
@@ -269,12 +269,10 @@ const CoffeeMenu = () => {
           <Typography
             sx={{
               fontFamily: "Noto Sans Lao",
-              fontSize:12
+              fontSize: 12,
             }}
           >
-            {row.sellPrice
-              ? `${row.sellPrice.toLocaleString()} ກີບ`
-              : "."}
+            {row.sellPrice ? `${row.sellPrice.toLocaleString()} ກີບ` : "."}
           </Typography>
         </Box>
       ),
@@ -299,7 +297,7 @@ const CoffeeMenu = () => {
             width="100%"
             height="100%"
           >
-            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize:12 }}>
+            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}>
               {ingredient
                 ? `${ingredient.totalIngredientUsePrice.toLocaleString()} ກີບ`
                 : "."}
@@ -328,7 +326,7 @@ const CoffeeMenu = () => {
             width="100%"
             height="100%"
           >
-            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize:12 }}>
+            <Typography sx={{ fontFamily: "Noto Sans Lao", fontSize: 12 }}>
               {ingredient
                 ? `${ingredient.percentage.toFixed(2)} %`
                 : "ຍັງບໍ່ໄດ້ຕັ້ງວັດຖຸດິບ"}
@@ -417,7 +415,7 @@ const CoffeeMenu = () => {
 
         <Box
           m="40px 0 0 0"
-          height="75vh"
+          height="95vh"
           sx={{
             "& .MuiDataGrid-root": {
               border: "none",
@@ -447,12 +445,18 @@ const CoffeeMenu = () => {
           <DataGrid
             rows={filteredRows}
             columns={columns}
-            hideFooter
             sx={{
               "& .MuiDataGrid-columnHeaders": {
                 fontFamily: "Noto Sans Lao",
                 fontWeight: "bold", // optional
                 fontSize: "16px", // optional
+              },
+            }}
+            initialState={{
+              pagination: {
+                paginationModel: {
+                  pageSize: 11,
+                },
               },
             }}
           />
