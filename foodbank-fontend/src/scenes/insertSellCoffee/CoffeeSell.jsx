@@ -434,7 +434,7 @@ const CoffeeSell = () => {
     },
   ];
 
-const getDetailedCheckedSales = (checked, coffeeMenu) => {
+  const getDetailedCheckedSales = (checked, coffeeMenu) => {
     // 1. Create Menu Map for O(1) lookup
     const menuMap = new Map();
     for (const menu of coffeeMenu) {
@@ -454,35 +454,35 @@ const getDetailedCheckedSales = (checked, coffeeMenu) => {
           productSellPrice: menuDetails.sellPrice,
           productImage: menuDetails.image,
           // Include type_2 directly for easier sorting/grouping
-          productType2: menuDetails.type_2, 
+          productType2: menuDetails.type_2,
         };
       } else {
         console.warn(
           `Menu item with ID ${sale.coffeeMenuId} not found for sale ID ${sale.id}`
         );
-        return { 
-            ...sale, 
-            menuDetails: { name: "Product Not Found" }, 
-            productType2: "Z_UNSORTED" // Use a key that sorts to the end
+        return {
+          ...sale,
+          menuDetails: { name: "Product Not Found" },
+          productType2: "Z_UNSORTED", // Use a key that sorts to the end
         };
       }
     });
 
     // 3. Sort the Detailed Sales Data by productType2
     detailedSales.sort((a, b) => {
-        // Use the productType2 field for sorting
-        const typeA = a.productType2 || ""; // Handle undefined/null safely
-        const typeB = b.productType2 || ""; 
-        
-        // Sorts alphabetically (e.g., COFFEE, ICED, SMOOTIE)
-        return typeA.localeCompare(typeB);
+      // Use the productType2 field for sorting
+      const typeA = a.productType2 || ""; // Handle undefined/null safely
+      const typeB = b.productType2 || "";
+
+      // Sorts alphabetically (e.g., COFFEE, ICED, SMOOTIE)
+      return typeA.localeCompare(typeB);
     });
 
     return detailedSales;
-};
+  };
 
   const detailedSalesData = getDetailedCheckedSales(checked, coffeeMenu);
-  
+
   const aggregateSalesByObject = (checked, coffeeMenu) => {
     // 1. Map Menu for Quick Lookup (O(1) efficiency)
     const menuMap = new Map();
@@ -495,8 +495,8 @@ const getDetailedCheckedSales = (checked, coffeeMenu) => {
       ICED: 0,
       HOT: 0,
       SMOOTIE: 0,
-      EXTRA:0,
-      PROMOTION:0
+      EXTRA: 0,
+      PROMOTION: 0,
     };
 
     for (const sale of checked) {
@@ -655,13 +655,19 @@ const getDetailedCheckedSales = (checked, coffeeMenu) => {
                   rows={coffeeMenu}
                   columns={columns}
                   autoHeight
-                  hideFooter
                   sx={{
                     width: "100%",
                     "& .MuiDataGrid-columnHeaders": {
                       fontFamily: "Noto Sans Lao",
                       fontWeight: "bold", // optional
                       fontSize: "14px", // optional
+                    },
+                  }}
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: 11,
+                      },
                     },
                   }}
                 />

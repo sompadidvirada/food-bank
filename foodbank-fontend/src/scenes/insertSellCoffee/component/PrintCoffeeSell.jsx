@@ -19,8 +19,6 @@ const PrintCoffeeSell = ({
     documentTitle: `ປີ່ນລາຍງານການຂາຍ ປະຈຳວັນທີ`,
   });
 
-  console.log(detailedSalesData)
-  console.log(aggregatedCounts)
 
   return (
     <Box>
