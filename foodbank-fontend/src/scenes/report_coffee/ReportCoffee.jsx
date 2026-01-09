@@ -191,6 +191,20 @@ export default function ReportCoffee() {
                 color="warning"
               />
             </Grid>
+            <Grid item xs={10} md={3}>
+              <StatCard
+                title="ຍອດຂາຍ EXTRA"
+                value={
+                  dataReport?.total_type_2
+                    ? `${
+                        dataReport?.total_type_2?.EXTRA?.toLocaleString() || 0
+                      }`
+                    : "-"
+                }
+                icon={<BlenderIcon sx={{ color: "black" }} />}
+                color="warning"
+              />
+            </Grid>
 
             <Grid item xs={12} md={12}>
               <Paper

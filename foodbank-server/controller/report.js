@@ -8,59 +8,53 @@ exports.reportPerBranch = async (req, res) => {
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
-    // Fetch all products with their available products (for all branches)
     const fecthProducts = await prisma.products.findMany({
       include: {
         available: true,
       },
     });
 
-    // Fetch all branches with tracking info within the date range
     const fecthBrach = await prisma.branch.findMany({
       include: {
         tracksell: {
-          where: {
-            sellAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { sellAt: { gte: start, lte: end } },
         },
         tracksend: {
-          where: {
-            sendAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { sendAt: { gte: start, lte: end } },
         },
         trackexp: {
-          where: {
-            expAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { expAt: { gte: start, lte: end } },
         },
       },
     });
 
-    // Generate result per branch
     const result = fecthBrach.map((brach) => {
       const detail = fecthProducts.map((product) => {
-        const totalSell = brach.tracksell
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.sellCount, 0);
+        // 1. Calculate Sell Totals using tracksell.sellPrice
+        const filteredSells = brach.tracksell.filter((s) => s.productsId === product.id);
+        const totalSell = filteredSells.reduce((sum, s) => sum + s.sellCount, 0);
+        const totalPriceSell = filteredSells.reduce((sum, s) => {
+            // Fallback to product.sellprice if the record's sellPrice is null
+            const priceToUse = s.sellPrice ?? product.sellprice; 
+            return sum + (s.sellCount * priceToUse);
+        }, 0);
 
-        const totalSend = brach.tracksend
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.sendCount, 0);
+        // 2. Calculate Send Totals using tracksend.price
+        const filteredSends = brach.tracksend.filter((s) => s.productsId === product.id);
+        const totalSend = filteredSends.reduce((sum, s) => sum + s.sendCount, 0);
+        const totalPriceSend = filteredSends.reduce((sum, s) => {
+            const priceToUse = s.price ?? product.price;
+            return sum + (s.sendCount * priceToUse);
+        }, 0);
 
-        const totalExp = brach.trackexp
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.expCount, 0);
+        // 3. Calculate Expire Totals using trackexp.price
+        const filteredExps = brach.trackexp.filter((s) => s.productsId === product.id);
+        const totalExp = filteredExps.reduce((sum, s) => sum + s.expCount, 0);
+        const totalPriceExp = filteredExps.reduce((sum, s) => {
+            const priceToUse = s.price ?? product.price;
+            return sum + (s.expCount * priceToUse);
+        }, 0);
 
-        // Find avilableproduct specific to this product and this branch
         const availableProduct = product.available.find(
           (ap) => ap.branchId === brach.id
         );
@@ -74,12 +68,10 @@ exports.reportPerBranch = async (req, res) => {
           totalSell,
           totalSend,
           totalExp,
-          totalPriceSend: product.price * totalSend,
-          totalPriceSell: product.sellprice * totalSell,
-          totalPriceExp: product.price * totalExp,
-          availableProductCount: availableProduct?.aviableStatus
-            ? availableProduct.count
-            : 0, // Optional chaining in case it's undefined
+          totalPriceSend, // Now calculated row-by-row
+          totalPriceSell, // Now calculated row-by-row
+          totalPriceExp,  // Now calculated row-by-row
+          availableProductCount: availableProduct?.aviableStatus ? availableProduct.count : 0,
         };
       });
 
@@ -109,28 +101,13 @@ exports.TotalData = async (req, res) => {
     const fecthBrach = await prisma.branch.findMany({
       include: {
         tracksell: {
-          where: {
-            sellAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { sellAt: { gte: start, lte: end } },
         },
         tracksend: {
-          where: {
-            sendAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { sendAt: { gte: start, lte: end } },
         },
         trackexp: {
-          where: {
-            expAt: {
-              gte: start,
-              lte: end,
-            },
-          },
+          where: { expAt: { gte: start, lte: end } },
         },
       },
     });
@@ -140,19 +117,30 @@ exports.TotalData = async (req, res) => {
       let totalSell = 0;
       let totalSend = 0;
       let totalExp = 0;
+      
+      // New accumulators for sums
+      let totalPriceSell = 0;
+      let totalPriceSend = 0;
+      let totalPriceEXP = 0;
 
       fecthBrach.forEach((branch) => {
-        totalSell += branch.tracksell
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.sellCount, 0);
+        // Calculate Sales
+        const filteredSales = branch.tracksell.filter((s) => s.productsId === product.id);
+        totalSell += filteredSales.reduce((sum, s) => sum + s.sellCount, 0);
+        // Sum the stored sellPrice directly
+        totalPriceSell += filteredSales.reduce((sum, s) => sum + ( s.sellCount * s.sellPrice || 0), 0);
 
-        totalSend += branch.tracksend
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.sendCount, 0);
+        // Calculate Shipments (Send)
+        const filteredSends = branch.tracksend.filter((s) => s.productsId === product.id);
+        totalSend += filteredSends.reduce((sum, s) => sum + s.sendCount, 0);
+        // Sum the stored price directly
+        totalPriceSend += filteredSends.reduce((sum, s) => sum + (s.sendCount * s.price || 0), 0);
 
-        totalExp += branch.trackexp
-          .filter((s) => s.productsId === product.id)
-          .reduce((sum, s) => sum + s.expCount, 0);
+        // Calculate Expiries (Exp)
+        const filteredExps = branch.trackexp.filter((s) => s.productsId === product.id);
+        totalExp += filteredExps.reduce((sum, s) => sum + s.expCount, 0);
+        // Sum the stored price directly
+        totalPriceEXP += filteredExps.reduce((sum, s) => sum + (s.expCount * s.price || 0), 0);
       });
 
       return {
@@ -165,9 +153,10 @@ exports.TotalData = async (req, res) => {
         totalSell,
         totalSend,
         totalExp,
-        totalPriceSend: product.price * totalSend,
-        totalPriceSell: product.sellprice * totalSell,
-        totalPriceEXP: product.price * totalExp,
+        // Now using the sums calculated above instead of multiplying count * product.price
+        totalPriceSend,
+        totalPriceSell,
+        totalPriceEXP,
       };
     });
 
