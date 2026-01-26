@@ -32,6 +32,8 @@ import { toast } from "react-toastify";
 import DialogOrder from "./component/DialogOrder";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
 import ImageModal from "../../component/ImageModal";
+import { getAllSupplyer } from "../../api/suppler";
+import SelectSupplyer from "./component/SelectSupplyer";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
@@ -60,66 +62,67 @@ const OrderManage = () => {
   const [selectDateBrachCheck, setSelectDateBrachCheck] = useState({
     orderDate: "",
     brachId: "",
+    supplyerId: "",
   });
   const date = new Date(selectDateBrachCheck?.orderDate);
   const dayName = date.toLocaleDateString("en-US", { weekday: "long" });
-const result = checked
-  ?.map((item) => {
-    const product = products.find((p) => p.id === item.productId);
-    if (!product) return null;
+  const result = checked
+    ?.map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      if (!product) return null;
 
-    const branchAvail = product.available?.find(
-      (a) => a.branchId === selectDateBrachCheck.brachId
-    );
-    if (!branchAvail || !branchAvail.aviableStatus) return null;
+      const branchAvail = product.available?.find(
+        (a) => a.branchId === selectDateBrachCheck.brachId,
+      );
+      if (!branchAvail || !branchAvail.aviableStatus) return null;
 
-    const totalSell = item.week1Sell + item.week2Sell + item.week3Sell;
-    const totalSend = item.week1Send + item.week2Send + item.week3Send;
-    const totalExp = item.week1Exp + item.week2Exp + item.week3Exp;
+      const totalSell = item.week1Sell + item.week2Sell + item.week3Sell;
+      const totalSend = item.week1Send + item.week2Send + item.week3Send;
+      const totalExp = item.week1Exp + item.week2Exp + item.week3Exp;
 
-    let orderWant = 0;
-    let highlight = false;
-    let valueadd = 0;
+      let orderWant = 0;
+      let highlight = false;
+      let valueadd = 0;
 
-    const baseDivisor = dayName === "Saturday" ? 10 : 11;
-    const baseMultiplier = dayName === "Saturday" ? 3 : 4;
-    orderWant = (totalSell / baseDivisor) * baseMultiplier;
+      const baseDivisor = dayName === "Saturday" ? 10 : 11;
+      const baseMultiplier = dayName === "Saturday" ? 3 : 4;
+      orderWant = (totalSell / baseDivisor) * baseMultiplier;
 
-    const isAStatus = product?.status === "A";
-    const isWednesday = dayName === "Wednesday";
+      const isAStatus = product?.status === "A";
+      const isWednesday = dayName === "Wednesday";
 
-    if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
-      if (isAStatus) {
-        valueadd = isWednesday ? 3 : 2;
-      } else {
-        valueadd = isWednesday ? 2 : 1;
+      if (totalSell >= totalSend && item.week1Sell >= item.week1Send) {
+        if (isAStatus) {
+          valueadd = isWednesday ? 3 : 2;
+        } else {
+          valueadd = isWednesday ? 2 : 1;
+        }
+
+        orderWant += valueadd;
+        highlight = true;
+
+        // 🧩 Condition TRUE → round down if decimal ≥ 0.5
+        const decimal = orderWant - Math.floor(orderWant);
+        if (decimal >= 0.5) {
+          orderWant = Math.floor(orderWant);
+        }
       }
 
-      orderWant += valueadd;
-      highlight = true;
-
-      // 🧩 Condition TRUE → round down if decimal ≥ 0.5
-      const decimal = orderWant - Math.floor(orderWant);
-      if (decimal >= 0.5) {
-        orderWant = Math.floor(orderWant);
-      }
-    } 
-
-    return {
-      ...item,
-      orderWant,
-      highlight,
-      valueadd,
-      category: product?.category,
-      name: product?.name,
-    };
-  })
-  .filter(Boolean);
-
+      return {
+        ...item,
+        orderWant,
+        highlight,
+        valueadd,
+        category: product?.category,
+        name: product?.name,
+      };
+    })
+    .filter(Boolean);
 
   const fecthPreviousOrderTrack = async () => {
     try {
       const ress = await getPreviousOrderTrack(selectDateBrachCheck, token);
+      console.log(ress)
       setPreviousOrderTrack(ress.data);
     } catch (err) {
       console.log(err);
@@ -199,7 +202,7 @@ const result = checked
         const productId = params.row.id;
         // Find the tracked product in `checkedOrder`
         const trackedProduct = checkedOrder?.find(
-          (item) => item?.productsId === productId
+          (item) => item?.productsId === productId,
         );
         if (trackedProduct) {
           return (
@@ -284,7 +287,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checkedOrder?.find(
-          (item) => item?.productsId === productId
+          (item) => item?.productsId === productId,
         );
         if (
           trackedProduct &&
@@ -313,7 +316,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = previousOrderTrack?.find(
-          (item) => item?.productsId === productId
+          (item) => item?.productsId === productId,
         );
         if (trackedProduct) {
           return (
@@ -345,7 +348,7 @@ const result = checked
       width: 100,
       renderCell: (params) => {
         const trackedProduct = result?.find(
-          (item) => item?.productId === params.row.id
+          (item) => item?.productId === params.row.id,
         );
 
         if (!trackedProduct) return <Box>No Data</Box>;
@@ -384,7 +387,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -416,7 +419,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -448,7 +451,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -480,7 +483,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -512,7 +515,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -544,7 +547,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -576,7 +579,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -608,7 +611,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -640,7 +643,7 @@ const result = checked
       renderCell: (params) => {
         const productId = params.row.id;
         const trackedProduct = checked?.find(
-          (item) => item?.productId === productId
+          (item) => item?.productId === productId,
         );
         if (trackedProduct) {
           return (
@@ -696,9 +699,9 @@ const result = checked
           "Only Wednesday or Saturday allowed.";
 
         if (isWedSatError) {
-          setAllowedd(true); // ✅ set true if specific error
+          setAllowedd(true);
         } else {
-          setAllowedd(false); // ✅ optional: reset to false if other errors
+          setAllowedd(false);
         }
 
         toast.error("ສ້າງຍອດສັ່ງໄດ້ສະເພາະວັນ ພຸດ - ເສົາ");
@@ -707,12 +710,20 @@ const result = checked
   };
 
   useEffect(() => {
-    if (selectDateBrachCheck.brachId && selectDateBrachCheck.orderDate) {
+    if (
+      selectDateBrachCheck.brachId &&
+      selectDateBrachCheck.orderDate &&
+      selectDateBrachCheck.supplyerId
+    ) {
       fetchDateBrachCheck();
       fecthconfirmOrder();
       fecthPreviousOrderTrack();
     }
-  }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate]);
+  }, [selectDateBrachCheck.brachId, selectDateBrachCheck.orderDate, selectDateBrachCheck.supplyerId]);
+
+  useEffect(() => {
+    fecthAllSupllyer();
+  }, []);
 
   const handleSetOrder = async (productId, countOrForm) => {
     let countToUse = 0;
@@ -763,12 +774,11 @@ const result = checked
       toast.error("ບໍ່ມີຂໍ້ມູນແນະນຳ");
       return;
     }
-
     try {
       await Promise.all(
         result.map(
-          (item) => handleSetOrder(item.productId, item.orderWant) // 👈 floor only when setting
-        )
+          (item) => handleSetOrder(item.productId, item.orderWant), // 👈 floor only when setting
+        ),
       );
 
       toast.success("ນຳໃຊ້ຈຳນວນແນະນຳສຳເລັດ");
@@ -778,32 +788,6 @@ const result = checked
     }
   };
 
-  function generateOrderUrl(baseUrl, orderDate, branchId, branchName) {
-    const params = new URLSearchParams({
-      orderDate, // should be in YYYY-MM-DD format
-      branchId,
-      branchName,
-    });
-    return `${baseUrl}?${params.toString()}`;
-  }
-  const handleCreateLink = () => {
-    const url = generateOrderUrl(
-      URLCUSTOMER,
-      selectDateBrachCheck?.orderDate,
-      selectDateBrachCheck?.brachId,
-      branchName
-    );
-
-    // Copy to clipboard
-    navigator.clipboard
-      .writeText(url)
-      .then(() => {
-        toast.success(`ກ໋ອປປີ້ລີ້ງສຳເລັດ.`);
-      })
-      .catch((err) => {
-        console.error("Failed to copy: ", err);
-      });
-  };
   const handleConfirmOrderChange = async (statuss) => {
     try {
       socket.emit("confirmOrderByAdmin", {
@@ -823,8 +807,6 @@ const result = checked
 
   useEffect(() => {
     const updateHandler = (data) => {
-      console.log("data:", data);
-      console.log("branch:", selectDateBrachCheck?.brachId);
       if (data.branchId === selectDateBrachCheck?.brachId) {
         setStatus(data);
       }
@@ -841,6 +823,17 @@ const result = checked
       socket.off("responeConfirmOrderCustomer", updateHandler);
     };
   }, [selectDateBrachCheck]);
+
+  const [supplyers, setSupplyer] = useState([]);
+
+  const fecthAllSupllyer = async () => {
+    try {
+      const ress = await getAllSupplyer(token);
+      setSupplyer(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Box m="20px">
@@ -864,6 +857,12 @@ const result = checked
             setSelectFormtracksell={setSelectFormtracksell}
             setSelectDateBrachCheck={setSelectDateBrachCheck}
             setBranchName={setBranchName}
+          />
+        </Box>
+        <Box>
+          <SelectSupplyer
+            supplyers={supplyers}
+            setSelectDateBrachCheck={setSelectDateBrachCheck}
           />
         </Box>
         <Box>
@@ -906,22 +905,6 @@ const result = checked
               ຢືນຢັນອໍເດີສາຂາ
             </Button>
           )}
-        </Box>
-        <Box>
-          <Button
-            variant="contained"
-            color="info"
-            startIcon={<AddLinkIcon />}
-            disabled={
-              selectFormtracksell?.orderDate && selectFormtracksell?.brachId
-                ? false
-                : true
-            }
-            onClick={handleCreateLink}
-            sx={{ fontFamily: "Noto Sans Lao", fontSize: 15 }}
-          >
-            ກ໋ອປປີ້ລີ້ງຍອດສັ່ງສາຂາ
-          </Button>
         </Box>
         <Box>
           <Button
@@ -971,19 +954,22 @@ const result = checked
       >
         {selectFormtracksell?.orderDate &&
         selectFormtracksell?.brachId &&
+        selectDateBrachCheck?.supplyerId &&
         !allowedd ? (
           <DataGrid
             rows={products?.filter((product) => {
               const hasValidCategory =
-                product.category?.name !== "ເຄື່ອງດື່ມ ແອວກໍຮໍ";
+                product.category?.name !== "ເຄື່ອງດື່ມ ແອວກໍຮໍ" 
 
               const isAvailable =
                 Array.isArray(product.available) &&
                 product.available.some(
-                  (item) => item.aviableStatus === true && item.branchId === 1
+                  (item) => item.aviableStatus === true && item.branchId === 1,
                 );
 
-              return hasValidCategory && isAvailable;
+              const isSupplyer = product.suppler_bakeryId === selectDateBrachCheck?.supplyerId
+
+              return hasValidCategory && isAvailable && isSupplyer
             })}
             columns={columns}
             hideFooter
@@ -1004,7 +990,7 @@ const result = checked
               fontWeight="bold"
               color={colors.grey[100]}
             >
-              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ" 
+              "ເລືອກວັນທີ່ ແລະ ສາຂາທີ່ຕ້ອງການເພີ່ມຂໍ້ມູນ"
             </Typography>
           </Box>
         )}

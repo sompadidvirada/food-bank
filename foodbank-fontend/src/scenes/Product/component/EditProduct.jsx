@@ -28,10 +28,11 @@ import axios from "axios";
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
 
-const EditProduct = ({ productRow }) => {
+const EditProduct = ({ productRow,supplyers }) => {
   {
     /**import theme setting */
   }
+
 
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -54,7 +55,7 @@ const EditProduct = ({ productRow }) => {
     const array = new Uint8Array(length);
     window.crypto.getRandomValues(array); // Secure random numbers
     return Array.from(array, (byte) => byte.toString(16).padStart(2, "0")).join(
-      ""
+      "",
     );
   };
 
@@ -69,8 +70,9 @@ const EditProduct = ({ productRow }) => {
     price: "",
     sellprice: "",
     categoryId: "",
+    suppler_bakeryId:"",
     lifetime: "",
-    status:""
+    status: "",
   });
 
   const handleOpen = (productRow) => {
@@ -218,11 +220,16 @@ const EditProduct = ({ productRow }) => {
             name="sellprice"
           />
 
-          <Box display="flex" gap="10px" sx={{width:"100%"}}>
+          <Box display="flex" gap="10px" sx={{ width: "100%" }}>
             {/* Select LifeTime */}
 
-            <FormControl sx={{ mt: "10px", width:"30%" }}>
-              <InputLabel id="category-label" sx={{fontFamily:"Noto Sans Lao"}}>ອາຍຸສິນຄ້າ</InputLabel>
+            <FormControl sx={{ mt: "10px", width: "30%" }}>
+              <InputLabel
+                id="category-label"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+              >
+                ອາຍຸສິນຄ້າ
+              </InputLabel>
               <Select
                 labelId="lifetime-label"
                 id="lifetime-select"
@@ -248,12 +255,17 @@ const EditProduct = ({ productRow }) => {
             </FormControl>
             {/* Select Category */}
 
-            <FormControl sx={{ mt: "10px", width:"30%" }}>
-              <InputLabel id="category-label" sx={{fontFamily:"Noto Sans Lao"}}>CATEGORY</InputLabel>
+            <FormControl sx={{ mt: "10px", width: "30%" }}>
+              <InputLabel
+                id="category-label"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+              >
+                CATEGORY
+              </InputLabel>
               <Select
                 labelId="category-label"
                 id="category-select"
-                sx={{fontFamily:"Noto Sans Lao"}}
+                sx={{ fontFamily: "Noto Sans Lao" }}
                 value={editProduct.categoryId} // ✅ This will now default to the selected category ID
                 onChange={(event) => {
                   // Update the categoryId in editProduct state
@@ -264,18 +276,26 @@ const EditProduct = ({ productRow }) => {
                 }}
               >
                 {categorys?.map((cate) => (
-                  <MenuItem key={cate.id} value={cate.id} sx={{fontFamily:"Noto Sans Lao"}}>
+                  <MenuItem
+                    key={cate.id}
+                    value={cate.id}
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
                     {cate.name}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-
             {/** SELECT STATUS */}
 
-            <FormControl sx={{ mt: "10px", width:"30%" }}>
-              <InputLabel id="status-label" sx={{fontFamily:"Noto Sans Lao"}}>ສະຖານະສິນຄ້າ</InputLabel>
+            <FormControl sx={{ mt: "10px", width: "30%" }}>
+              <InputLabel
+                id="status-label"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+              >
+                ສະຖານະສິນຄ້າ
+              </InputLabel>
               <Select
                 labelId="status-select"
                 id="status-select"
@@ -293,6 +313,39 @@ const EditProduct = ({ productRow }) => {
                 <MenuItem value={"LPB A"}>LPB A</MenuItem>
                 <MenuItem value={"LPB B"}>LPB B</MenuItem>
                 <MenuItem value={"LPB F"}>LPB F</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
+          <Box mt={2}>
+            <FormControl sx={{ mt: "10px", width: "30%" }}>
+              <InputLabel
+                id="category-label"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+              >
+                ບໍລິສັດຜູ້ສະໜອງ
+              </InputLabel>
+              <Select
+                labelId="category-label"
+                id="category-select"
+                sx={{ fontFamily: "Noto Sans Lao" }}
+                value={editProduct.suppler_bakeryId} // ✅ This will now default to the selected category ID
+                onChange={(event) => {
+                  // Update the categoryId in editProduct state
+                  setEditProduct({
+                    ...editProduct,
+                    suppler_bakeryId: Number(event.target.value),
+                  });
+                }}
+              >
+                {supplyers?.map((sup) => (
+                  <MenuItem
+                    key={sup.id}
+                    value={sup.id}
+                    sx={{ fontFamily: "Noto Sans Lao" }}
+                  >
+                    {sup.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>

@@ -99,6 +99,7 @@ exports.getProducts = async (req, res) => {
       include: {
         category: true,
         available: true,
+        supplerBakery: true
       },
     });
     res.send(allProduct);
@@ -155,6 +156,7 @@ exports.updateProduct = async (req, res) => {
       price,
       sellprice,
       categoryId,
+      suppler_bakeryId,
       lifetime,
       status,
       imageName,
@@ -218,6 +220,7 @@ exports.updateProduct = async (req, res) => {
         status: status,
         categoryId: Number(categoryId),
         image: imageName,
+        suppler_bakeryId: Number(suppler_bakeryId) ?? ""
       },
     });
     res.status(201).json({

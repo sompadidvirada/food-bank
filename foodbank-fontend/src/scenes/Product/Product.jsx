@@ -23,6 +23,8 @@ import AddCategory from "./component/AddCategory";
 import DeleteCategory from "./component/DeleteCategory";
 import { toast } from "react-toastify";
 import ImageModal from "../../component/ImageModal";
+import AddSupller from "./component/AddSupller";
+import { getAllSupplyer } from "../../api/suppler";
 
 const URL =
   "https://treekoff-store-product-image.s3.ap-southeast-2.amazonaws.com";
@@ -57,6 +59,17 @@ const Product = () => {
   const getCategory = useFoodBankStorage((state) => state.getCategory);
   const branch = useFoodBankStorage((state) => state.branchs);
   const user = useFoodBankStorage((state) => state.user);
+  const [supplyers, setSupplyer] = useState([]);
+
+  const fecthAllSupllyer = async () => {
+    try {
+      const ress = await getAllSupplyer(token);
+      console.log(ress)
+      setSupplyer(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   {
     /** column for DataGrid */
@@ -134,6 +147,27 @@ const Product = () => {
       },
     },
     {
+      field: "supplyer",
+      headerName: "ບໍລິສັດຜູ້ສະໜອງ",
+      type: "text",
+      headerAlign: "left",
+      flex: 0.3,
+      align: "left",
+      renderCell: (params) => {
+        return params.row.suppler_bakeryId ? (
+          <Typography
+            variant="laoText"
+            fontWeight="bold"
+            color={colors.grey[100]}
+          >
+            {params.row.supplerBakery.name}
+          </Typography>
+        ) : (
+          "No Supplyer"
+        );
+      },
+    },
+    {
       field: "price",
       headerName: "ລາຄາຕົ້ນທຶນ",
       flex: 0.3,
@@ -179,7 +213,7 @@ const Product = () => {
       renderCell: (params) => (
         <Box display="flex" justifyContent="space-around" width="100%">
           {/* Show EditIcon to everyone */}
-          <EditProduct productRow={params.row} />
+          <EditProduct productRow={params.row} supplyers={supplyers}/>
           {user?.role === "admin" && <DeleteProduct productRow={params.row} />}
         </Box>
       ),
@@ -208,6 +242,7 @@ const Product = () => {
   useEffect(() => {
     getProduct(true);
     getCategory(true);
+    fecthAllSupllyer()
   }, []);
 
   {
@@ -221,11 +256,12 @@ const Product = () => {
 
   return (
     <Box ml="20px">
-      <Header title="ລາຍການສິນຄ້າ"/>
+      <Header title="ລາຍການສິນຄ້າ" />
       <Box display={"flex"} gap={5} justifyContent={"center"}>
         <AddProduct />
         <AddCategory />
         <DeleteCategory />
+        <AddSupller />
       </Box>
       <Box
         height="75vh"

@@ -7,13 +7,13 @@ import useFoodBankStorage from "../../../zustand/foodbank-storage";
 import { getAllOrderTrack } from "../../../api/preorder";
 import { format, parseISO } from "date-fns";
 
-const PrintCompo = () => {
+const PrintCompo = ({supplyerId}) => {
   const componentRef = useRef();
   const [orders, setOrders] = useState([]);
   const products = useFoodBankStorage((state) => state.products);
   const token = useFoodBankStorage((state) => state.token);
   const dateConfirmOrder = useFoodBankStorage(
-    (state) => state.dateConfirmOrder
+    (state) => state.dateConfirmOrder,
   );
   const formattedDate = dateConfirmOrder?.orderDate
     ? format(parseISO(dateConfirmOrder.orderDate), "dd/MM/yyyy")
@@ -22,7 +22,7 @@ const PrintCompo = () => {
   const fetchDataAndPrint = async () => {
     try {
       // Fetch order data
-      const ordersRes = await getAllOrderTrack(dateConfirmOrder, token);
+      const ordersRes = await getAllOrderTrack({orderDate: dateConfirmOrder.orderDate, supplyerId: supplyerId }, token);
 
       setOrders(ordersRes.data);
 
@@ -45,7 +45,7 @@ const PrintCompo = () => {
         onClick={fetchDataAndPrint}
         variant="outlined"
         color="info"
-        disabled={dateConfirmOrder.orderDate ? false : true}
+        disabled={dateConfirmOrder.orderDate && supplyerId ? false : true}
         startIcon={<LocalPrintshopIcon />}
         sx={{ fontFamily: "Noto Sans Lao" }}
       >
@@ -55,7 +55,7 @@ const PrintCompo = () => {
         <CompoPrint
           componentRef={componentRef}
           orders={orders}
-          products={products}
+          products={products.filter((item)=> item.suppler_bakeryId === supplyerId)}
         />
       </Box>
     </>

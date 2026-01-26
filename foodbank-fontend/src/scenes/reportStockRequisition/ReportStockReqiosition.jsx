@@ -70,6 +70,7 @@ const ReportStockReqiosition = () => {
   // difference in days (rounded up or down depending what you need)
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
+  console.log(stockRequisitionData)
   const fecthStockRequisition = async () => {
     try {
       const ress = await getAllStockrequisition(queryForm, token);
@@ -139,14 +140,6 @@ const ReportStockReqiosition = () => {
     return Number.isInteger(value) ? value.toString() : value.toFixed(digits);
   };
 
-  const RightText = ({ children, color }) => (
-    <Typography
-      sx={{ fontFamily: "Noto Sans Lao", fontSize: 13 }}
-      color={color}
-    >
-      {children}
-    </Typography>
-  );
 
   const stockRemainMap = useMemo(() => {
     const map = new Map();

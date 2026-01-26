@@ -101,8 +101,8 @@ exports.updateOrderWant = async (req, res) => {
     const { id } = req.params;
     const { orderWant } = req.body;
 
-    console.log(id)
-    console.log(orderWant)
+    console.log(id);
+    console.log(orderWant);
     const chaneg = await prisma.orderTrack.update({
       where: {
         id: Number(id),
@@ -177,7 +177,11 @@ function createRange(startDate, endDate) {
 
 exports.getPassThreeWeekTrack = async (req, res) => {
   try {
-    const { orderDate, brachId } = req.body;
+    console.log(req.body);
+    const { orderDate, brachId, supplyerId } = req.body;
+    if (!orderDate || !brachId || !supplyerId) {
+      return res.status(400).json({ message: `emty data.` });
+    }
 
     const utcDate = parseISO(orderDate);
     const localDate = startOfDay(utcToZonedTime(utcDate, timeZone)); // ✅ Ensure Lao calendar day
@@ -189,48 +193,59 @@ exports.getPassThreeWeekTrack = async (req, res) => {
         .json({ message: "Only Wednesday or Saturday allowed." });
     }
 
-    const weekRanges = [];
-
-    if (dayName === "Wednesday") {
-      weekRanges.push(
-        createRange(subDays(localDate, 4), subDays(localDate, 1))
-      ); // 23–26
-      weekRanges.push(
-        createRange(subDays(localDate, 7), subDays(localDate, 5))
-      ); // 20–22
-      weekRanges.push(
-        createRange(subDays(localDate, 11), subDays(localDate, 8))
-      ); // 16–19
-    }
-
-    if (dayName === "Saturday") {
-      weekRanges.push(
-        createRange(subDays(localDate, 3), subDays(localDate, 1))
-      ); // 25–27
-      weekRanges.push(
-        createRange(subDays(localDate, 7), subDays(localDate, 4))
-      ); // 22–24
-      weekRanges.push(
-        createRange(subDays(localDate, 10), subDays(localDate, 8))
-      ); // 18–21
-    }
-
-    // 🔍 Optional debug log
-    console.log("📅 Week Ranges:");
-    weekRanges.forEach((r, i) => {
-      console.log(
-        `Week ${i + 1}: ${format(r.start, "yyyy-MM-dd")} to ${format(
-          r.end,
-          "yyyy-MM-dd"
-        )}`
-      );
+    const checkSupplyer = await prisma.suppler_bakery.findFirst({
+      where: {
+        id: Number(supplyerId),
+      },
     });
+    const weekRanges = [];
+    if (checkSupplyer.order_range_date === 3) {
+      if (dayName === "Wednesday") {
+        weekRanges.push(
+          createRange(subDays(localDate, 4), subDays(localDate, 1)),
+        );
+        weekRanges.push(
+          createRange(subDays(localDate, 7), subDays(localDate, 5)),
+        );
+        weekRanges.push(
+          createRange(subDays(localDate, 11), subDays(localDate, 8)),
+        );
+      }
 
+      if (dayName === "Saturday") {
+        weekRanges.push(
+          createRange(subDays(localDate, 3), subDays(localDate, 1)),
+        );
+        weekRanges.push(
+          createRange(subDays(localDate, 7), subDays(localDate, 4)),
+        );
+        weekRanges.push(
+          createRange(subDays(localDate, 10), subDays(localDate, 8)),
+        );
+      }
+    } else if (checkSupplyer.order_range_date === 7) {
+      weekRanges.push(
+        createRange(subDays(localDate, 7), subDays(localDate, 1)),
+      );
+      weekRanges.push(
+        createRange(subDays(localDate, 14), subDays(localDate, 8)),
+      );
+      weekRanges.push(
+        createRange(subDays(localDate, 22), subDays(localDate, 15)),
+      );
+    }
     const products = await prisma.tracksend.findMany({
-      where: { branchId: brachId },
+      where: {
+        branchId: brachId,
+        products: {
+          suppler_bakeryId: Number(supplyerId)
+        }
+      },
       select: { productsId: true },
       distinct: ["productsId"],
     });
+
+    console.log(products)
 
     const results = [];
 
@@ -288,8 +303,8 @@ exports.getPassThreeWeekTrack = async (req, res) => {
 
 exports.getAllORderTrack = async (req, res) => {
   try {
-    const { orderDate } = req.body;
-    if (!orderDate) {
+    const { orderDate, supplyerId } = req.body;
+    if (!orderDate || !supplyerId) {
       return res
         .status(500)
         .json({ message: `Something went wrong. No Data.` });
@@ -305,6 +320,9 @@ exports.getAllORderTrack = async (req, res) => {
           gte: startofDay,
           lt: endofDay,
         },
+        products: {
+          suppler_bakeryId: Number(supplyerId)
+        }
       },
       include: {
         branch: true,
@@ -448,7 +466,9 @@ exports.getPreviuosPreOrder = async (req, res) => {
     const { orderDate, brachId } = req.body;
 
     if (!orderDate || !brachId) {
-      return res.status(400).json({ message: "orderDate and brachId are required" });
+      return res
+        .status(400)
+        .json({ message: "orderDate and brachId are required" });
     }
 
     // Convert request date into Lao timezone

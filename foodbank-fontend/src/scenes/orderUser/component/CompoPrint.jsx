@@ -6,6 +6,8 @@ const CompoPrint = ({ componentRef, orders, products }) => {
   const dateConfirmOrder = useFoodBankStorage(
     (state) => state.dateConfirmOrder
   );
+
+  console.log(orders)
   // 1. Get all unique branch names
   const branchNames = Array.from(
     new Set(orders.map((o) => o.branch?.branchname || "Unknown"))
@@ -22,7 +24,6 @@ const CompoPrint = ({ componentRef, orders, products }) => {
     return hasValidCategory && isAvailable;
   });
 
-  console.log(filterProducts);
 
   // 2. Pivot data: Map productId -> { productName, price, branchQuantities, total }
   const pivotData = filterProducts.map((product) => {

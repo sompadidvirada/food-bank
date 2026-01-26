@@ -266,7 +266,7 @@ exports.getRawMaterial = async (req, res) => {
     // Transform response: pick only parent variant
     const formatted = ress.map((item) => {
       const parentVariant = item.materialVariant.find(
-        (v) => v.parentVariantId === null
+        (v) => v.parentVariantId === null,
       );
 
       return {
@@ -581,7 +581,7 @@ exports.getMaterialVariant = async (req, res) => {
           branchId: req.branchId,
           branch: req.branch.branchname,
         };
-      })
+      }),
     );
 
     res.json(normalized);
@@ -764,10 +764,9 @@ exports.getStockRequisitionAllItem = async (req, res) => {
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
 
-    // 1. Get all raw materials with flat variants
     const rawMaterials = await prisma.rawMaterial.findMany({
       include: {
-        materialVariant: true, // fetch all variants flat
+        materialVariant: true,
       },
     });
 
@@ -775,146 +774,107 @@ exports.getStockRequisitionAllItem = async (req, res) => {
 
     const results = [];
 
-    // 2. Process each raw material
     for (const rawMaterial of rawMaterials) {
       const variants = rawMaterial.materialVariant || [];
       if (!variants.length) continue;
 
-      // 2a. Build variant map and tree
+      // 1. Build local variant tree
       const variantMap = {};
       variants.forEach((v) => {
         variantMap[v.id] = { ...v, childVariants: [] };
       });
       variants.forEach((v) => {
-        if (v.parentVariantId) {
+        if (v.parentVariantId && variantMap[v.parentVariantId]) {
           variantMap[v.parentVariantId].childVariants.push(variantMap[v.id]);
         }
       });
+
       const rootVariants = variants
         .filter((v) => !v.parentVariantId)
         .map((v) => variantMap[v.id]);
 
-      // 2b. Fetch requisitions for all variants
+      // 2. Fetch Requisitions
       const variantIds = variants.map((v) => v.id);
       const requisitions = await prisma.stockRequisition.findMany({
         where: {
           materialVariantId: { in: variantIds },
-          ...(branchId !== "all" && { branchId }), // only filter branchId if not "all"
+          ...(branchId !== "all" && { branchId: Number(branchId) }),
           requisitionDate: { gte: start, lte: end },
         },
       });
 
-      // 2c. Build requisition map
-      const reqMap = {}; // quantities
-      const kipMap = {}; // total kip
-      const bathMap = {}; // total bath
+      // 3. Map actual DB quantities
+      const reqMap = {};
+      variants.forEach((v) => {
+        reqMap[v.id] = 0;
+      });
 
       for (const reqItem of requisitions) {
-        if (!reqMap[reqItem.materialVariantId]) {
-          reqMap[reqItem.materialVariantId] = 0;
-          kipMap[reqItem.materialVariantId] = 0;
-          bathMap[reqItem.materialVariantId] = 0;
-        }
         reqMap[reqItem.materialVariantId] += reqItem.quantityRequisition;
-        kipMap[reqItem.materialVariantId] += reqItem.totalPriceKip || 0;
-        bathMap[reqItem.materialVariantId] += reqItem.totalPriceBath || 0;
       }
 
-      // 3. Bottom-up calculation: sum child totals into parent
-      // 3. Bottom-up calculation: sum child totals into parent
+      // 4. Bottom-up: Gather everything into the Top-Level (e.g., all units to "Boxes")
       const bottomUp = (variant) => {
         let totalQty = reqMap[variant.id] || 0;
-        let totalKip = kipMap[variant.id] || 0;
-        let totalBath = bathMap[variant.id] || 0;
 
         for (const child of variant.childVariants) {
           const childQty = bottomUp(child);
-
-          if (child.quantityInParent) {
+          if (child.quantityInParent > 0) {
             totalQty += childQty / child.quantityInParent;
-          } else {
-            totalQty += childQty;
           }
-
-          totalKip += kipMap[child.id] || 0; // 👈 add child’s kip total
-          totalBath += bathMap[child.id] || 0; // 👈 add child’s bath total
         }
-
         reqMap[variant.id] = totalQty;
-        kipMap[variant.id] = totalKip;
-        bathMap[variant.id] = totalBath;
-
         return totalQty;
       };
 
-      // 4. Top-down distribution: distribute parent total to children
-      // 4. Top-down distribution: distribute parent total to children
-      const topDown = (
-        variant,
-        parentQty = 0,
-        parentKip = 0,
-        parentBath = 0
-      ) => {
-        let ownQty = reqMap[variant.id] || 0;
-        let ownKip = kipMap[variant.id] || 0;
-        let ownBath = bathMap[variant.id] || 0;
+      // 5. Top-down: FORCED distribution (This gives you 580 and 29000)
+      const finalMap = {};
+      const topDown = (variant, inheritedQty = null) => {
+        let currentQty;
 
-        // if no direct requisition but parent has values, distribute
-        if (parentQty > 0 && variant.quantityInParent && ownQty === 0) {
-          ownQty = parentQty * variant.quantityInParent;
-          ownKip = parentKip; // 👈 propagate parent's totalPriceKip
-          ownBath = parentBath; // 👈 propagate parent's totalPriceBath
+        if (inheritedQty === null) {
+          // This is the Root (Box) - use the sum of everything from bottomUp
+          currentQty = reqMap[variant.id];
+        } else {
+          // This is a Child (Pack/Cup) - multiply from the parent
+          currentQty = inheritedQty * (variant.quantityInParent || 0);
         }
 
-        reqMap[variant.id] = ownQty;
-        kipMap[variant.id] = ownKip;
-        bathMap[variant.id] = ownBath;
+        finalMap[variant.id] = currentQty;
 
         for (const child of variant.childVariants) {
-          topDown(child, ownQty, ownKip, ownBath);
+          topDown(child, currentQty);
         }
       };
 
-      // 5. Run bottomUp + topDown on all root variants
+      // Run logic
       for (const root of rootVariants) {
-        const total = bottomUp(root);
-        reqMap[root.id] = total;
-        topDown(root, total, kipMap[root.id] || 0, bathMap[root.id] || 0);
+        bottomUp(root);
+        topDown(root);
       }
 
-      // 6. Build result
-      const result = {
+      // 6. Build response
+      results.push({
         id: rawMaterial.id,
         rawMaterial: rawMaterial.name,
-        categoryMeterail: rawMaterial.categoryMaterialName,
         description: rawMaterial.description || "",
-        categoryMeterailId: rawMaterial.categoryMeterailId || null,
+        categoryMeterailId: rawMaterial.categoryMeterailId,
         image: rawMaterial.image || "",
         sizeUnit: rawMaterial.sizeUnit || "",
-        Allstockrequisition: variants.map((v) => {
-          const qty = reqMap[v.id] || 0;
-
-          // if requisitions exist, calculate directly from them
-          const totalKip = requisitions
+        Allstockrequisition: variants.map((v) => ({
+          id: v.id,
+          variantName: v.variantName,
+          // Keep actual price totals for that specific variant
+          totalPriceKip: requisitions
             .filter((r) => r.materialVariantId === v.id)
-            .reduce((sum, r) => sum + (r.totalPriceKip || 0), 0);
-
-          const totalBath = requisitions
+            .reduce((sum, r) => sum + (r.totalPriceKip || 0), 0),
+          totalPriceBath: requisitions
             .filter((r) => r.materialVariantId === v.id)
-            .reduce((sum, r) => sum + (r.totalPriceBath || 0), 0);
-
-          return {
-            id: v.id,
-            variantName: v.variantName,
-            totalPriceKip: totalKip || kipMap[v.id] || 0,
-            totalPriceBath: totalBath || bathMap[v.id] || 0,
-            barcode: v.barcode || "",
-            quantityRequition: qty,
-          };
-        }),
-      };
-
-      results.push(result);
+            .reduce((sum, r) => sum + (r.totalPriceBath || 0), 0),
+          barcode: v.barcode || "",
+          quantityRequition: finalMap[v.id] || 0,
+        })),
+      });
     }
 
     return res.json(results);
@@ -1059,7 +1019,7 @@ exports.updateMaterialVariantByExchangeRate = async (req, res) => {
           costPriceKip: Math.round(variant.costPriceBath * exchangeRate),
           sellPriceKip: Math.round(variant.costPriceBath * exchangeRate),
         },
-      })
+      }),
     );
 
     // Execute all updates atomically

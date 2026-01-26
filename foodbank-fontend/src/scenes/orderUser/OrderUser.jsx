@@ -42,6 +42,8 @@ import { toast } from "react-toastify";
 import PrintCompo from "./component/PrintCompo";
 import { format, isValid, parseISO } from "date-fns";
 import { useSocket } from "../../../socket-io-provider/SocketProvider";
+import SelectSupplyer from "./component/SelectSupplyer";
+import { getAllSupplyer } from "../../api/suppler";
 
 const URLCUSTOMER = "https://treekoff.store/customerorder";
 
@@ -49,35 +51,34 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-function createData(name, calories, fat, carbs, protein) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData("Frozen yoghurt", 159, 6.0, 24, 4.0),
-  createData("Ice cream sandwich", 237, 9.0, 37, 4.3),
-  createData("Eclair", 262, 16.0, 24, 6.0),
-  createData("Cupcake", 305, 3.7, 67, 4.3),
-  createData("Gingerbread", 356, 16.0, 49, 3.9),
-];
-
 const OrderUser = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const branchs = useFoodBankStorage((state) => state.branchs);
   const getBrnachs = useFoodBankStorage((state) => state.getBrnachs);
   const token = useFoodBankStorage((state) => state.token);
-  const [selectDateBrachCheck, setSelectDateBrachCheck] = useState("");
   const [status, setStatus] = useState([]);
   const [open, setOpen] = useState(false);
   const [idBranch, setIdbranch] = useState("");
   const [orderTrack, setOrderTrack] = useState([]);
   const [value, setValue] = useState("");
+  const [selectDateBrachCheck, setSelectDateBrachCheck] = useState({
+    supplyerId: "",
+  });
+  const [supplyers, setSupplyer] = useState([]);
+
+  const fecthAllSupllyer = async () => {
+    try {
+      const ress = await getAllSupplyer(token);
+      setSupplyer(ress.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   const socket = useSocket();
   const dateConfirmOrder = useFoodBankStorage(
-    (state) => state.dateConfirmOrder
+    (state) => state.dateConfirmOrder,
   );
-  const products = useFoodBankStorage((state) => state.products);
   const orderWantFilter = Object.values(
     orderTrack?.reduce((acc, item) => {
       if (!acc[item.branchId]) {
@@ -91,16 +92,11 @@ const OrderUser = () => {
         acc[item.branchId].totalOrderWant += 1;
       }
       return acc;
-    }, {})
+    }, {}),
   );
 
   const handleChange = (event) => {
     setValue(event.target.value);
-  };
-
-  const handleClickOpen = (id) => {
-    setOpen(true);
-    setIdbranch(id);
   };
 
   const handleClose = () => {
@@ -110,36 +106,8 @@ const OrderUser = () => {
   };
 
   const filterBranchs = branchs?.filter(
-    (item) => item.province === "ນະຄອນຫຼວງວຽງຈັນ"
+    (item) => item.province === "ນະຄອນຫຼວງວຽງຈັນ",
   );
-
-  function generateOrderUrl(baseUrl, orderDate, branchId, branchName) {
-    const params = new URLSearchParams({
-      orderDate,
-      branchId,
-      branchName,
-    });
-    return `${baseUrl}?${params.toString()}`;
-  }
-
-  const handleCreateLink = (name, id, phone) => {
-    const url = generateOrderUrl(
-      URLCUSTOMER,
-      dateConfirmOrder?.orderDate,
-      id,
-      name
-    );
-
-    const phoneNumber = `85620${phone}`;
-
-    // Keep URL as-is (encoded), no decodeURIComponent here
-    const message = `ນີ້ແມ່ນລີ້ງກວດລາຍການຂະໜົມ (ແກ້ໄຂໄດ້ບໍ່ເກີນ 10:30): ${url}`;
-
-    const whatsappUrl = `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(whatsappUrl, "_blank");
-  };
 
   const fecthconfirmOrder = async () => {
     if (!dateConfirmOrder) return;
@@ -156,8 +124,8 @@ const OrderUser = () => {
       const ress = await chanheStatusOrder(id, { status: status }, token);
       setStatus((prev) =>
         prev.map((item) =>
-          item.id === ress.data.id ? { ...item, ...ress.data } : item
-        )
+          item.id === ress.data.id ? { ...item, ...ress.data } : item,
+        ),
       );
     } catch (err) {
       console.log(err);
@@ -176,7 +144,7 @@ const OrderUser = () => {
     try {
       const ress = await changePhonenumber(
         { branchId: idBranch.id, phonenumber: value },
-        token
+        token,
       );
       getBrnachs(true);
       handleClose();
@@ -201,14 +169,16 @@ const OrderUser = () => {
     getBrnachs(true);
   }, [dateConfirmOrder]);
 
-
+  useEffect(() => {
+    fecthAllSupllyer();
+  }, []);
 
   useEffect(() => {
     const updateHandler = (data) => {
       setStatus((prevStatus) =>
         prevStatus.map((item) =>
-          item.id === data.id ? { ...item, ...data } : item
-        )
+          item.id === data.id ? { ...item, ...data } : item,
+        ),
       );
     };
 
@@ -221,13 +191,17 @@ const OrderUser = () => {
       const orderDateStr = orderDate.toISOString().split("T")[0];
 
       if (confirmDateStr !== orderDateStr) {
-        return console.log("block this confirm order cause it's not the date", confirmDateStr, orderDateStr);
+        return console.log(
+          "block this confirm order cause it's not the date",
+          confirmDateStr,
+          orderDateStr,
+        );
       }
       setStatus((prev) => {
         const exists = prev.some((item) => item.id === data.id);
         if (exists) {
           return prev.map((item) =>
-            item.id === data.id ? { ...item, ...data } : item
+            item.id === data.id ? { ...item, ...data } : item,
           );
         } else {
           return [...prev, data];
@@ -242,7 +216,7 @@ const OrderUser = () => {
       socket.off("updateConfirmStatusOrder", updateHandler);
       socket.off("responeConfirmOrderCustomer", responseHandler);
     };
-  }, [socket,dateConfirmOrder]);
+  }, [socket, dateConfirmOrder]);
 
   return (
     <Box m="20px">
@@ -254,7 +228,8 @@ const OrderUser = () => {
         gap="20px"
       >
         <CalendarOrderUser />
-        <PrintCompo />
+        <PrintCompo supplyerId={selectDateBrachCheck?.supplyerId}/>
+        <SelectSupplyer setSelectDateBrachCheck={setSelectDateBrachCheck} supplyers={supplyers}/>
       </Box>
       <Box sx={{ p: 3 }}>
         <Typography variant="Laotext" sx={{ fontSize: 20 }}>
@@ -311,7 +286,7 @@ const OrderUser = () => {
                     <TableCell align="right">
                       {(() => {
                         const checkOrderWant = orderWantFilter.find(
-                          (item) => item.branchId === row.id
+                          (item) => item.branchId === row.id,
                         );
                         if (
                           !checkOrderWant ||
@@ -338,7 +313,7 @@ const OrderUser = () => {
                     <TableCell align="right">
                       {(() => {
                         const foundStatus = status.find(
-                          (item) => item.branchId === row.id
+                          (item) => item.branchId === row.id,
                         );
                         if (!foundStatus || foundStatus.status === false) {
                           return (
@@ -399,7 +374,7 @@ const OrderUser = () => {
                     <TableCell align="right">
                       {(() => {
                         const foundStatus = status.find(
-                          (item) => item.branchId === row.id
+                          (item) => item.branchId === row.id,
                         );
                         if (!foundStatus || foundStatus.status === false) {
                           return <Box>-</Box>;

@@ -56,21 +56,30 @@ model branch {
 }
 
 model products {
-  id              Int                @id @unique @default(autoincrement())
-  name            String
-  price           Int
-  sellprice       Int
-  status          String             @default("A")
-  lifetime        Int                @default(7)
-  image           String?
-  tracksell       tracksell[]
-  tracksend       tracksend[]
-  trackexp        trackexp[]
-  available       availableproduct[]
-  category        category           @relation(fields: [categoryId], references: [id])
-  categoryId      Int
-  order           orderTrack[]
-  BaristarComment BaristarComment[]
+  id               Int                @id @unique @default(autoincrement())
+  name             String
+  price            Int
+  sellprice        Int
+  status           String             @default("A")
+  lifetime         Int                @default(7)
+  image            String?
+  tracksell        tracksell[]
+  tracksend        tracksend[]
+  trackexp         trackexp[]
+  available        availableproduct[]
+  category         category           @relation(fields: [categoryId], references: [id])
+  categoryId       Int
+  order            orderTrack[]
+  BaristarComment  BaristarComment[]
+  supplerBakery    suppler_bakery?    @relation(fields: [suppler_bakeryId], references: [id])
+  suppler_bakeryId Int?
+}
+
+model suppler_bakery {
+  id               Int        @id @default(autoincrement())
+  name             String
+  order_range_date Int        @default(3)
+  products         products[]
 }
 
 model category {
