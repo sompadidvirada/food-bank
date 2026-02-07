@@ -9,17 +9,18 @@ const App = () => {
   const [theme, colorMode] = useMode();
 
   return (
-    <SocketProvider>
-      <ColorModeContext.Provider value={colorMode}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <div className="app">
-            <AppRoutes />
-            <ToastContainer position="top-center" />
-          </div>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </SocketProvider>
+    // <SocketProvider>
+    //   <ColorModeContext.Provider value={colorMode}>
+    //     <ThemeProvider theme={theme}>
+    //       <CssBaseline />
+    //       <div className="app">
+    //         <AppRoutes />
+    //         <ToastContainer position="top-center" />
+    //       </div>
+    //     </ThemeProvider>
+    //   </ColorModeContext.Provider>
+    // </SocketProvider>
+    <>ປິດລະບົບອັປເດດຊົ່ວຄາວ ຈະເປີດກັບມານຳໃຊ້ໄວ້ໆນີ້</>
   );
 };
 
